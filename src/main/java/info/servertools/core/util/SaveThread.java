@@ -15,11 +15,42 @@
  */
 package info.servertools.core.util;
 
+import info.servertools.core.lib.Reference;
+
+import com.google.common.io.Files;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.annotation.Nullable;
+
 public class SaveThread extends Thread {
 
+    protected final Logger log = LogManager.getLogger();
+
     public final String data;
+    @Nullable
+    private File file;
 
     public SaveThread(String data) {
         this.data = data;
+    }
+
+    public SaveThread(String data, File file) {
+        this.data = data;
+        this.file = file;
+    }
+
+    @Override
+    public void run() {
+        if (file != null) {
+            try {
+                Files.write(data, file, Reference.CHARSET);
+            } catch (IOException e) {
+                log.warn("Failed to save file to disk", e);
+            }
+        }
     }
 }

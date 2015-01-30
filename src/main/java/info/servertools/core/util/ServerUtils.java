@@ -15,13 +15,15 @@
  */
 package info.servertools.core.util;
 
-import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
-import javax.annotation.Nullable;
+import com.mojang.authlib.GameProfile;
+
 import java.util.List;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 /**
  * Helper class with methods used for server functions and checks

@@ -15,19 +15,21 @@
  */
 package info.servertools.core.chat;
 
+import info.servertools.core.ServerTools;
+import info.servertools.core.lib.Reference;
+import info.servertools.core.util.ChatUtils;
+import info.servertools.core.util.GsonUtils;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumChatFormatting;
+
 import com.google.common.io.Files;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import gnu.trove.map.hash.THashMap;
-import info.servertools.core.ServerTools;
-import info.servertools.core.lib.Reference;
-import info.servertools.core.util.ChatUtils;
-import info.servertools.core.util.GsonUtils;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 

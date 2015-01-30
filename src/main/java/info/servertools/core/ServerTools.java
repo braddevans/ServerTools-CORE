@@ -15,10 +15,6 @@
  */
 package info.servertools.core;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.event.*;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.FMLInjectionData;
 import info.servertools.core.chat.Motd;
 import info.servertools.core.chat.NickHandler;
 import info.servertools.core.chat.VoiceHandler;
@@ -26,14 +22,29 @@ import info.servertools.core.command.CommandManager;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.task.TickHandler;
 import info.servertools.core.util.FlatBedrockGenerator;
+
 import net.minecraft.command.CommandHandler;
 import net.minecraft.server.MinecraftServer;
+
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.FMLInjectionData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, dependencies = Reference.DEPENDENCIES, acceptableRemoteVersions = "*", certificateFingerprint = Reference.FINGERPRINT)
+@Mod(
+        modid = Reference.MOD_ID,
+        name = Reference.MOD_NAME,
+        dependencies = Reference.DEPENDENCIES,
+        acceptableRemoteVersions = "*"
+)
 public class ServerTools {
 
     public static final File minecraftDir = (File) FMLInjectionData.data()[6];
@@ -42,7 +53,6 @@ public class ServerTools {
     public static final Logger LOG = LogManager.getLogger(Reference.MOD_NAME);
 
     static {
-        //noinspection ResultOfMethodCallIgnored
         serverToolsDir.mkdirs();
     }
 
@@ -58,24 +68,7 @@ public class ServerTools {
     public BlockLogger blockLogger;
 
     @Mod.EventHandler
-    public void fingerprintViolation(FMLFingerprintViolationEvent event) {
-        LOG.warn("****************************************************");
-        LOG.warn("*     Invalid ServerTools Fingerprint Detected     *");
-        LOG.warn("****************************************************");
-        LOG.warn("* Expected: " + event.expectedFingerprint);
-        LOG.warn("****************************************************");
-        LOG.warn("* Received: ");
-        for (String fingerprint : event.fingerprints) {
-            LOG.warn("*   " + fingerprint);
-        }
-        LOG.warn("****************************************************");
-        LOG.warn("*Unpredictable results may occur, please relownload*");
-        LOG.warn("****************************************************");
-    }
-
-    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-
         /* Initialize the Core Configuration */
         CoreConfig.init(new File(serverToolsDir, "core.cfg"));
 
@@ -88,7 +81,6 @@ public class ServerTools {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-
         /* Register the Flat Bedrock Generator */
         if (CoreConfig.GENERATE_FLAT_BEDROCK) {
             LOG.info("Registering Flat Bedrock Generator");
@@ -98,16 +90,21 @@ public class ServerTools {
 
     @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
-
         /* Initialize the Message of the Day */
-        if (motd == null) motd = new Motd(new File(serverToolsDir, "motd.txt"));
+        if (motd == null) { motd = new Motd(new File(serverToolsDir, "motd.txt")); }
 
         /* Initialize the Voice Handler */
-        if (voiceHandler == null) voiceHandler = new VoiceHandler();
+        if (voiceHandler == null) { voiceHandler = new VoiceHandler(); }
 
-        /* Initialize the Block Break Logger */
-        if (blockLogger == null && CoreConfig.LOG_BLOCK_BREAKS)
-            blockLogger = new BlockLogger(new File(serverToolsDir, "blockBreaks"));
+        /* Initialize the Block Logger */
+        if (blockLogger == null && (CoreConfig.LOG_BLOCK_BREAKS || CoreConfig.LOG_BLOCK_PLACES)) {
+            blockLogger = new BlockLogger(
+                    new File(serverToolsDir, "blockBreaks"),
+                    new File(serverToolsDir, "blockPlaces"),
+                    CoreConfig.LOG_BLOCK_BREAKS,
+                    CoreConfig.LOG_BLOCK_PLACES
+            );
+        }
 
         /* Initialize the Core Commands to be Registered */
         CommandManager.initCoreCommands();
@@ -115,7 +112,6 @@ public class ServerTools {
 
     @Mod.EventHandler
     public void serverStarted(FMLServerStartedEvent event) {
-
         /* Register All Commands In Queue */
         CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
         CommandManager.registerCommands(ch);
@@ -123,7 +119,6 @@ public class ServerTools {
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
-
         CommandManager.onServerStopped();
     }
 }

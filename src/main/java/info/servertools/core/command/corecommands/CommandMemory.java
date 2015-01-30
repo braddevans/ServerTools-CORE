@@ -15,12 +15,15 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static net.minecraft.util.EnumChatFormatting.AQUA;
+import static net.minecraft.util.EnumChatFormatting.RESET;
+import static net.minecraft.util.EnumChatFormatting.WHITE;
+
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.util.ChatUtils;
-import net.minecraft.command.ICommandSender;
 
-import static net.minecraft.util.EnumChatFormatting.*;
+import net.minecraft.command.ICommandSender;
 
 public class CommandMemory extends ServerToolsCommand {
 

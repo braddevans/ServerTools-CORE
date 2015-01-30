@@ -15,16 +15,17 @@
  */
 package info.servertools.core.chat;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import static net.minecraft.util.EnumChatFormatting.BLUE;
+import static net.minecraft.util.EnumChatFormatting.RED;
+import static net.minecraft.util.EnumChatFormatting.RESET;
+
 import info.servertools.core.CoreConfig;
 import info.servertools.core.ServerTools;
 import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
 import info.servertools.core.util.FileUtils;
 import info.servertools.core.util.ServerUtils;
+
 import net.minecraft.command.server.CommandBroadcast;
 import net.minecraft.command.server.CommandEmote;
 import net.minecraft.command.server.CommandMessage;
@@ -32,6 +33,11 @@ import net.minecraft.command.server.CommandMessageRaw;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumChatFormatting;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
@@ -43,8 +49,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Set;
-
-import static net.minecraft.util.EnumChatFormatting.*;
 
 public class VoiceHandler {
 
@@ -174,7 +178,7 @@ public class VoiceHandler {
         if (CoreConfig.COLOR_OP_CHAT_MESSAGE) {
 
             if (!MinecraftServer.getServer().isSinglePlayer() && ServerUtils.isOP(event.entityPlayer.getGameProfile())) {
-                event.displayname = String.valueOf(RED) + '[' + "OP" + "] " + RESET + event.displayname;
+                event.displayname = String.valueOf(RED) + '[' + CoreConfig.OP_CHAT_PREFIX + "] " + RESET + event.displayname;
             }
         }
 

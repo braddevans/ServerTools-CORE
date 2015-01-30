@@ -15,20 +15,22 @@
  */
 package info.servertools.core.command.corecommands;
 
-import com.google.common.collect.Lists;
-import cpw.mods.fml.common.registry.GameData;
 import info.servertools.core.CoreConfig;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.lib.Strings;
 import info.servertools.core.task.RemoveAllTickTask;
+
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+
+import com.google.common.collect.Lists;
+import cpw.mods.fml.common.registry.GameData;
 
 import java.util.HashSet;
 import java.util.List;

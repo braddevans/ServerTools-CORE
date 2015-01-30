@@ -17,16 +17,39 @@ package info.servertools.core.command;
 
 import info.servertools.core.CoreConfig;
 import info.servertools.core.ServerTools;
-import info.servertools.core.command.corecommands.*;
+import info.servertools.core.command.corecommands.CommandDisarm;
+import info.servertools.core.command.corecommands.CommandEntityCount;
+import info.servertools.core.command.corecommands.CommandHeal;
+import info.servertools.core.command.corecommands.CommandInventory;
+import info.servertools.core.command.corecommands.CommandKillAll;
+import info.servertools.core.command.corecommands.CommandKillPlayer;
+import info.servertools.core.command.corecommands.CommandMemory;
+import info.servertools.core.command.corecommands.CommandMotd;
+import info.servertools.core.command.corecommands.CommandNick;
+import info.servertools.core.command.corecommands.CommandPing;
+import info.servertools.core.command.corecommands.CommandReloadMotd;
+import info.servertools.core.command.corecommands.CommandRemoveAll;
+import info.servertools.core.command.corecommands.CommandSetNick;
+import info.servertools.core.command.corecommands.CommandSilence;
+import info.servertools.core.command.corecommands.CommandSpawnMob;
+import info.servertools.core.command.corecommands.CommandTPS;
+import info.servertools.core.command.corecommands.CommandVoice;
+import info.servertools.core.command.corecommands.CommandWhereIs;
+
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.CommandHelp;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 
 public class CommandManager {
 

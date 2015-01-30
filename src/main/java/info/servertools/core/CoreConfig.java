@@ -27,6 +27,7 @@ public class CoreConfig {
     public static boolean COLOR_OP_CHAT_MESSAGE;
     public static boolean GENERATE_FLAT_BEDROCK;
     public static boolean LOG_BLOCK_BREAKS;
+    public static boolean LOG_BLOCK_PLACES;
     public static int DEFAULT_REMOVE_ALL_RANGE;
     public static String OP_CHAT_PREFIX;
     public static String VOICE_CHAT_PREFIX;
@@ -42,9 +43,11 @@ public class CoreConfig {
 
             String category = "general";
 
+            configuration.renameProperty(category, "Color OP Messages", "Enable OP Prefix");
+
             DEBUG_MODE = configuration.get(category, "Debug Mode", false, "Spams the logs with debug info").getBoolean(false);
             SEND_MOTD_ON_LOGIN = configuration.get(category, "Send MOTD on Login", true, "Send the MOTD to players upon logging into the server").getBoolean(true);
-            COLOR_OP_CHAT_MESSAGE = configuration.get(category, "Color OP Messages", true, "Colors op's chat messages").getBoolean(true);
+            COLOR_OP_CHAT_MESSAGE = configuration.get(category, "Enable OP Prefix", true, "Gives OPs a prefix in chat").getBoolean(true);
             GENERATE_FLAT_BEDROCK = configuration.get(category, "Enable Flat Bedrock", true, "Causes bedrock to generate only one layer thick").getBoolean(true);
             DEFAULT_REMOVE_ALL_RANGE = configuration.get(category, "Default RemoveAll Range", 20, "The default range for the /removeall command").getInt();
             OP_CHAT_PREFIX = configuration.get(category, "OP Chat Prefix", "OP", "The prefix in chat for server operators").getString();
@@ -53,6 +56,7 @@ public class CoreConfig {
 
             category = "world";
             LOG_BLOCK_BREAKS = configuration.get(category, "Log Block Breaks", false, "This will log all blocks broken by players and fake players").getBoolean(false);
+            LOG_BLOCK_PLACES = configuration.get(category, "Log Block Places", false, "This will log all blocks placed by players and fake players").getBoolean(false);
 
         } catch (Exception e) {
             ServerTools.LOG.log(Level.FATAL, "Failed to load core configuration", e);

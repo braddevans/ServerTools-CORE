@@ -15,13 +15,13 @@
  */
 package info.servertools.core.util;
 
+import info.servertools.core.ServerTools;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
-import info.servertools.core.ServerTools;
 import org.apache.logging.log4j.Level;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -29,6 +29,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.concurrent.Callable;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Helper class for interacting with Mojang accounts

@@ -15,20 +15,26 @@
  */
 package info.servertools.core.chat;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
 import info.servertools.core.CoreConfig;
 import info.servertools.core.ServerTools;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
 import info.servertools.core.util.FileUtils;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import org.apache.logging.log4j.Level;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

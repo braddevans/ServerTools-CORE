@@ -15,14 +15,15 @@
  */
 package info.servertools.core;
 
+import info.servertools.core.lib.Reference;
+import info.servertools.core.util.SaveThread;
+
+import com.google.common.io.Files;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
-import org.apache.logging.log4j.Level;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,49 +31,100 @@ import java.util.Calendar;
 
 public class BlockLogger {
 
-    private File logDirectory;
-
-    private static final String FILE_HEADER = "TimeStamp,PlayerName,DimID,BlockX,BlockY,BlockZ,BlockName";
+    private static final String FILE_HEADER = "TimeStamp,UUID,DimID,BlockX,BlockY,BlockZ,BlockName";
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-YYYY");
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("kk-mm-ss");
 
-    public BlockLogger(File logDirectory) {
+    private final File breakDirectory;
+    private final File placeDirectory;
 
-        if (logDirectory.exists() && !logDirectory.isDirectory())
-            throw new IllegalArgumentException("File with same name as block logging directory detected");
+    private final boolean logBlockPlaces;
+    private final boolean logBlockBreaks;
 
-        //noinspection ResultOfMethodCallIgnored
-        logDirectory.mkdirs();
 
-        this.logDirectory = logDirectory;
+    public BlockLogger(File breakDirectory, File placeDirectory, boolean logBlockBreaks, boolean logBlockPlaces) {
+        this.logBlockBreaks = logBlockBreaks;
+        this.logBlockPlaces = logBlockPlaces;
+        this.breakDirectory = breakDirectory;
+        this.placeDirectory = placeDirectory;
+        if (logBlockBreaks) {
+            if (breakDirectory.exists() && !breakDirectory.isDirectory()) {
+                throw new IllegalArgumentException("File with same name as block break logging directory detected");
+            }
+            breakDirectory.mkdirs();
+        }
+        if (logBlockPlaces) {
+            if (placeDirectory.exists() && !placeDirectory.isDirectory()) {
+                throw new IllegalArgumentException("File with same name as block place logging directory detected");
+            }
+            placeDirectory.mkdirs();
+        }
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event) {
+        if (!logBlockBreaks) { return; }
+        final File logFile = new File(breakDirectory, DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".csv");
+        new SaveThread(String.format(
+                "%s,%s,%s,%s,%s,%s,%s",
+                TIME_FORMAT.format(Calendar.getInstance().getTime()), //When was it placed
+                event.getPlayer().getPersistentID(), // Who placed it (UUID)
+                event.world.provider.dimensionId, // What dimension was it in
+                event.x, // XCoord
+                event.y, // YCoord
+                event.z, // ZCoord
+                event.block.getUnlocalizedName() // What block was it
 
-        File logFile = new File(logDirectory, DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".csv");
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
-
-            if (!logFile.exists())
-                writeHeader(logFile);
-
-            writer.write(String.format("%s,%s,%s,%s,%s,%s,%s", TIME_FORMAT.format(Calendar.getInstance().getTime()), event.getPlayer().getCommandSenderName(),
-                    event.world.provider.dimensionId, event.x, event.y, event.z, event.block.getUnlocalizedName()));
-            writer.newLine();
-        } catch (IOException e) {
-            ServerTools.LOG.log(Level.WARN, "Failed to write block break event to file", e);
-        }
+        ) + Reference.LINE_SEPARATOR) {
+            @Override
+            public void run() {
+                synchronized (breakDirectory) {
+                    try {
+                        if (!logFile.exists()) {
+                            writeHeader(logFile);
+                        }
+                        Files.append(data, logFile, Reference.CHARSET);
+                    } catch (IOException e) {
+                        super.log.warn("Failed to save block break file to disk", e);
+                    }
+                }
+            }
+        }.start();
     }
 
-    private static void writeHeader(File file) {
+    @SubscribeEvent
+    public void onBlockPlace(BlockEvent.PlaceEvent event) {
+        if (!logBlockPlaces) { return; }
+        final File logFile = new File(placeDirectory, DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".csv");
+        new SaveThread(String.format(
+                "%s,%s,%s,%s,%s,%s,%s",
+                TIME_FORMAT.format(Calendar.getInstance().getTime()), //When was it placed
+                event.player.getPersistentID(), // Who placed it (UUID)
+                event.world.provider.dimensionId, // What dimension was it in
+                event.x, // XCoord
+                event.y, // YCoord
+                event.z, // ZCoord
+                event.block.getUnlocalizedName() // What block was it
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write(FILE_HEADER);
-            writer.newLine();
-        } catch (IOException e) {
-            ServerTools.LOG.log(Level.ERROR, "Failed to write BlockLogger header", e);
-        }
+        ) + Reference.LINE_SEPARATOR) {
+            @Override
+            public void run() {
+                synchronized (placeDirectory) {
+                    try {
+                        if (!logFile.exists()) {
+                            writeHeader(logFile);
+                        }
+                        Files.append(data, logFile, Reference.CHARSET);
+                    } catch (IOException e) {
+                        super.log.warn("Failed to save block place file to disk", e);
+                    }
+                }
+            }
+        }.start();
+    }
+
+    private static void writeHeader(File file) throws IOException {
+        Files.append(FILE_HEADER + Reference.LINE_SEPARATOR, file, Reference.CHARSET);
     }
 }

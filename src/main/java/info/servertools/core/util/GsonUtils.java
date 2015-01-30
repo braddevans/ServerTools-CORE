@@ -15,12 +15,17 @@
  */
 package info.servertools.core.util;
 
+import info.servertools.core.lib.Reference;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import info.servertools.core.lib.Reference;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 /**
  * Variety of helper methods for dealing with serializing/deserializing via {@link com.google.gson.Gson Gson}
