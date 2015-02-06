@@ -28,9 +28,10 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 import com.google.common.collect.Lists;
-import cpw.mods.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameData;
 
 import java.util.HashSet;
 import java.util.List;
@@ -55,14 +56,14 @@ public class CommandRemoveAll extends ServerToolsCommand {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
 
         List<String> blockNames = getBlockNames();
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, blockNames.toArray(new String[blockNames.size()])) : null;
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] strings) {
+    public void processCommand(ICommandSender sender, String[] strings) throws CommandException {
 
         if (!(sender instanceof EntityPlayerMP))
             throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER);

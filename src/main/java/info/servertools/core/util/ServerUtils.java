@@ -99,7 +99,7 @@ public final class ServerUtils {
 
         Util.checkNotNull(entityPlayer, location);
 
-        if (entityPlayer.worldObj.provider.dimensionId != location.dimID)
+        if (entityPlayer.worldObj.provider.getDimensionId() != location.dimID)
             entityPlayer.travelToDimension(location.dimID);
 
         entityPlayer.setPositionAndUpdate(location.x, location.y, location.z);

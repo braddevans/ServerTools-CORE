@@ -25,9 +25,9 @@ import info.servertools.core.util.FileUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -74,9 +74,8 @@ public class Motd {
     }
 
     public void serveMotd(EntityPlayer player) {
-
         for (String line : motd) {
-            line = line.replace("$PLAYER$", player.getDisplayName());
+            line = line.replace("$PLAYER$", player.getDisplayNameString());
             player.addChatComponentMessage(ChatUtils.getChatComponent(line, EnumChatFormatting.WHITE));
         }
     }

@@ -19,10 +19,12 @@ import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.util.ChatUtils;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 
 import java.text.DecimalFormat;
@@ -48,7 +50,7 @@ public class CommandWhereIs extends ServerToolsCommand {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr) {
+    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos) {
 
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
     }
@@ -60,7 +62,7 @@ public class CommandWhereIs extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender icommandsender, String[] astring) {
+    public void processCommand(ICommandSender icommandsender, String[] astring) throws CommandException {
 
         if (astring.length < 1)
             throw new WrongUsageException(getCommandUsage(icommandsender));
@@ -70,7 +72,7 @@ public class CommandWhereIs extends ServerToolsCommand {
 
         String str = String.format("Player: %s is at X:%s Y:%s Z:%s in Dim:%s", player.getDisplayName(),
                 f.format(player.posX), f.format(player.posY), f.format(player.posZ),
-                player.worldObj.provider.dimensionId + "-" + player.worldObj.provider.getDimensionName());
+                player.worldObj.provider.getDimensionId() + "-" + player.worldObj.provider.getDimensionName());
 
         icommandsender.addChatMessage(ChatUtils.getChatComponent(str, EnumChatFormatting.WHITE));
     }

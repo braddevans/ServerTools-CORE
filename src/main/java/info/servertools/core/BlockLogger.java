@@ -19,7 +19,7 @@ import info.servertools.core.lib.Reference;
 import info.servertools.core.util.SaveThread;
 
 import com.google.common.io.Files;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -70,11 +70,11 @@ public class BlockLogger {
                 "%s,%s,%s,%s,%s,%s,%s",
                 TIME_FORMAT.format(Calendar.getInstance().getTime()), //When was it placed
                 event.getPlayer().getPersistentID(), // Who placed it (UUID)
-                event.world.provider.dimensionId, // What dimension was it in
-                event.x, // XCoord
-                event.y, // YCoord
-                event.z, // ZCoord
-                event.block.getUnlocalizedName() // What block was it
+                event.world.provider.getDimensionId(), // What dimension was it in
+                event.pos.getX(), // XCoord
+                event.pos.getY(), // YCoord
+                event.pos.getZ(), // ZCoord
+                event.state.getBlock().getUnlocalizedName() // What block was it
 
         ) + Reference.LINE_SEPARATOR) {
             @Override
@@ -101,11 +101,11 @@ public class BlockLogger {
                 "%s,%s,%s,%s,%s,%s,%s",
                 TIME_FORMAT.format(Calendar.getInstance().getTime()), //When was it placed
                 event.player.getPersistentID(), // Who placed it (UUID)
-                event.world.provider.dimensionId, // What dimension was it in
-                event.x, // XCoord
-                event.y, // YCoord
-                event.z, // ZCoord
-                event.block.getUnlocalizedName() // What block was it
+                event.world.provider.getDimensionId(), // What dimension was it in
+                event.pos.getX(), // XCoord
+                event.pos.getY(), // YCoord
+                event.pos.getZ(), // ZCoord
+                event.state.getBlock().getUnlocalizedName() // What block was it
 
         ) + Reference.LINE_SEPARATOR) {
             @Override

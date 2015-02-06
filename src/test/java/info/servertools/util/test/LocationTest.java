@@ -18,7 +18,9 @@ package info.servertools.util.test;
 import static org.junit.Assert.assertEquals;
 
 import info.servertools.core.util.Location;
-import net.minecraft.util.ChunkCoordinates;
+
+import net.minecraft.util.BlockPos;
+
 import org.junit.Test;
 
 public class LocationTest {
@@ -27,7 +29,7 @@ public class LocationTest {
     public void test() {
         Location loc1 = new Location(0, 1, 2, 3);
         Location loc2 = new Location(0, 1, 2, 3);
-        Location loc3 = new Location(0, new ChunkCoordinates(1, 2, 3));
+        Location loc3 = new Location(0, new BlockPos(1, 2, 3));
 
         assertEquals(loc1, loc2);
         assertEquals(loc2, loc3);

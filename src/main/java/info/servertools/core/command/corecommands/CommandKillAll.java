@@ -19,6 +19,7 @@ import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.lib.Strings;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
@@ -26,6 +27,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -43,9 +45,9 @@ public class CommandKillAll extends ServerToolsCommand {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
 
-        return args.length >= 1 ? getListOfStringsFromIterableMatchingLastWord(args, EntityList.stringToClassMapping.keySet()) : null;
+        return args.length >= 1 ? getListOfStringsMatchingLastWord(args, EntityList.stringToClassMapping.keySet()) : null;
     }
 
     @Override
@@ -55,7 +57,7 @@ public class CommandKillAll extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
         if (args.length != 1)
             throw new WrongUsageException(getCommandUsage(sender));

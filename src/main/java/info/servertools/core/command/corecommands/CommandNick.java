@@ -19,6 +19,7 @@ import info.servertools.core.chat.NickHandler;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,7 +42,7 @@ public class CommandNick extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
         EntityPlayer player = getCommandSenderAsPlayer(sender);
 

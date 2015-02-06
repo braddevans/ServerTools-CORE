@@ -19,6 +19,7 @@ import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.util.ChatUtils;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
@@ -45,7 +46,7 @@ public class CommandTPS extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
         if (args.length < 1) {
 
@@ -55,7 +56,7 @@ public class CommandTPS extends ServerToolsCommand {
             if (args[0].contains("all")) {
                 calculateAllDimTps(sender);
             } else {
-                int dimId = parseInt(sender, args[0]);
+                int dimId = parseInt(args[0]);
                 calculateDimTps(sender, dimId);
             }
         } else {
@@ -63,7 +64,7 @@ public class CommandTPS extends ServerToolsCommand {
         }
     }
 
-    private static void calculateDimTps(ICommandSender sender, int dimId) {
+    private static void calculateDimTps(ICommandSender sender, int dimId) throws CommandException {
 
         World world = MinecraftServer.getServer().worldServerForDimension(dimId);
 

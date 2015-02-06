@@ -18,9 +18,11 @@ package info.servertools.core.command.corecommands;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 
 import java.util.Collections;
@@ -39,13 +41,13 @@ public class CommandKillPlayer extends ServerToolsCommand {
     }
 
     @Override
-    public List getCommandAliases() {
+    public List getAliases() {
 
         return Collections.singletonList("kp");
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr) {
+    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos) {
 
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
     }
@@ -63,12 +65,11 @@ public class CommandKillPlayer extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender icommandsender, String[] astring) {
+    public void processCommand(ICommandSender icommandsender, String[] astring) throws CommandException {
 
         if (astring.length > 0) {
             getPlayer(icommandsender, astring[0]).attackEntityFrom(DamageSource.outOfWorld, Integer.MAX_VALUE);
             notifyOperators(icommandsender, this, "Killing: " + astring[0]);
-        } else
-            throw new WrongUsageException(getCommandUsage(icommandsender));
+        } else { throw new WrongUsageException(getCommandUsage(icommandsender)); }
     }
 }

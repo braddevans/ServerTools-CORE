@@ -21,6 +21,7 @@ import info.servertools.core.util.ChatUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 
@@ -35,7 +36,7 @@ public class RemoveAllTickTask implements ITickTask {
 
     private boolean isComplete;
     private final EntityPlayer player;
-    private Collection<TempBlock> blocksToRemove;
+    private Collection<BlockPos> blocksToRemove;
     private final World world;
     private int blockCounter;
 
@@ -58,30 +59,31 @@ public class RemoveAllTickTask implements ITickTask {
 
         for (int x = centerX - radius; x < centerX + radius; x++) {
             for (int y = centerY - radius; y < centerY + radius; y++) {
-                for (int z = centerZ - radius; z < centerZ + radius; z++)
-                    if (blocksToClear.contains(world.getBlock(x, y, z))) {
-                        blocksToRemove.add(new TempBlock(x, y, z));
+                for (int z = centerZ - radius; z < centerZ + radius; z++) {
+                    final BlockPos pos = new BlockPos(x, y, z);
+                    if (blocksToClear.contains(world.getBlockState(pos).getBlock())) {
+                        blocksToRemove.add(pos);
                         blockCounter++;
                     }
+                }
             }
         }
 
         player.addChatComponentMessage(ChatUtils.getChatComponent(String.format("Removing %s blocks", blockCounter), EnumChatFormatting.GOLD));
 
-        if (blockCounter > LAG_THREASHOLD)
-            player.addChatComponentMessage(ChatUtils.getChatComponent("Removing a lot of blocks, Incomming lag", EnumChatFormatting.RED));
+        if (blockCounter > LAG_THREASHOLD) { player.addChatComponentMessage(ChatUtils.getChatComponent("Removing a lot of blocks, Incomming lag", EnumChatFormatting.RED)); }
     }
 
     @Override
     public void tick() {
 
-        Iterator<TempBlock> iterator = blocksToRemove.iterator();
+        Iterator<BlockPos> iterator = blocksToRemove.iterator();
 
         for (int i = 0; i < BLOCKS_PER_TICK; i++) {
 
             if (iterator.hasNext()) {
-                TempBlock block = iterator.next();
-                world.setBlock(block.x, block.y, block.z, Blocks.air, 0, 2);
+                BlockPos pos = iterator.next();
+                world.setBlockState(pos, Blocks.air.getDefaultState(), 2);
                 iterator.remove();
             }
         }
@@ -101,20 +103,5 @@ public class RemoveAllTickTask implements ITickTask {
     public boolean isComplete() {
 
         return isComplete;
-    }
-
-    /**
-     * Used to reference an actaul block in world
-     */
-    private static class TempBlock {
-        final int x;
-        final int y;
-        final int z;
-
-        TempBlock(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
     }
 }

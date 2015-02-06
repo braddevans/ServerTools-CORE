@@ -19,6 +19,7 @@ import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.lib.Strings;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
@@ -26,6 +27,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 import java.lang.reflect.Constructor;
@@ -46,7 +48,7 @@ public class CommandSpawnMob extends ServerToolsCommand {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender var1, String[] var2) {
+    public List addTabCompletionOptions(ICommandSender var1, String[] var2, BlockPos pos) {
         List<?> var = getValidEntities();
         return var2.length >= 1 ? getListOfStringsMatchingLastWord(var2, (String[]) var.toArray()) : null;
     }
@@ -69,7 +71,7 @@ public class CommandSpawnMob extends ServerToolsCommand {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
         if (!(sender instanceof EntityPlayer))
             throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER);
@@ -79,7 +81,7 @@ public class CommandSpawnMob extends ServerToolsCommand {
         if (args.length < 1) throw new WrongUsageException(getCommandUsage(sender));
 
         int amount = 1;
-        if (args.length > 1) amount = parseIntBounded(sender, args[1], 1, 100);
+        if (args.length > 1) amount = parseInt(args[1], 1, 100);
 
         Class<?> clazz = null;
         String type = "Unknown";

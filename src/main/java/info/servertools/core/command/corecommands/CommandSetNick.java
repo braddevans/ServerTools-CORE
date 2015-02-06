@@ -19,10 +19,12 @@ import info.servertools.core.chat.NickHandler;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class CommandSetNick extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
         if (args.length == 1) {
             EntityPlayer player = getPlayer(sender, args[0]);
@@ -57,7 +59,7 @@ public class CommandSetNick extends ServerToolsCommand {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
 
         if (args.length == 1) {
             return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());

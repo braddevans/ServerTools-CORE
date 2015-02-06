@@ -21,9 +21,11 @@ import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 
 import java.util.List;
@@ -47,7 +49,7 @@ public class CommandVoice extends ServerToolsCommand {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] par2) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] par2, BlockPos pos) {
 
         if (par2.length == 1) {
             return getListOfStringsMatchingLastWord(par2, "add", "remove", "reload");
@@ -66,7 +68,7 @@ public class CommandVoice extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
         if (args.length >= 1) {
 

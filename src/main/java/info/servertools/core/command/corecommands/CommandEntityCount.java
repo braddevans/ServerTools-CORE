@@ -20,12 +20,14 @@ import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 
@@ -47,7 +49,7 @@ public class CommandEntityCount extends ServerToolsCommand {
 
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] par2ArrayOfStr) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] par2ArrayOfStr, BlockPos pos) {
 
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, (String[]) EntityList.classToStringMapping.values().toArray()) : null;
     }
@@ -59,7 +61,7 @@ public class CommandEntityCount extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
         if (!(sender instanceof EntityPlayer))
             throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER);
@@ -98,7 +100,7 @@ public class CommandEntityCount extends ServerToolsCommand {
 
             int count = 0;
             String name = null;
-            String pname = getStringFromNthArg(sender, args, 0);
+            String pname = args[0];
             for (Object obj : EntityList.stringToClassMapping.keySet()) {
                 if (obj.toString().equalsIgnoreCase(pname)) name = obj.toString();
             }

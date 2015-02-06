@@ -37,7 +37,7 @@ import net.minecraft.util.EnumChatFormatting;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
@@ -50,6 +50,7 @@ import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO This needs to move to UUIDs
 public class VoiceHandler {
 
     private final File voiceFile;
@@ -201,7 +202,7 @@ public class VoiceHandler {
     @SubscribeEvent
     public void command(CommandEvent event) {
 
-        if (isUserSilenced(event.sender.getCommandSenderName())) {
+        if (isUserSilenced(event.sender.getName())) {
             if (event.command instanceof CommandBroadcast || event.command instanceof CommandMessage || event.command instanceof CommandEmote || event.command instanceof CommandMessageRaw) {
 
                 event.setCanceled(true);

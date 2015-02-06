@@ -16,7 +16,7 @@
 package info.servertools.core.util;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 
 import java.io.Serializable;
 
@@ -35,17 +35,17 @@ public class Location implements Serializable {
         this.z = z;
     }
 
-    public Location(int dimID, ChunkCoordinates chunkCoordinates) {
+    public Location(int dimID, BlockPos blockPos) {
 
         this.dimID = dimID;
-        this.x = chunkCoordinates.posX;
-        this.y = chunkCoordinates.posY;
-        this.z = chunkCoordinates.posZ;
+        this.x = blockPos.getX();
+        this.y = blockPos.getY();
+        this.z = blockPos.getZ();
     }
 
     public Location(Entity entity) {
 
-        this.dimID = entity.worldObj.provider.dimensionId;
+        this.dimID = entity.worldObj.provider.getDimensionId();
         this.x = entity.posX;
         this.y = entity.posY;
         this.z = entity.posZ;
@@ -54,15 +54,15 @@ public class Location implements Serializable {
     @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
 
         Location location = (Location) o;
 
-        if (dimID != location.dimID) return false;
-        if (Double.compare(location.x, x) != 0) return false;
-        if (Double.compare(location.y, y) != 0) return false;
-        if (Double.compare(location.z, z) != 0) return false;
+        if (dimID != location.dimID) { return false; }
+        if (Double.compare(location.x, x) != 0) { return false; }
+        if (Double.compare(location.y, y) != 0) { return false; }
+        if (Double.compare(location.z, z) != 0) { return false; }
 
         return true;
     }
