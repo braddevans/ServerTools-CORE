@@ -57,6 +57,7 @@ public class FileUtils {
      * @param file
      *         the file to write to
      */
+    // TODO Remove this shit
     public static void writeStringToFile(final String string, final File file) {
 
         new Thread() {

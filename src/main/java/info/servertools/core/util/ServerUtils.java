@@ -15,6 +15,7 @@
  */
 package info.servertools.core.util;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
@@ -46,8 +47,7 @@ public final class ServerUtils {
     /**
      * Get the player for a given {@link java.util.UUID UUID}
      *
-     * @param uuid
-     *         the UUID
+     * @param uuid the UUID
      *
      * @return the EntityPlayer, or <code>null</code> if the player does not exist
      */
@@ -68,8 +68,7 @@ public final class ServerUtils {
     /**
      * Get the player for a given username
      *
-     * @param username
-     *         the username
+     * @param username the username
      *
      * @return the EntityPlayer, or <code>null</code> if the player does not exist
      */
@@ -88,19 +87,42 @@ public final class ServerUtils {
     }
 
     /**
+     * Get a player's {@link UUID} given their username.
+     * <p>
+     * Local players will be checked first and their offline UUID will be used if necessary. <br>
+     * If the player isn't logged into the server, Mojang's servers will be queried for their UUID.
+     * </p>
+     *
+     * @param username The username
+     *
+     * @return The UUID, or {@code null} if a match could not be found
+     */
+    @Nullable
+    public static UUID getUUIDForUsername(String username) {
+        @Nullable final EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(username);
+        if (player != null) {
+            return player.getPersistentID();
+        } else {
+            @Nullable final GameProfile profile = MinecraftServer.getServer().getPlayerProfileCache().getGameProfileForUsername(username);
+            if (profile != null) {
+                return profile.getId();
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
      * Teleport a player to a given location
      *
-     * @param entityPlayer
-     *         the player
-     * @param location
-     *         the location
+     * @param entityPlayer the player
+     * @param location     the location
      */
     public static void teleportPlayer(EntityPlayerMP entityPlayer, Location location) {
 
         Util.checkNotNull(entityPlayer, location);
 
-        if (entityPlayer.worldObj.provider.getDimensionId() != location.dimID)
-            entityPlayer.travelToDimension(location.dimID);
+        if (entityPlayer.worldObj.provider.getDimensionId() != location.dimID) { entityPlayer.travelToDimension(location.dimID); }
 
         entityPlayer.setPositionAndUpdate(location.x, location.y, location.z);
     }
@@ -108,12 +130,21 @@ public final class ServerUtils {
     /**
      * Checks to see if a given player has server OP status
      *
-     * @param profile
-     *         the player's {@link com.mojang.authlib.GameProfile GameProfile}
+     * @param profile the player's {@link com.mojang.authlib.GameProfile GameProfile}
      *
      * @return if the player is OP
      */
     public static boolean isOP(GameProfile profile) {
         return MinecraftServer.getServer().getConfigurationManager().getOppedPlayers().hasEntry(profile);
+    }
+
+    /**
+     * Refresh a player's {@link EntityPlayer#displayname display name} given their {@link UUID}.
+     *
+     * @param uuid The UUID
+     */
+    public static void refreshPlayerDisplayName(UUID uuid) {
+        EntityPlayer player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUUID(uuid);
+        if (player != null) { player.refreshDisplayName(); }
     }
 }

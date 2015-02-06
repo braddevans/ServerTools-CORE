@@ -21,189 +21,251 @@ import static net.minecraft.util.EnumChatFormatting.RESET;
 
 import info.servertools.core.CoreConfig;
 import info.servertools.core.ServerTools;
+import info.servertools.core.lib.Reference;
 import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
-import info.servertools.core.util.FileUtils;
 import info.servertools.core.util.ServerUtils;
 
 import net.minecraft.command.server.CommandBroadcast;
 import net.minecraft.command.server.CommandEmote;
 import net.minecraft.command.server.CommandMessage;
 import net.minecraft.command.server.CommandMessageRaw;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumChatFormatting;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.common.io.Files;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import org.apache.logging.log4j.Level;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
-// TODO This needs to move to UUIDs
 public class VoiceHandler {
 
-    private final File voiceFile;
-    private final File silenceFile;
-    private final Gson gson;
-    private Set<String> voicedUsers;
-    private Set<String> silencedUsers;
+    private static final Logger log = LogManager.getLogger(VoiceHandler.class);
+
+    private final File voiceFile = new File(ServerTools.serverToolsDir, "voice.json");
+    private final File silenceFile = new File(ServerTools.serverToolsDir, "silence.json");
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private Set<UUID> voicedUsers = new HashSet<>();
+    private Set<UUID> silencedUsers = new HashSet<>();
 
     public VoiceHandler() {
-
-        voicedUsers = new HashSet<>();
-        silencedUsers = new HashSet<>();
-
-        voiceFile = new File(ServerTools.serverToolsDir, "voice.json");
-        silenceFile = new File(ServerTools.serverToolsDir, "silence.json");
-
-        gson = new GsonBuilder().setPrettyPrinting().create();
-
         loadSilenceList();
         loadVoiceList();
-
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private static void refreshPlayerDisplayName(String username) {
-
-        EntityPlayer player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(username);
-
-        if (player != null)
-            player.refreshDisplayName();
+    /**
+     * Check if a player has voice.
+     *
+     * @param uuid The player's {@link UUID}
+     *
+     * @return {@code true} if the player is voiced, {@code false} if not
+     */
+    public boolean isUserVoiced(UUID uuid) {
+        return voicedUsers.contains(uuid);
     }
 
-    public boolean isUserVoiced(String username) {
-
-        return voicedUsers.contains(username.toLowerCase());
-    }
-
-    public void giveVoice(String username) {
-
-        voicedUsers.add(username.toLowerCase());
-        saveVoiceList();
-        refreshPlayerDisplayName(username);
-    }
-
-    public boolean removeVoice(String username) {
-
-        if (voicedUsers.contains(username.toLowerCase())) {
-            voicedUsers.remove(username.toLowerCase());
+    /**
+     * Give voice to a player.
+     *
+     * @param uuid The player's {@link UUID}
+     *
+     * @return {@code true} if the entry was added, {@code false} if it already existed
+     */
+    public boolean addVoice(UUID uuid) {
+        if (voicedUsers.add(uuid)) {
             saveVoiceList();
-            refreshPlayerDisplayName(username);
+            ServerUtils.refreshPlayerDisplayName(uuid);
             return true;
         }
         return false;
     }
 
-    public boolean isUserSilenced(String username) {
-
-        return silencedUsers.contains(username.toLowerCase());
+    /**
+     * Remove voice from a player.
+     *
+     * @param uuid The player's {@link UUID}
+     *
+     * @return {@code true} if the entry was removed, {@code false} if it didn't exist
+     */
+    public boolean removeVoice(UUID uuid) {
+        if (voicedUsers.contains(uuid)) {
+            voicedUsers.remove(uuid);
+            saveVoiceList();
+            ServerUtils.refreshPlayerDisplayName(uuid);
+            return true;
+        }
+        return false;
     }
 
-    public void silence(String username) {
-
-        silencedUsers.add(username.toLowerCase());
-        saveSilenceList();
+    /**
+     * Check if a player is silenced.
+     *
+     * @param uuid The player's {@link UUID}
+     *
+     * @return {@code true} if the player is silenced, {@code false} if not
+     */
+    public boolean isUserSilenced(UUID uuid) {
+        return silencedUsers.contains(uuid);
     }
 
-    public boolean removeSilence(String username) {
-
-        if (silencedUsers.contains(username.toLowerCase())) {
-            silencedUsers.remove(username.toLowerCase());
+    /**
+     * Set a silence on a player.
+     *
+     * @param uuid The player's {@link UUID}
+     *
+     * @return {@code true} if the entry was added, {@code false} if it already existed
+     */
+    public boolean addSilence(UUID uuid) {
+        if (silencedUsers.add(uuid)) {
             saveSilenceList();
             return true;
         }
         return false;
     }
 
-    public Set<String> getVoicedUsers() {
+    /**
+     * Remove silence on a player.
+     *
+     * @param uuid The player's {@link UUID}
+     *
+     * @return {@code true} if the entry was removed, {@code false} if it didn't exist
+     */
+    public boolean removeSilence(UUID uuid) {
+        if (silencedUsers.contains(uuid)) {
+            silencedUsers.remove(uuid);
+            saveSilenceList();
+            return true;
+        }
+        return false;
+    }
 
+    /**
+     * Get an {@link ImmutableSet immutable} set of the voiced users.
+     *
+     * @return A set of voiced users
+     */
+    public ImmutableSet<UUID> getVoicedUsers() {
         return ImmutableSet.copyOf(voicedUsers);
     }
 
-    public Set<String> getSilencedUsers() {
-
+    /**
+     * Get an {@link ImmutableSet immutable} set of the silenced users.
+     *
+     * @return A set of voiced users
+     */
+    public ImmutableSet<UUID> getSilencedUsers() {
         return ImmutableSet.copyOf(silencedUsers);
     }
 
+    /**
+     * Save the voiced users to disk. This is done in a separate thread.
+     */
     public void saveVoiceList() {
-        String gsonRepresentation = gson.toJson(voicedUsers);
-        FileUtils.writeStringToFile(gsonRepresentation, voiceFile);
+        final String json = gson.toJson(voicedUsers);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (voiceFile) {
+                    try {
+                        Files.write(json, voiceFile, Reference.CHARSET);
+                    } catch (IOException e) {
+                        log.error("Failed to save voice file " + voiceFile + " to disk", e);
+                    }
+                }
+            }
+        }).start();
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Load the voiced users from disk. <b>This is done on the main thread!</b>
+     */
     public void loadVoiceList() {
-
-        if (!voiceFile.exists())
-            return;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(voiceFile))) {
-            voicedUsers = gson.fromJson(reader, HashSet.class);
+        if (!voiceFile.exists()) { return; }
+        try {
+            voicedUsers = gson.fromJson(Files.toString(voiceFile, Reference.CHARSET), new TypeToken<Set<UUID>>() {}.getType());
         } catch (Exception e) {
-            ServerTools.LOG.log(Level.WARN, Strings.VOICE_LOAD_ERROR, e);
+            log.error("Failed to load voiced players from file " + voiceFile, e);
+        } finally {
+            if (voicedUsers == null) { voicedUsers = Sets.newHashSet(); }
         }
     }
 
+    /**
+     * Save the silenced users to disk. This is done in a separate thread.
+     */
     public void saveSilenceList() {
-        String gsonRepresentation = gson.toJson(silencedUsers);
-        FileUtils.writeStringToFile(gsonRepresentation, silenceFile);
+        final String json = gson.toJson(silencedUsers);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (silenceFile) {
+                    try {
+                        Files.write(json, silenceFile, Reference.CHARSET);
+                    } catch (IOException e) {
+                        log.error("Failed to save silence file " + silenceFile + " to disk", e);
+                    }
+                }
+            }
+        }).start();
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Load the silenced users from disk. <b>This is done on the main thread!</b>
+     */
     public void loadSilenceList() {
-
-        if (!silenceFile.exists())
-            return;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(silenceFile))) {
-            silencedUsers = gson.fromJson(reader, HashSet.class);
+        if (!silenceFile.exists()) { return; }
+        try {
+            silencedUsers = gson.fromJson(Files.toString(silenceFile, Reference.CHARSET), new TypeToken<Set<UUID>>() {}.getType());
         } catch (Exception e) {
-            ServerTools.LOG.log(Level.WARN, Strings.SILENCE_LOAD_ERROR, e);
+            log.error("Failed to load silenced players from file " + silenceFile, e);
         }
     }
 
     @SubscribeEvent
     public void nameFormat(PlayerEvent.NameFormat event) {
-
-        if (CoreConfig.COLOR_OP_CHAT_MESSAGE) {
-
+        if (CoreConfig.ENABLE_OP_PREFIX) {
             if (!MinecraftServer.getServer().isSinglePlayer() && ServerUtils.isOP(event.entityPlayer.getGameProfile())) {
                 event.displayname = String.valueOf(RED) + '[' + CoreConfig.OP_CHAT_PREFIX + "] " + RESET + event.displayname;
             }
         }
 
-        if (isUserVoiced(event.username)) {
+        if (isUserVoiced(event.entityPlayer.getPersistentID())) {
             event.displayname = String.valueOf(BLUE) + "[" + CoreConfig.VOICE_CHAT_PREFIX + "] " + RESET + event.displayname;
         }
-
     }
 
     @SubscribeEvent
     public void serverChat(ServerChatEvent event) {
-
-        if (isUserSilenced(event.username)) {
+        if (isUserSilenced(event.player.getPersistentID())) {
             event.setCanceled(true);
             event.player.addChatComponentMessage(ChatUtils.getChatComponent(Strings.ERROR_SILENCED, EnumChatFormatting.RED));
         }
-
     }
 
     @SubscribeEvent
     public void command(CommandEvent event) {
-
-        if (isUserSilenced(event.sender.getName())) {
-            if (event.command instanceof CommandBroadcast || event.command instanceof CommandMessage || event.command instanceof CommandEmote || event.command instanceof CommandMessageRaw) {
+        if (event.sender instanceof EntityPlayerMP && isUserSilenced(((EntityPlayerMP) event.sender).getPersistentID())) {
+            if (event.command instanceof CommandBroadcast
+                || event.command instanceof CommandMessage
+                || event.command instanceof CommandEmote
+                || event.command instanceof CommandMessageRaw) {
 
                 event.setCanceled(true);
                 event.sender.addChatMessage(ChatUtils.getChatComponent(Strings.ERROR_SILENCED, EnumChatFormatting.RED));

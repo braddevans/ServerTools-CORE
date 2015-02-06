@@ -16,19 +16,22 @@
 package info.servertools.core.command.corecommands;
 
 import info.servertools.core.ServerTools;
+import info.servertools.core.chat.VoiceHandler;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.lib.Strings;
-import info.servertools.core.util.ChatUtils;
+import info.servertools.core.util.ServerUtils;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
 
 import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 public class CommandSilence extends ServerToolsCommand {
 
@@ -38,67 +41,77 @@ public class CommandSilence extends ServerToolsCommand {
 
     @Override
     public CommandLevel getCommandLevel() {
-
         return CommandLevel.OP;
     }
 
     @Override
-    public boolean isUsernameIndex(String[] par1ArrayOfStr, int par2) {
-
+    public boolean isUsernameIndex(String[] args, int par2) {
         return par2 == 1;
     }
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-
-        return String.format("/%s [add|remove|reload} {username}", name);
+        return String.format("/%s [add|remove] [username]" + " OR " + "/%s reload", name, name);
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] par2, BlockPos pos) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
 
-        if (par2.length == 1) {
-            return getListOfStringsMatchingLastWord(par2, "add", "remove", "reload");
-        } else if (par2.length == 2) {
-            if (!"reload".equalsIgnoreCase(par2[0]))
-                return getListOfStringsMatchingLastWord(par2, MinecraftServer.getServer().getAllUsernames());
+        if (args.length == 1) {
+            return getListOfStringsMatchingLastWord(args, "add", "remove", "reload");
+        } else if (args.length == 2 && !"reload".equals(args[0])) {
+            return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
         }
-
         return null;
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        final VoiceHandler voiceHandler = ServerTools.instance.voiceHandler;
 
-        if (args.length < 1)
+        if (args.length >= 1) {
+            switch (args[0]) {
+                case "add":
+                    if (args.length == 2) {
+                        @Nullable final UUID uuid = ServerUtils.getUUIDForUsername(args[1]);
+                        if (uuid == null) {
+                            throw new PlayerNotFoundException();
+                        } else {
+                            if (voiceHandler.addSilence(uuid)) {
+                                notifyOperators(sender, this, "Gave silence to %s", args[1]);
+                            } else {
+                                throw new CommandException("That player was already silenced");
+                            }
+                        }
+                    } else {
+                        throw new WrongUsageException(getCommandUsage(sender));
+                    }
+                    break;
+                case "remove":
+                    if (args.length == 2) {
+                        @Nullable final UUID uuid = ServerUtils.getUUIDForUsername(args[1]);
+                        if (uuid == null) {
+                            throw new PlayerNotFoundException();
+                        } else {
+                            if (voiceHandler.removeSilence(uuid)) {
+                                notifyOperators(sender, this, "Removed silence from %s", args[1]);
+                            } else {
+                                throw new CommandException("That player wasn't silenced");
+                            }
+                        }
+                    } else {
+                        throw new WrongUsageException(getCommandUsage(sender));
+                    }
+                    break;
+                case "reload":
+                    voiceHandler.loadSilenceList();
+                    notifyOperators(sender, this, "Reloaded silenced players");
+                    break;
+                default:
+                    throw new WrongUsageException(getCommandUsage(sender));
+            }
+        } else {
             throw new WrongUsageException(getCommandUsage(sender));
-
-        if ("add".equalsIgnoreCase(args[0])) {
-
-            if (args.length == 2) {
-
-                ServerTools.instance.voiceHandler.silence(args[1].toLowerCase());
-                notifyOperators(sender, this, String.format(Strings.COMMAND_SILENCE_ADD, args[1]));
-            } else
-                throw new WrongUsageException(getCommandUsage(sender));
-
-        } else if ("remove".equalsIgnoreCase(args[0])) {
-
-            if (args.length == 2) {
-
-                boolean result = ServerTools.instance.voiceHandler.removeSilence(args[1].toLowerCase());
-
-                if (result)
-                    notifyOperators(sender, this, String.format(Strings.COMMAND_SILENCE_REMOVE, args[1]));
-                else
-                    sender.addChatMessage(ChatUtils.getChatComponent(Strings.COMMAND_SILENCE_REMOVE_NOUSER, EnumChatFormatting.RED));
-            } else
-                throw new WrongUsageException(getCommandUsage(sender));
-
-        } else if ("reload".equalsIgnoreCase(args[0])) {
-
-            ServerTools.instance.voiceHandler.loadSilenceList();
-            notifyOperators(sender, this, Strings.COMMAND_SILENCE_RELOAD);
         }
     }
 }

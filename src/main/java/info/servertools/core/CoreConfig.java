@@ -24,7 +24,7 @@ public class CoreConfig {
 
     public static boolean DEBUG_MODE;
     public static boolean SEND_MOTD_ON_LOGIN;
-    public static boolean COLOR_OP_CHAT_MESSAGE;
+    public static boolean ENABLE_OP_PREFIX;
     public static boolean GENERATE_FLAT_BEDROCK;
     public static boolean LOG_BLOCK_BREAKS;
     public static boolean LOG_BLOCK_PLACES;
@@ -47,7 +47,7 @@ public class CoreConfig {
 
             DEBUG_MODE = configuration.get(category, "Debug Mode", false, "Spams the logs with debug info").getBoolean(false);
             SEND_MOTD_ON_LOGIN = configuration.get(category, "Send MOTD on Login", true, "Send the MOTD to players upon logging into the server").getBoolean(true);
-            COLOR_OP_CHAT_MESSAGE = configuration.get(category, "Enable OP Prefix", true, "Gives OPs a prefix in chat").getBoolean(true);
+            ENABLE_OP_PREFIX = configuration.get(category, "Enable OP Prefix", true, "Gives OPs a prefix in chat").getBoolean(true);
             GENERATE_FLAT_BEDROCK = configuration.get(category, "Enable Flat Bedrock", true, "Causes bedrock to generate only one layer thick").getBoolean(true);
             DEFAULT_REMOVE_ALL_RANGE = configuration.get(category, "Default RemoveAll Range", 20, "The default range for the /removeall command").getInt();
             OP_CHAT_PREFIX = configuration.get(category, "OP Chat Prefix", "OP", "The prefix in chat for server operators").getString();
