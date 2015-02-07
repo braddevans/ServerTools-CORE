@@ -27,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import javax.annotation.Nullable;
+
 /**
  * Variety of helper methods for dealing with serializing/deserializing via {@link com.google.gson.Gson Gson}
  */
@@ -69,7 +71,7 @@ public final class GsonUtils {
      * @param prettyPrinting
      *         if 'pretty priniting' should be used in the generated JSON
      */
-    public static void writeToFile(Object object, File toFile, Logger logger, boolean prettyPrinting) {
+    public static void writeToFile(Object object, File toFile, @Nullable Logger logger, boolean prettyPrinting) {
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(toFile), Reference.FILE_ENCODING))) {
             writer.write(toJson(object, prettyPrinting));

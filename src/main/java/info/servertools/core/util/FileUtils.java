@@ -52,10 +52,8 @@ public class FileUtils {
      * <b>IO is done on a separate thread!</b>
      * </p>
      *
-     * @param string
-     *         the string to write
-     * @param file
-     *         the file to write to
+     * @param string the string to write
+     * @param file   the file to write to
      */
     // TODO Remove this shit
     public static void writeStringToFile(final String string, final File file) {
@@ -77,13 +75,11 @@ public class FileUtils {
      * Read a file into a collection of strings
      * Each line is a new collection element
      *
-     * @param file
-     *         the file to read
+     * @param file the file to read
      *
      * @return A collection of strings
      *
-     * @throws java.io.IOException
-     *         IOException
+     * @throws java.io.IOException IOException
      */
     public static Collection<String> readFileToString(File file) throws IOException {
 
@@ -101,8 +97,7 @@ public class FileUtils {
     /**
      * Check the size of a directory
      *
-     * @param directory
-     *         the directory to check
+     * @param directory the directory to check
      *
      * @return the size of the directory in bytes
      */
@@ -110,13 +105,10 @@ public class FileUtils {
 
         long length = 0;
         if (directory.exists() && directory.isDirectory()) {
-            File[] files = directory.listFiles();
+            @Nullable File[] files = directory.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    if (file.isFile())
-                        length += file.length();
-                    else
-                        length += getFolderSize(file);
+                    if (file.isFile()) { length += file.length(); } else { length += getFolderSize(file); }
                 }
             }
         }
@@ -127,14 +119,15 @@ public class FileUtils {
     /**
      * Retrieve the oldest file in a directory
      *
-     * @param directory
-     *         the directory to check
+     * @param directory the directory to check
      *
      * @return the oldest file
      */
+    @Nullable
     public static File getOldestFile(File directory) {
 
-        File[] files = directory.listFiles((FileFilter) FileFileFilter.FILE);
+        @Nullable File[] files = directory.listFiles((FileFilter) FileFileFilter.FILE);
+        if (files == null) { return null; }
 
         Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR);
 
@@ -152,21 +145,19 @@ public class FileUtils {
             res = zout;
             while (!queue.isEmpty()) {
                 directory = queue.removeFirst();
-                File[] dirFiles = directory.listFiles();
+                @Nullable File[] dirFiles = directory.listFiles();
                 if (dirFiles != null && dirFiles.length != 0) {
                     for (File child : dirFiles) {
-                        if (child != null) {
-                            String name = baseDir.relativize(child.toURI()).getPath();
-                            if (child.isDirectory() && (folderBlacklist == null || !folderBlacklist.contains(child.getName()))) {
-                                queue.push(child);
-                                name = name.endsWith("/") ? name : name + "/";
+                        String name = baseDir.relativize(child.toURI()).getPath();
+                        if (child.isDirectory() && (folderBlacklist == null || !folderBlacklist.contains(child.getName()))) {
+                            queue.push(child);
+                            name = name.endsWith("/") ? name : name + "/";
+                            zout.putNextEntry(new ZipEntry(name));
+                        } else {
+                            if (fileBlacklist != null && !fileBlacklist.contains(child.getName())) {
                                 zout.putNextEntry(new ZipEntry(name));
-                            } else {
-                                if (fileBlacklist != null && !fileBlacklist.contains(child.getName())) {
-                                    zout.putNextEntry(new ZipEntry(name));
-                                    copy(child, zout);
-                                    zout.closeEntry();
-                                }
+                                copy(child, zout);
+                                zout.closeEntry();
                             }
                         }
                     }

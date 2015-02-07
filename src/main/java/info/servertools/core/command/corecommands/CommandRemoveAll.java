@@ -36,6 +36,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 public class CommandRemoveAll extends ServerToolsCommand {
 
     public CommandRemoveAll(String defaultName) {
@@ -54,9 +56,9 @@ public class CommandRemoveAll extends ServerToolsCommand {
         return "/" + name + " [blockName] {radius}";
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-
         List<String> blockNames = getBlockNames();
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, blockNames.toArray(new String[blockNames.size()])) : null;
     }

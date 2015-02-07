@@ -31,6 +31,8 @@ import net.minecraftforge.common.DimensionManager;
 
 import java.text.DecimalFormat;
 
+import javax.annotation.Nullable;
+
 public class CommandTPS extends ServerToolsCommand {
 
     private static final DecimalFormat timeFormatter = new DecimalFormat("########0.000");
@@ -66,7 +68,7 @@ public class CommandTPS extends ServerToolsCommand {
 
     private static void calculateDimTps(ICommandSender sender, int dimId) throws CommandException {
 
-        World world = MinecraftServer.getServer().worldServerForDimension(dimId);
+        @Nullable World world = MinecraftServer.getServer().worldServerForDimension(dimId);
 
         if (world == null) throw new PlayerNotFoundException("That Dimension Doesn't Exist!");
 

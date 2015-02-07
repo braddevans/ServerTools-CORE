@@ -64,6 +64,7 @@ public class NickHandler {
             } catch (IOException e) {
                 ServerTools.LOG.error("Failed to load nicknames from disk", e);
             } finally {
+                //noinspection ConstantConditions
                 if (nickMap == null)
                     nickMap = new HashMap<>();
             }

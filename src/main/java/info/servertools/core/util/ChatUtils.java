@@ -18,13 +18,15 @@ package info.servertools.core.util;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
+import javax.annotation.Nullable;
+
 public final class ChatUtils {
 
     public static ChatComponentText getChatComponent(String message) {
         return getChatComponent(message, null);
     }
 
-    public static ChatComponentText getChatComponent(String message, EnumChatFormatting formatting) {
+    public static ChatComponentText getChatComponent(String message, @Nullable EnumChatFormatting formatting) {
         ChatComponentText text = new ChatComponentText(message);
         if (formatting != null)
             text.getChatStyle().setColor(formatting);

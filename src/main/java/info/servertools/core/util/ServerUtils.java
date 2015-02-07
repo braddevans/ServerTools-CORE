@@ -15,6 +15,8 @@
  */
 package info.servertools.core.util;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -54,7 +56,7 @@ public final class ServerUtils {
     @Nullable
     public static EntityPlayerMP getPlayerForUUID(UUID uuid) {
 
-        Util.checkNotNull(uuid);
+        checkNotNull(uuid, "uurd");
 
         for (EntityPlayerMP player : getAllPlayers()) {
             if (uuid.equals(player.getGameProfile().getId())) {
@@ -75,7 +77,7 @@ public final class ServerUtils {
     @Nullable
     public static EntityPlayerMP getPlayerForUsername(String username) {
 
-        Util.checkNotNull(username);
+        checkNotNull(username, "username");
 
         for (EntityPlayerMP player : getAllPlayers()) {
             if (username.equals(player.getGameProfile().getName())) {
@@ -120,7 +122,8 @@ public final class ServerUtils {
      */
     public static void teleportPlayer(EntityPlayerMP entityPlayer, Location location) {
 
-        Util.checkNotNull(entityPlayer, location);
+        checkNotNull(entityPlayer, "entityPlayer");
+        checkNotNull(location, "location");
 
         if (entityPlayer.worldObj.provider.getDimensionId() != location.dimID) { entityPlayer.travelToDimension(location.dimID); }
 
@@ -144,7 +147,7 @@ public final class ServerUtils {
      * @param uuid The UUID
      */
     public static void refreshPlayerDisplayName(UUID uuid) {
-        EntityPlayer player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUUID(uuid);
+        @Nullable EntityPlayer player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUUID(uuid);
         if (player != null) { player.refreshDisplayName(); }
     }
 }

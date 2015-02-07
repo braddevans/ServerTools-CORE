@@ -33,6 +33,8 @@ import net.minecraft.util.IChatComponent;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class CommandInventory extends ServerToolsCommand {
 
     public CommandInventory(String defaultName) {
@@ -51,9 +53,9 @@ public class CommandInventory extends ServerToolsCommand {
         return Collections.singletonList("inv");
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos) {
-
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 
@@ -93,16 +95,17 @@ public class CommandInventory extends ServerToolsCommand {
 
         @Override
         public int getSizeInventory() {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
             }
 
             return 45;
         }
 
+        @Nullable
         @Override
         public ItemStack getStackInSlot(int var1) {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return null;
             }
@@ -116,14 +119,15 @@ public class CommandInventory extends ServerToolsCommand {
             } else { return null; }
         }
 
+        @Nullable
         @Override
         public ItemStack decrStackSize(int i, int j) {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return null;
             }
 
-            ItemStack stack = getStackInSlot(i);
+            @Nullable ItemStack stack = getStackInSlot(i);
             if (stack != null) {
                 if (stack.stackSize <= j) {
                     setInventorySlotContents(i, null);
@@ -139,14 +143,15 @@ public class CommandInventory extends ServerToolsCommand {
             } else { return null; }
         }
 
+        @Nullable
         @Override
         public ItemStack getStackInSlotOnClosing(int var1) {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return null;
             }
 
-            ItemStack stack = getStackInSlot(var1);
+            @Nullable ItemStack stack = getStackInSlot(var1);
             if (stack != null) {
                 setInventorySlotContents(var1, null);
                 return stack;
@@ -154,9 +159,11 @@ public class CommandInventory extends ServerToolsCommand {
         }
 
         @Override
-        public void setInventorySlotContents(int var1, ItemStack var2) {
-            if (player == null || player.isDead) {
-                viewer.entityDropItem(var2, 0.5F);
+        public void setInventorySlotContents(int var1, @Nullable ItemStack var2) {
+            if (player.isDead) {
+                if (var2 != null) {
+                    viewer.entityDropItem(var2, 0.5F);
+                }
                 viewer.closeScreen();
                 return;
             }
@@ -167,7 +174,7 @@ public class CommandInventory extends ServerToolsCommand {
                 player.inventory.mainInventory[var1 - 27] = var2;
             } else if (var1 >= 36 && var1 < 40) {
                 player.inventory.armorInventory[39 - var1] = var2;
-            } else {
+            } else if (var2 != null) {
                 viewer.entityDropItem(var2, 0.5F);
             }
         }
@@ -182,6 +189,7 @@ public class CommandInventory extends ServerToolsCommand {
             return false;
         }
 
+        @Nullable
         @Override
         public IChatComponent getDisplayName() {
             return null;
@@ -189,7 +197,7 @@ public class CommandInventory extends ServerToolsCommand {
 
         @Override
         public int getInventoryStackLimit() {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return 64;
             }
@@ -201,7 +209,7 @@ public class CommandInventory extends ServerToolsCommand {
 
         @Override
         public boolean isUseableByPlayer(EntityPlayer var1) {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return false;
             }

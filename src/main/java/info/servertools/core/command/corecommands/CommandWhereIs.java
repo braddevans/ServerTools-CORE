@@ -31,6 +31,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class CommandWhereIs extends ServerToolsCommand {
 
     public CommandWhereIs(String defaultName) {
@@ -49,9 +51,9 @@ public class CommandWhereIs extends ServerToolsCommand {
         return par2 == 0;
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos) {
-
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 

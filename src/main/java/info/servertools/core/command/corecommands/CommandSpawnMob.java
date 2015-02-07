@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 public class CommandSpawnMob extends ServerToolsCommand {
 
     public CommandSpawnMob(String defaultName) {
@@ -47,6 +49,7 @@ public class CommandSpawnMob extends ServerToolsCommand {
         return CommandLevel.OP;
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender var1, String[] var2, BlockPos pos) {
         List<?> var = getValidEntities();
@@ -83,7 +86,7 @@ public class CommandSpawnMob extends ServerToolsCommand {
         int amount = 1;
         if (args.length > 1) amount = parseInt(args[1], 1, 100);
 
-        Class<?> clazz = null;
+        @Nullable Class<?> clazz = null;
         String type = "Unknown";
         for (String name : ((Map<String, Class<?>>) EntityList.stringToClassMapping).keySet()) {
             if (name.equalsIgnoreCase(args[0])) {

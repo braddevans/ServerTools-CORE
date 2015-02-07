@@ -28,6 +28,8 @@ import net.minecraft.util.DamageSource;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class CommandKillPlayer extends ServerToolsCommand {
 
     public CommandKillPlayer(String defaultName) {
@@ -46,9 +48,9 @@ public class CommandKillPlayer extends ServerToolsCommand {
         return Collections.singletonList("kp");
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos) {
-
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 

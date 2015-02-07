@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 public class CommandEntityCount extends ServerToolsCommand {
 
     public CommandEntityCount(String defaultName) {
@@ -48,9 +50,9 @@ public class CommandEntityCount extends ServerToolsCommand {
     }
 
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] par2ArrayOfStr, BlockPos pos) {
-
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, (String[]) EntityList.classToStringMapping.values().toArray()) : null;
     }
 
@@ -72,7 +74,7 @@ public class CommandEntityCount extends ServerToolsCommand {
 
         for (Object obj : world.loadedEntityList) {
             if (obj instanceof Entity) {
-                String name = EntityList.getEntityString((Entity) obj);
+                @Nullable String name = EntityList.getEntityString((Entity) obj);
                 if (name != null) {
                     if (entityCount.containsKey(name))
                         entityCount.put(name, entityCount.get(name) + 1);
@@ -99,7 +101,7 @@ public class CommandEntityCount extends ServerToolsCommand {
         } else {
 
             int count = 0;
-            String name = null;
+            @Nullable String name = null;
             String pname = args[0];
             for (Object obj : EntityList.stringToClassMapping.keySet()) {
                 if (obj.toString().equalsIgnoreCase(pname)) name = obj.toString();
@@ -111,7 +113,7 @@ public class CommandEntityCount extends ServerToolsCommand {
                 if (obj instanceof Entity) {
                     Entity ent = (Entity) obj;
 
-                    String string = EntityList.getEntityString(ent);
+                    @Nullable String string = EntityList.getEntityString(ent);
                     if (string != null && string.equalsIgnoreCase(name)) {
                         count++;
                     }

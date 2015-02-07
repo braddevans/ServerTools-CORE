@@ -196,10 +196,12 @@ public class VoiceHandler {
     public void loadVoiceList() {
         if (!voiceFile.exists()) { return; }
         try {
-            voicedUsers = gson.fromJson(Files.toString(voiceFile, Reference.CHARSET), new TypeToken<Set<UUID>>() {}.getType());
+            final String json = Files.toString(voiceFile, Reference.CHARSET);
+            voicedUsers = gson.fromJson(json, new TypeToken<Set<UUID>>() {}.getType());
         } catch (Exception e) {
             log.error("Failed to load voiced players from file " + voiceFile, e);
         } finally {
+            //noinspection ConstantConditions
             if (voicedUsers == null) { voicedUsers = Sets.newHashSet(); }
         }
     }
@@ -229,7 +231,8 @@ public class VoiceHandler {
     public void loadSilenceList() {
         if (!silenceFile.exists()) { return; }
         try {
-            silencedUsers = gson.fromJson(Files.toString(silenceFile, Reference.CHARSET), new TypeToken<Set<UUID>>() {}.getType());
+            final String json = Files.toString(silenceFile, Reference.CHARSET);
+            silencedUsers = gson.fromJson(json, new TypeToken<Set<UUID>>() {}.getType());
         } catch (Exception e) {
             log.error("Failed to load silenced players from file " + silenceFile, e);
         }

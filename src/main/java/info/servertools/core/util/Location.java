@@ -20,6 +20,8 @@ import net.minecraft.util.BlockPos;
 
 import java.io.Serializable;
 
+import javax.annotation.Nullable;
+
 public class Location implements Serializable {
 
     private static final long serialVersionUID = 3963771476006875987L;
@@ -53,7 +55,7 @@ public class Location implements Serializable {
 
     @SuppressWarnings("RedundantIfStatement")
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
 

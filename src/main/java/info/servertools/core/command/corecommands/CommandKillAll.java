@@ -32,6 +32,8 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class CommandKillAll extends ServerToolsCommand {
 
     public CommandKillAll(String defaultName) {
@@ -44,9 +46,9 @@ public class CommandKillAll extends ServerToolsCommand {
         return CommandLevel.OP;
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-
         return args.length >= 1 ? getListOfStringsMatchingLastWord(args, EntityList.stringToClassMapping.keySet()) : null;
     }
 
@@ -62,7 +64,7 @@ public class CommandKillAll extends ServerToolsCommand {
         if (args.length != 1)
             throw new WrongUsageException(getCommandUsage(sender));
 
-        String target = null;
+        @Nullable String target = null;
 
         for (Object o : EntityList.stringToClassMapping.keySet()) {
             if (o.toString().equalsIgnoreCase(args[0])) {
@@ -80,7 +82,7 @@ public class CommandKillAll extends ServerToolsCommand {
             for (Object obj : world.loadedEntityList) {
                 if (obj instanceof Entity && (!(obj instanceof EntityPlayer))) {
                     Entity entity = (Entity) obj;
-                    String entityName = EntityList.getEntityString(entity);
+                    @Nullable String entityName = EntityList.getEntityString(entity);
                     if (entityName != null && entityName.equalsIgnoreCase(target)) {
                         world.removeEntity(entity);
                         removed++;

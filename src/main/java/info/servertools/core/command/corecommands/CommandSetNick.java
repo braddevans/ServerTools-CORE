@@ -28,6 +28,8 @@ import net.minecraft.util.BlockPos;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class CommandSetNick extends ServerToolsCommand {
 
     public CommandSetNick(String defaultName) {
@@ -58,13 +60,12 @@ public class CommandSetNick extends ServerToolsCommand {
         }
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-
         if (args.length == 1) {
             return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
         }
-
         return null;
     }
 

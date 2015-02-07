@@ -25,6 +25,8 @@ import net.minecraft.util.BlockPos;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class CommandDisarm extends ServerToolsCommand {
 
     public CommandDisarm(String defaultName) {
@@ -43,9 +45,9 @@ public class CommandDisarm extends ServerToolsCommand {
         return "/" + name + " {username}";
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] par2ArrayOfStr, BlockPos pos) {
-
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 

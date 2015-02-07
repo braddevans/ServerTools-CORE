@@ -49,9 +49,9 @@ public class CommandVoice extends ServerToolsCommand {
         return String.format("/%s [add|remove] [username]" + " OR " + "/%s reload", name, name);
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-
         if (args.length == 1) {
             return getListOfStringsMatchingLastWord(args, "add", "remove", "reload");
         } else if (args.length == 2 && !"reload".equals(args[0])) {

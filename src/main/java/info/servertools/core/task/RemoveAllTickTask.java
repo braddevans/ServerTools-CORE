@@ -15,7 +15,6 @@
  */
 package info.servertools.core.task;
 
-import info.servertools.core.ServerTools;
 import info.servertools.core.util.ChatUtils;
 
 import net.minecraft.block.Block;
@@ -36,7 +35,7 @@ public class RemoveAllTickTask implements ITickTask {
 
     private boolean isComplete;
     private final EntityPlayer player;
-    private Collection<BlockPos> blocksToRemove;
+    private final Collection<BlockPos> blocksToRemove;
     private final World world;
     private int blockCounter;
 
@@ -44,12 +43,6 @@ public class RemoveAllTickTask implements ITickTask {
 
         this.player = player;
         world = player.worldObj;
-
-        if (world == null) {
-            ServerTools.LOG.warn(String.format("Player: %s tried to start a removeall task, but their worldObj was null", player.getDisplayName()));
-            isComplete = true;
-            return;
-        }
 
         int centerX = (int) player.posX;
         int centerY = (int) player.posY;

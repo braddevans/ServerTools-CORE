@@ -26,6 +26,8 @@ import net.minecraft.util.BlockPos;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class CommandHeal extends ServerToolsCommand {
 
     public CommandHeal(String defaultName) {
@@ -38,9 +40,9 @@ public class CommandHeal extends ServerToolsCommand {
         return CommandLevel.OP;
     }
 
+    @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos) {
-
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 

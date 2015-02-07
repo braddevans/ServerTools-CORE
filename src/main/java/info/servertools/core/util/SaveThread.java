@@ -38,7 +38,7 @@ public class SaveThread extends Thread {
         this.data = data;
     }
 
-    public SaveThread(String data, File file) {
+    public SaveThread(String data, @Nullable File file) {
         this.data = data;
         this.file = file;
     }

@@ -73,26 +73,4 @@ public class Util {
 
         ServerUtils.teleportPlayer(entityPlayer, location);
     }
-
-    /**
-     * Sanity check to make sure an object is not <code>null</code>
-     *
-     * @param obj
-     *         the object
-     *
-     * @throws NullPointerException
-     *         if the object is <code>null</code>
-     */
-    public static void checkNotNull(Object... obj) {
-
-        if (obj == null) {
-            throw new NullPointerException();
-        }
-
-        for (Object object : obj) {
-            if (object == null) {
-                throw new NullPointerException();
-            }
-        }
-    }
 }
