@@ -183,12 +183,16 @@ curse {
     additionalArtifact sourcesJar, javadocJar, deobfJar
 }
 
-task clean(type: Delete, overwrite: true) << {
+task clean(type: Delete, overwrite: true) {
     file(buildDir).eachFile { file ->
         if (!'dirtyArtifacts'.equals(file.getName())) {
             delete file
         }
     }
+}
+
+task cleanAll(type: Delete) {
+    delete buildDir
 }
 
 class ProjectVersion {
