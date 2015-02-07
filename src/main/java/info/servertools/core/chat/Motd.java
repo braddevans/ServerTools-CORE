@@ -15,60 +15,55 @@
  */
 package info.servertools.core.chat;
 
-import info.servertools.core.ServerTools;
 import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
-import info.servertools.core.util.FileUtils;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 
+import com.google.common.io.Files;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
 public class Motd {
 
+    private static final Logger log = LogManager.getLogger(Motd.class);
+
     private Collection<String> motd = new ArrayList<>();
     private final File motdFile;
 
     public Motd(File motdFile) {
-
         this.motdFile = motdFile;
         loadMotd();
         FMLCommonHandler.instance().bus().register(this);
     }
 
     public void loadMotd() {
-
         if (!motdFile.exists()) {
-            try (Writer out = new OutputStreamWriter(new FileOutputStream(motdFile), Reference.FILE_ENCODING)) {
+            try {
                 for (String line : Strings.MOTD_DEFAULT) {
-                    out.write(line);
-                    out.write(System.lineSeparator());
+                    Files.append(line + Reference.LINE_SEPARATOR, motdFile, Reference.CHARSET);
                 }
             } catch (IOException e) {
-                ServerTools.LOG.log(Level.WARN, "Failed to create default MOTD", e);
+                log.error("Failed to save default MOTD to file: " + motdFile, e);
             }
-
             Collections.addAll(motd, Strings.MOTD_DEFAULT);
         } else {
             try {
-                motd = FileUtils.readFileToString(motdFile);
+                motd = Files.readLines(motdFile, Reference.CHARSET);
             } catch (IOException e) {
-                ServerTools.LOG.log(Level.ERROR, "Failed to read MOTD from file", e);
+                log.error("Failed to read MOTD from file: " + motdFile, e);
             }
         }
     }
@@ -76,7 +71,10 @@ public class Motd {
     public void serveMotd(EntityPlayer player) {
         for (String line : motd) {
             line = line.replace("$PLAYER$", player.getDisplayNameString());
-            player.addChatComponentMessage(ChatUtils.getChatComponent(line, EnumChatFormatting.WHITE));
+            for (final EnumChatFormatting formatting : EnumChatFormatting.values()) {
+                line = line.replace('$' + formatting.getFriendlyName().toUpperCase() + '$', formatting.toString());
+            }
+            player.addChatComponentMessage(ChatUtils.getChatComponent(line));
         }
     }
 
