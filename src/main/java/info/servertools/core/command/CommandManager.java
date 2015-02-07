@@ -15,7 +15,6 @@
  */
 package info.servertools.core.command;
 
-import info.servertools.core.CoreConfig;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.corecommands.CommandDisarm;
 import info.servertools.core.command.corecommands.CommandEntityCount;
@@ -27,6 +26,7 @@ import info.servertools.core.command.corecommands.CommandMemory;
 import info.servertools.core.command.corecommands.CommandMotd;
 import info.servertools.core.command.corecommands.CommandNick;
 import info.servertools.core.command.corecommands.CommandPing;
+import info.servertools.core.command.corecommands.CommandReloadConfig;
 import info.servertools.core.command.corecommands.CommandReloadMotd;
 import info.servertools.core.command.corecommands.CommandRemoveAll;
 import info.servertools.core.command.corecommands.CommandSetNick;
@@ -35,6 +35,7 @@ import info.servertools.core.command.corecommands.CommandSpawnMob;
 import info.servertools.core.command.corecommands.CommandTPS;
 import info.servertools.core.command.corecommands.CommandVoice;
 import info.servertools.core.command.corecommands.CommandWhereIs;
+import info.servertools.core.config.STConfig;
 
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.CommandHelp;
@@ -64,7 +65,7 @@ public class CommandManager {
         commandConfig.addCustomCategoryComment(ENABLE_COMMAND_CONFIG_CATEGORY, "Allows you to disable any command registered with ServerTools");
         commandConfig.addCustomCategoryComment(COMMAND_NAME_CONFIG_CATEGORY, "Allows you to rename any command registered with ServerTools");
 
-        if (commandConfig.hasChanged()) commandConfig.save();
+        if (commandConfig.hasChanged()) { commandConfig.save(); }
     }
 
     private static final Collection<ServerToolsCommand> commandsToLoad = new HashSet<>();
@@ -74,8 +75,7 @@ public class CommandManager {
     /**
      * Registers a command with ServerTools
      *
-     * @param command
-     *         A command that extends ServerToolsCommand
+     * @param command A command that extends ServerToolsCommand
      */
     public static void registerSTCommand(ServerToolsCommand command) {
 
@@ -104,7 +104,7 @@ public class CommandManager {
             commandHandler.registerCommand(command);
         }
 
-        if (CoreConfig.ENABLE_HELP_OVERRIDE) {
+        if (STConfig.settings().ENABLE_HELP_OVERRIDE) {
             commandHandler.registerCommand(new CommandHelp() {
                 @SuppressWarnings("unchecked")
                 @Override
@@ -150,6 +150,7 @@ public class CommandManager {
         registerSTCommand(new CommandPing("ping"));
         registerSTCommand(new CommandNick("nick"));
         registerSTCommand(new CommandSetNick("setnick"));
+        registerSTCommand(new CommandReloadConfig("reloadconfig"));
     }
 
     public static boolean areCommandsLoaded() {

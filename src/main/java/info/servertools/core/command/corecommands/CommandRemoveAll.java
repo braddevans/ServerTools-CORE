@@ -15,7 +15,6 @@
  */
 package info.servertools.core.command.corecommands;
 
-import info.servertools.core.CoreConfig;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
@@ -72,7 +71,7 @@ public class CommandRemoveAll extends ServerToolsCommand {
             throw new WrongUsageException(getCommandUsage(sender));
 
         EntityPlayerMP player = (EntityPlayerMP) sender;
-        int range = CoreConfig.DEFAULT_REMOVE_ALL_RANGE;
+        int range = 15;
 
         if (strings.length >= 2)
             range = Integer.parseInt(strings[1]);

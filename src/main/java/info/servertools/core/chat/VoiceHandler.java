@@ -19,17 +19,13 @@ import static net.minecraft.util.EnumChatFormatting.BLUE;
 import static net.minecraft.util.EnumChatFormatting.RED;
 import static net.minecraft.util.EnumChatFormatting.RESET;
 
-import info.servertools.core.CoreConfig;
 import info.servertools.core.ServerTools;
+import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
 import info.servertools.core.util.ServerUtils;
 
-import net.minecraft.command.server.CommandBroadcast;
-import net.minecraft.command.server.CommandEmote;
-import net.minecraft.command.server.CommandMessage;
-import net.minecraft.command.server.CommandMessageRaw;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumChatFormatting;
@@ -61,6 +57,7 @@ public class VoiceHandler {
     private final File voiceFile = new File(ServerTools.serverToolsDir, "voice.json");
     private final File silenceFile = new File(ServerTools.serverToolsDir, "silence.json");
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
     private Set<UUID> voicedUsers = new HashSet<>();
     private Set<UUID> silencedUsers = new HashSet<>();
 
@@ -240,14 +237,14 @@ public class VoiceHandler {
 
     @SubscribeEvent
     public void nameFormat(PlayerEvent.NameFormat event) {
-        if (CoreConfig.ENABLE_OP_PREFIX) {
+        if (STConfig.settings().ENABLE_OP_PREFIX) {
             if (!MinecraftServer.getServer().isSinglePlayer() && ServerUtils.isOP(event.entityPlayer.getGameProfile())) {
-                event.displayname = String.valueOf(RED) + '[' + CoreConfig.OP_CHAT_PREFIX + "] " + RESET + event.displayname;
+                event.displayname = String.valueOf(RED) + '[' + STConfig.settings().OP_PREFIX + "] " + RESET + event.displayname;
             }
         }
 
         if (isUserVoiced(event.entityPlayer.getPersistentID())) {
-            event.displayname = String.valueOf(BLUE) + "[" + CoreConfig.VOICE_CHAT_PREFIX + "] " + RESET + event.displayname;
+            event.displayname = String.valueOf(BLUE) + "[" + STConfig.settings().VOICE_PREFIX + "] " + RESET + event.displayname;
         }
     }
 
@@ -261,15 +258,13 @@ public class VoiceHandler {
 
     @SubscribeEvent
     public void command(CommandEvent event) {
-        if (event.sender instanceof EntityPlayerMP && isUserSilenced(((EntityPlayerMP) event.sender).getPersistentID())) {
-            if (event.command instanceof CommandBroadcast
-                || event.command instanceof CommandMessage
-                || event.command instanceof CommandEmote
-                || event.command instanceof CommandMessageRaw) {
 
-                event.setCanceled(true);
-                event.sender.addChatMessage(ChatUtils.getChatComponent(Strings.ERROR_SILENCED, EnumChatFormatting.RED));
-            }
+        if (event.sender instanceof EntityPlayerMP &&
+            isUserSilenced(((EntityPlayerMP) event.sender).getPersistentID()) &&
+            STConfig.settings().SILENCE_BLACKLISTED_COMMANDS.contains(event.command.getCommandName())) {
+
+            event.setCanceled(true);
+            event.sender.addChatMessage(ChatUtils.getChatComponent(Strings.ERROR_SILENCED, EnumChatFormatting.RED));
         }
     }
 }

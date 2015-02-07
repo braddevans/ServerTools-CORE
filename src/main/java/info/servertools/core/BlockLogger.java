@@ -42,7 +42,7 @@ public class BlockLogger {
     private final boolean logBlockBreaks;
 
 
-    public BlockLogger(File breakDirectory, File placeDirectory, boolean logBlockBreaks, boolean logBlockPlaces) {
+    public BlockLogger(File breakDirectory, boolean logBlockBreaks, File placeDirectory, boolean logBlockPlaces) {
         this.logBlockBreaks = logBlockBreaks;
         this.logBlockPlaces = logBlockPlaces;
         this.breakDirectory = breakDirectory;

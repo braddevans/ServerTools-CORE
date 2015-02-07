@@ -15,8 +15,8 @@
  */
 package info.servertools.core.chat;
 
-import info.servertools.core.CoreConfig;
 import info.servertools.core.ServerTools;
+import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
@@ -82,8 +82,7 @@ public class Motd {
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-
-        if (CoreConfig.SEND_MOTD_ON_LOGIN) {
+        if (STConfig.settings().ENABLE_MOTD_LOGIN) {
             serveMotd(event.player);
         }
     }

@@ -19,6 +19,7 @@ import info.servertools.core.chat.Motd;
 import info.servertools.core.chat.NickHandler;
 import info.servertools.core.chat.VoiceHandler;
 import info.servertools.core.command.CommandManager;
+import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.task.TickHandler;
 import info.servertools.core.util.FlatBedrockGenerator;
@@ -70,7 +71,7 @@ public class ServerTools {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         /* Initialize the Core Configuration */
-        CoreConfig.init(new File(serverToolsDir, "core.cfg"));
+        STConfig.load();
 
         /* Initialize the save file for nicknames */
         NickHandler.instance.init(new File(serverToolsDir, "nicks.json"));
@@ -82,7 +83,7 @@ public class ServerTools {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         /* Register the Flat Bedrock Generator */
-        if (CoreConfig.GENERATE_FLAT_BEDROCK) {
+        if (STConfig.settings().ENABLE_FLAT_BEDROCK) {
             LOG.info("Registering Flat Bedrock Generator");
             GameRegistry.registerWorldGenerator(new FlatBedrockGenerator(), 1);
         }
@@ -97,12 +98,13 @@ public class ServerTools {
         if (voiceHandler == null) { voiceHandler = new VoiceHandler(); }
 
         /* Initialize the Block Logger */
-        if (blockLogger == null && (CoreConfig.LOG_BLOCK_BREAKS || CoreConfig.LOG_BLOCK_PLACES)) {
+        if (blockLogger == null && (STConfig.settings().ENABLE_BLOCK_BREAK_LOG ||
+                                    STConfig.settings().ENABLE_BLOCK_PLACE_LOG)) {
             blockLogger = new BlockLogger(
                     new File(serverToolsDir, "blockBreaks"),
+                    STConfig.settings().ENABLE_BLOCK_BREAK_LOG,
                     new File(serverToolsDir, "blockPlaces"),
-                    CoreConfig.LOG_BLOCK_BREAKS,
-                    CoreConfig.LOG_BLOCK_PLACES
+                    STConfig.settings().ENABLE_BLOCK_PLACE_LOG
             );
         }
 
