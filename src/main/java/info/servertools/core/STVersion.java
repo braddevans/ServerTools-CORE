@@ -18,24 +18,17 @@
  */
 package info.servertools.core;
 
-import lombok.Getter;
-
 public final class STVersion {
 
-    @Getter
-    private static final String major = "@MAJOR@";
+    public static final String MAJOR = "@MAJOR@";
 
-    @Getter
-    private static final String minor = "@MINOR@";
+    public static final String MINOR = "@MINOR@";
 
-    @Getter
-    private static final String revision = "@REV@";
+    public static final String REVISION = "@REV@";
 
-    @Getter
-    private static final String build = "@BUILD@";
+    public static final String BUILD = "@BUILD@";
 
-    @Getter
-    private static final String version = "@MAJOR@.@MINOR@.@REV@.@BUILD@";
+    public static final String VERSION = MAJOR + '.' + MINOR + '.' + REVISION + '.' + BUILD;
 
     private STVersion() {}
 }
