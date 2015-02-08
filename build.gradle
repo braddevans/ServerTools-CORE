@@ -31,7 +31,7 @@ version = new ProjectVersion(
         minor: '3',
         revision: '0',
 
-        mappings: 'snapshot_20150204'
+        mappings: 'snapshot_20150208'
 )
 
 apply from: 'gradle/maven.gradle'
