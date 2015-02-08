@@ -18,26 +18,18 @@
  */
 package info.servertools.core.util;
 
-import info.servertools.core.ServerTools;
-import info.servertools.core.lib.Reference;
-
-import com.google.common.io.Files;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.logging.log4j.Level;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
@@ -47,55 +39,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.annotation.Nullable;
 
-public class FileUtils {
-
-    /**
-     * Write a string to file
-     * <p>
-     * <b>IO is done on a separate thread!</b>
-     * </p>
-     *
-     * @param string the string to write
-     * @param file   the file to write to
-     */
-    // TODO Remove this shit
-    public static void writeStringToFile(final String string, final File file) {
-
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Files.write(string, file, Reference.CHARSET);
-                } catch (IOException e) {
-                    ServerTools.LOG.log(Level.WARN, "Failed to save file to disk", e);
-                }
-            }
-
-        }.start();
-    }
-
-    /**
-     * Read a file into a collection of strings
-     * Each line is a new collection element
-     *
-     * @param file the file to read
-     *
-     * @return A collection of strings
-     *
-     * @throws java.io.IOException IOException
-     */
-    public static Collection<String> readFileToString(File file) throws IOException {
-
-        Collection<String> lines;
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            lines = new ArrayList<>();
-            String line;
-            while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-            return lines;
-        }
-    }
+public final class FileUtils {
 
     /**
      * Check the size of a directory
@@ -105,7 +49,6 @@ public class FileUtils {
      * @return the size of the directory in bytes
      */
     public static long getFolderSize(File directory) {
-
         long length = 0;
         if (directory.exists() && directory.isDirectory()) {
             @Nullable File[] files = directory.listFiles();
@@ -115,7 +58,6 @@ public class FileUtils {
                 }
             }
         }
-
         return length;
     }
 
@@ -137,6 +79,16 @@ public class FileUtils {
         return files.length > 0 ? files[0] : null;
     }
 
+    /**
+     * Zip a directory into a zip file
+     *
+     * @param directory       The directory to compress
+     * @param zipfile         The file to compress into
+     * @param fileBlacklist   An optional collection of file names to exclude
+     * @param folderBlacklist An optional collection of directory names to exclude
+     *
+     * @throws IOException If a problem occurs
+     */
     public static void zipDirectory(File directory, File zipfile, @Nullable Collection<String> fileBlacklist, @Nullable Collection<String> folderBlacklist) throws IOException {
         URI baseDir = directory.toURI();
         Deque<File> queue = new LinkedList<>();
@@ -187,4 +139,6 @@ public class FileUtils {
             copy(in, out);
         }
     }
+
+    private FileUtils() {}
 }
