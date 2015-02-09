@@ -55,9 +55,11 @@ public class CommandSetNick extends ServerToolsCommand {
         if (args.length == 1) {
             EntityPlayer player = getPlayer(sender, args[0]);
             NickHandler.instance.setNick(player, player.getGameProfile().getName());
+            notifyOperators(sender, this, "Removed %s's nickname", player.getName());
         } else if (args.length == 2) {
             EntityPlayer player = getPlayer(sender, args[0]);
             NickHandler.instance.setNick(player, args[1]);
+            notifyOperators(sender, this, "Set %s's nickname to %s", player.getName(), args[1]);
         } else {
             throw new WrongUsageException(getCommandUsage(sender));
         }

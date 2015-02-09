@@ -18,25 +18,28 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static net.minecraft.util.EnumChatFormatting.AQUA;
+import static net.minecraft.util.EnumChatFormatting.GOLD;
+import static net.minecraft.util.EnumChatFormatting.YELLOW;
+
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.lib.Strings;
-import info.servertools.core.util.ChatUtils;
+import info.servertools.core.util.ChatMessage;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
-import java.util.HashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.procedure.TObjectIntProcedure;
+import net.minecraftforge.common.DimensionManager;
+
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -48,83 +51,65 @@ public class CommandEntityCount extends ServerToolsCommand {
 
     @Override
     public CommandLevel getCommandLevel() {
-
         return CommandLevel.OP;
     }
 
 
     @Nullable
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] par2ArrayOfStr, BlockPos pos) {
-        return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, (String[]) EntityList.classToStringMapping.values().toArray()) : null;
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return args.length >= 1 ? getListOfStringsMatchingLastWord(args, (String[]) EntityList.classToStringMapping.values().toArray()) : null;
     }
 
     @Override
-    public String getCommandUsage(ICommandSender icommandsender) {
-
-        return "/" + name + " {dimension} {entityname}";
+    public String getCommandUsage(ICommandSender sender) {
+        return "/" + name + " {DIMID}";
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+    public void processCommand(final ICommandSender sender, String[] args) throws CommandException {
 
-        if (!(sender instanceof EntityPlayer))
-            throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER);
+        WorldServer worldServer;
 
-        World world = ((EntityPlayer) sender).worldObj;
-
-        Map<String, Integer> entityCount = new HashMap<>();
-
-        for (Object obj : world.loadedEntityList) {
-            if (obj instanceof Entity) {
-                @Nullable String name = EntityList.getEntityString((Entity) obj);
-                if (name != null) {
-                    if (entityCount.containsKey(name))
-                        entityCount.put(name, entityCount.get(name) + 1);
-                    else
-                        entityCount.put(name, 1);
+        switch (args.length) {
+            case 0:
+                if (sender instanceof EntityPlayerMP) {
+                    worldServer = ((EntityPlayerMP) sender).getServerForPlayer();
+                } else {
+                    throw new WrongUsageException(getCommandUsage(sender));
                 }
+                break;
+            case 1:
+                @Nullable WorldServer world = DimensionManager.getWorld(parseInt(args[0]));
+                if (world != null) {
+                    worldServer = world;
+                } else {
+                    throw new CommandException("That dimension doesn't exist or isn't loaded");
+                }
+                break;
+            default:
+                throw new WrongUsageException(getCommandUsage(sender));
+        }
+
+        final TObjectIntHashMap<String> counts = new TObjectIntHashMap<>();
+
+        for (Entity entity : (List<Entity>) worldServer.loadedEntityList) {
+            final String name = EntityList.getEntityString(entity);
+            if (!counts.containsKey(name)) {
+                counts.put(name, 1);
+            } else {
+                counts.increment(name);
             }
         }
 
-        if (args.length == 0) {
-            int count = 0;
-            for (Map.Entry<String, Integer> entry : entityCount.entrySet()) {
-                count += entry.getValue();
+        sender.addChatMessage(ChatMessage.builder().color(GOLD).add("Loaded entities: ").color(AQUA).add(String.format("%d", worldServer.loadedEntityList.size())).build());
+        counts.forEachEntry(new TObjectIntProcedure<String>() {
+            @Override
+            public boolean execute(String name, int count) {
+                sender.addChatMessage(ChatMessage.builder().add("  ").color(YELLOW).add(name + ": ").color(AQUA).add(String.format("%d", count)).build());
+                return true;
             }
-
-            sender.addChatMessage(ChatUtils.getChatComponent("Entity Count: " + count, EnumChatFormatting.WHITE));
-        } else if ("all".equalsIgnoreCase(args[0])) {
-
-            sender.addChatMessage(ChatUtils.getChatComponent("Entity Count:", EnumChatFormatting.WHITE));
-
-            for (Map.Entry<String, Integer> entry : entityCount.entrySet()) {
-                sender.addChatMessage(ChatUtils.getChatComponent(String.format("  %s: %s", entry.getKey(), entry.getValue()), EnumChatFormatting.WHITE));
-            }
-        } else {
-
-            int count = 0;
-            @Nullable String name = null;
-            String pname = args[0];
-            for (Object obj : EntityList.stringToClassMapping.keySet()) {
-                if (obj.toString().equalsIgnoreCase(pname)) name = obj.toString();
-            }
-
-            if (name == null) throw new PlayerNotFoundException(Strings.COMMAND_ERROR_ENTITY_NOEXIST);
-
-            for (Object obj : world.loadedEntityList) {
-                if (obj instanceof Entity) {
-                    Entity ent = (Entity) obj;
-
-                    @Nullable String string = EntityList.getEntityString(ent);
-                    if (string != null && string.equalsIgnoreCase(name)) {
-                        count++;
-                    }
-                }
-            }
-
-            sender.addChatMessage(ChatUtils.getChatComponent(String.format("Entity: %s, Count: %s", name, count), EnumChatFormatting.WHITE));
-        }
-
+        });
     }
 }

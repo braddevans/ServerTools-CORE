@@ -51,7 +51,7 @@ public class CommandMotd extends ServerToolsCommand {
     }
 
     @Override
-    public String getCommandUsage(ICommandSender var1) {
+    public String getCommandUsage(ICommandSender sender) {
         return "/" + name;
     }
 }

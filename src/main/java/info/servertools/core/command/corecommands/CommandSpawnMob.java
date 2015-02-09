@@ -24,7 +24,6 @@ import info.servertools.core.lib.Strings;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -54,9 +53,9 @@ public class CommandSpawnMob extends ServerToolsCommand {
 
     @Nullable
     @Override
-    public List addTabCompletionOptions(ICommandSender var1, String[] var2, BlockPos pos) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         List<?> var = getValidEntities();
-        return var2.length >= 1 ? getListOfStringsMatchingLastWord(var2, (String[]) var.toArray()) : null;
+        return args.length >= 1 ? getListOfStringsMatchingLastWord(args, (String[]) var.toArray()) : null;
     }
 
     @SuppressWarnings("unchecked")
@@ -64,13 +63,13 @@ public class CommandSpawnMob extends ServerToolsCommand {
         List<String> ret = new ArrayList<>();
         for (String name : ((Map<String, Class<?>>) EntityList.stringToClassMapping).keySet()) {
             Class<?> clazz = (Class<?>) EntityList.stringToClassMapping.get(name);
-            if (EntityLiving.class.isAssignableFrom(clazz)) ret.add(name);
+            if (EntityLiving.class.isAssignableFrom(clazz)) { ret.add(name); }
         }
         return ret;
     }
 
     @Override
-    public String getCommandUsage(ICommandSender icommandsender) {
+    public String getCommandUsage(ICommandSender sender) {
 
         return "/" + name + " [mobname] {ammount}";
     }
@@ -79,15 +78,18 @@ public class CommandSpawnMob extends ServerToolsCommand {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
-        if (!(sender instanceof EntityPlayer))
-            throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER);
+        if (!(sender instanceof EntityPlayer)) { throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER); }
 
         EntityPlayer player = (EntityPlayer) sender;
 
-        if (args.length < 1) throw new WrongUsageException(getCommandUsage(sender));
+        if (args.length < 1) {
+            throw new WrongUsageException(getCommandUsage(sender));
+        }
 
         int amount = 1;
-        if (args.length > 1) amount = parseInt(args[1], 1, 100);
+        if (args.length > 1) {
+            amount = parseInt(args[1], 1, 100);
+        }
 
         @Nullable Class<?> clazz = null;
         String type = "Unknown";
@@ -98,8 +100,9 @@ public class CommandSpawnMob extends ServerToolsCommand {
                 break;
             }
         }
-        if (clazz == null || !EntityLiving.class.isAssignableFrom(clazz))
-            throw new PlayerNotFoundException(Strings.COMMAND_ERROR_ENTITY_NOEXIST);
+        if (clazz == null || !EntityLiving.class.isAssignableFrom(clazz)) {
+            throw new CommandException("That entity type doesn't exist. Try using tab completion");
+        }
 
         try {
             Constructor<?> ctor = clazz.getConstructor(World.class);
@@ -109,7 +112,7 @@ public class CommandSpawnMob extends ServerToolsCommand {
                 player.worldObj.spawnEntityInWorld(ent);
             }
         } catch (Throwable e) {
-            throw new PlayerNotFoundException(Strings.COMMAND_ERROR_ENTITY_NOEXIST);
+            throw new CommandException("Failed to spawn entity");
         }
 
         notifyOperators(sender, this, "Spawned " + amount + " " + type);

@@ -21,7 +21,6 @@ package info.servertools.core.command.corecommands;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.lib.Strings;
 
 import net.minecraft.command.ICommandSender;
 
@@ -33,20 +32,18 @@ public class CommandReloadMotd extends ServerToolsCommand {
 
     @Override
     public CommandLevel getCommandLevel() {
-
         return CommandLevel.OP;
     }
 
     @Override
-    public String getCommandUsage(ICommandSender icommandsender) {
-
+    public String getCommandUsage(ICommandSender sender) {
         return "/" + name;
     }
 
     @Override
-    public void processCommand(ICommandSender icommandsender, String[] astring) {
+    public void processCommand(ICommandSender sender, String[] args) {
 
         ServerTools.instance.motd.loadMotd();
-        notifyOperators(icommandsender, this, Strings.MOTD_RELOAD);
+        notifyOperators(sender, this, "Reloading MOTD");
     }
 }

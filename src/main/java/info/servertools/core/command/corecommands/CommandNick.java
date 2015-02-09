@@ -28,6 +28,7 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 
+//TODO more limiting of nicknames
 public class CommandNick extends ServerToolsCommand {
 
     public CommandNick(String defaultName) {
@@ -54,7 +55,6 @@ public class CommandNick extends ServerToolsCommand {
             addChatMessage(sender, "Removed nickname", EnumChatFormatting.GOLD);
         } else if (args.length == 1) {
             NickHandler.instance.setNick(player, args[0]);
-            addChatMessage(sender, "Set nick to: " + args[0], EnumChatFormatting.GOLD);
         } else {
             throw new WrongUsageException(getCommandUsage(sender));
         }

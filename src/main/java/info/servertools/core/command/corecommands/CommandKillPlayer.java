@@ -41,40 +41,38 @@ public class CommandKillPlayer extends ServerToolsCommand {
 
     @Override
     public CommandLevel getCommandLevel() {
-
         return CommandLevel.OP;
     }
 
     @Override
     public List getAliases() {
-
         return Collections.singletonList("kp");
     }
 
     @Nullable
     @Override
-    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos) {
-        return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return args.length >= 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 
     @Override
-    public boolean isUsernameIndex(String[] par1ArrayOfStr, int par2) {
-
-        return par2 == 0;
+    public boolean isUsernameIndex(String[] args, int index) {
+        return index == 0;
     }
 
     @Override
     public String getCommandUsage(ICommandSender icommandsender) {
-
         return "/" + name + " [username]";
     }
 
     @Override
-    public void processCommand(ICommandSender icommandsender, String[] astring) throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
-        if (astring.length > 0) {
-            getPlayer(icommandsender, astring[0]).attackEntityFrom(DamageSource.outOfWorld, Integer.MAX_VALUE);
-            notifyOperators(icommandsender, this, "Killing: " + astring[0]);
-        } else { throw new WrongUsageException(getCommandUsage(icommandsender)); }
+        if (args.length > 0) {
+            getPlayer(sender, args[0]).attackEntityFrom(DamageSource.magic, Integer.MAX_VALUE);
+            notifyOperators(sender, this, "Killing: " + args[0]);
+        } else {
+            throw new WrongUsageException(getCommandUsage(sender));
+        }
     }
 }

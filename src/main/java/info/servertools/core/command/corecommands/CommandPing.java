@@ -18,15 +18,17 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static net.minecraft.util.EnumChatFormatting.AQUA;
+import static net.minecraft.util.EnumChatFormatting.RESET;
+
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.util.ChatUtils;
+import info.servertools.core.util.ChatMessage;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.EnumChatFormatting;
 
 public class CommandPing extends ServerToolsCommand {
 
@@ -49,9 +51,9 @@ public class CommandPing extends ServerToolsCommand {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
-        if (!(sender instanceof EntityPlayerMP))
-            throw new WrongUsageException("Must be used by a player");
+        if (!(sender instanceof EntityPlayerMP)) { throw new WrongUsageException("Must be used by a player"); }
 
-        sender.addChatMessage(ChatUtils.getChatComponent(String.format("Your ping is %s ms", ((EntityPlayerMP) sender).ping), EnumChatFormatting.WHITE));
+        final EntityPlayerMP player = (EntityPlayerMP) sender;
+        sender.addChatMessage(ChatMessage.builder().add("Your ping to the server is ").color(AQUA).add(String.format("%d", player.ping)).color(RESET).add(" ms").build());
     }
 }

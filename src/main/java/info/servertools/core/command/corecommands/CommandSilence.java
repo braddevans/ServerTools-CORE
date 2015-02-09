@@ -48,8 +48,8 @@ public class CommandSilence extends ServerToolsCommand {
     }
 
     @Override
-    public boolean isUsernameIndex(String[] args, int par2) {
-        return par2 == 1;
+    public boolean isUsernameIndex(String[] args, int index) {
+        return index == 1;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class CommandSilence extends ServerToolsCommand {
                             throw new PlayerNotFoundException();
                         } else {
                             if (voiceHandler.addSilence(uuid)) {
-                                notifyOperators(sender, this, "Gave silence to %s", args[1]);
+                                notifyOperators(sender, this, "Set silence on %s", args[1]);
                             } else {
                                 throw new CommandException("That player was already silenced");
                             }
