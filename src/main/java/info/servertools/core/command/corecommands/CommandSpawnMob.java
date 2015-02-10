@@ -20,7 +20,6 @@ package info.servertools.core.command.corecommands;
 
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.lib.Strings;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -78,7 +77,7 @@ public class CommandSpawnMob extends ServerToolsCommand {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
-        if (!(sender instanceof EntityPlayer)) { throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER); }
+        if (!(sender instanceof EntityPlayer)) { throw new WrongUsageException("Only players can use that command"); }
 
         EntityPlayer player = (EntityPlayer) sender;
 

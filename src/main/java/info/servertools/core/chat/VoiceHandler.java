@@ -25,7 +25,6 @@ import static net.minecraft.util.EnumChatFormatting.RESET;
 import info.servertools.core.ServerTools;
 import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
-import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
 import info.servertools.core.util.ServerUtils;
 
@@ -258,7 +257,7 @@ public class VoiceHandler {
     public void serverChat(ServerChatEvent event) {
         if (isUserSilenced(event.player.getPersistentID())) {
             event.setCanceled(true);
-            event.player.addChatComponentMessage(ChatUtils.getChatComponent(Strings.ERROR_SILENCED, EnumChatFormatting.RED));
+            event.player.addChatComponentMessage(ChatUtils.getChatComponent("You are silenced on this server", EnumChatFormatting.RED));
         }
     }
 
@@ -270,7 +269,7 @@ public class VoiceHandler {
             STConfig.settings().SILENCE_BLACKLISTED_COMMANDS.contains(event.command.getCommandName())) {
 
             event.setCanceled(true);
-            event.sender.addChatMessage(ChatUtils.getChatComponent(Strings.ERROR_SILENCED, EnumChatFormatting.RED));
+            event.sender.addChatMessage(ChatUtils.getChatComponent("You are silenced on this server", EnumChatFormatting.RED));
         }
     }
 }

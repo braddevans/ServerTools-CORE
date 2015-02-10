@@ -21,7 +21,6 @@ package info.servertools.core.command.corecommands;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.lib.Strings;
 import info.servertools.core.task.RemoveAllTickTask;
 
 import net.minecraft.block.Block;
@@ -70,7 +69,7 @@ public class CommandRemoveAll extends ServerToolsCommand {
     public void processCommand(ICommandSender sender, String[] strings) throws CommandException {
 
         if (!(sender instanceof EntityPlayerMP))
-            throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER);
+            throw new WrongUsageException("Only players can use that command");
 
         if (strings.length < 1)
             throw new WrongUsageException(getCommandUsage(sender));

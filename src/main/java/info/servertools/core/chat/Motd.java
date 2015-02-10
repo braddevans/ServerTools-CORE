@@ -20,7 +20,6 @@ package info.servertools.core.chat;
 
 import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
-import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,6 +42,12 @@ public class Motd {
 
     private static final Logger log = LogManager.getLogger(Motd.class);
 
+    public static final String[] MOTD_DEFAULT = new String[]{
+            "Hello, $PLAYER$!",
+            "This is the default MOTD. In order to change it,",
+            "edit the motd.txt in the servertools directory"
+    };
+
     private Collection<String> motd = new ArrayList<>();
     private final File motdFile;
 
@@ -55,13 +60,13 @@ public class Motd {
     public void loadMotd() {
         if (!motdFile.exists()) {
             try {
-                for (String line : Strings.MOTD_DEFAULT) {
+                for (String line : MOTD_DEFAULT) {
                     Files.append(line + Reference.LINE_SEPARATOR, motdFile, Reference.CHARSET);
                 }
             } catch (IOException e) {
                 log.error("Failed to save default MOTD to file: " + motdFile, e);
             }
-            Collections.addAll(motd, Strings.MOTD_DEFAULT);
+            Collections.addAll(motd, MOTD_DEFAULT);
         } else {
             try {
                 motd = Files.readLines(motdFile, Reference.CHARSET);

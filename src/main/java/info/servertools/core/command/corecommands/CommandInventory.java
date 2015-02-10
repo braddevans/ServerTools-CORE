@@ -20,7 +20,6 @@ package info.servertools.core.command.corecommands;
 
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.lib.Strings;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -77,7 +76,7 @@ public class CommandInventory extends ServerToolsCommand {
     @Override
     public void processCommand(ICommandSender sender, String[] astring) throws CommandException {
 
-        if (!(sender instanceof EntityPlayerMP)) { throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER); }
+        if (!(sender instanceof EntityPlayerMP)) { throw new WrongUsageException("Only players can use that command"); }
 
         EntityPlayerMP player;
 
