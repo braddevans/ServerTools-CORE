@@ -24,17 +24,18 @@ import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.task.RemoveAllTickTask;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
-import com.google.common.collect.Lists;
+import gnu.trove.set.hash.THashSet;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.registry.GameData;
+import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,66 +56,47 @@ public class CommandRemoveAll extends ServerToolsCommand {
     @Override
     public String getCommandUsage(ICommandSender sender) {
 
-        return "/" + name + " [blockName] {radius}";
+        return "/" + name + " [blockName] {radius} <-u>";
     }
 
     @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-        List<String> blockNames = getBlockNames();
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, blockNames.toArray(new String[blockNames.size()])) : null;
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, GameData.getBlockRegistry().getKeys()) : null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void processCommand(ICommandSender sender, String[] strings) throws CommandException {
 
-        if (!(sender instanceof EntityPlayerMP))
-            throw new WrongUsageException("Only players can use that command");
+        if (!(sender instanceof EntityPlayerMP)) { throw new WrongUsageException("Only players can use that command"); }
 
-        if (strings.length < 1)
-            throw new WrongUsageException(getCommandUsage(sender));
+        if (strings.length < 1) { throw new WrongUsageException(getCommandUsage(sender)); }
+        int range = 15;
+        boolean blockUpdate = false;
+
+        if (ArrayUtils.contains(strings, "-u")) {
+            blockUpdate = true;
+        }
 
         EntityPlayerMP player = (EntityPlayerMP) sender;
-        int range = 15;
 
-        if (strings.length >= 2)
+        if (strings.length >= 2 && !"-u".equals(strings[1])) {
             range = Integer.parseInt(strings[1]);
+        }
 
-        Set<Block> blocksToClear = new HashSet<>();
+        Set<Block> blocksToClear = new THashSet<>();
 
-        for (Object obj : GameData.getBlockRegistry()) {
-            if (obj instanceof Block) {
-
-                String blockName = ((Block) obj).getUnlocalizedName();
-                if (blockName.startsWith("tile."))
-                    blockName = blockName.substring(5, blockName.length());
-
-                if (blockName.equalsIgnoreCase(strings[0]) && !(obj == Blocks.air)) {
-                    blocksToClear.add((Block) obj);
+        if ("fluid".equals(strings[0])) {
+            for (final Object block : GameData.getBlockRegistry()) {
+                if (block instanceof IFluidBlock || block instanceof BlockLiquid) {
+                    blocksToClear.add((Block) block);
                 }
             }
+        } else {
+            blocksToClear.add(getBlockByText(sender, strings[0]));
         }
 
-        if (blocksToClear.isEmpty())
-            throw new CommandException("That block can't be found. Try using tab-completion");
-
-        ServerTools.instance.tickHandler.registerTask(new RemoveAllTickTask(player, range, blocksToClear));
-    }
-
-    private static List<String> getBlockNames() {
-
-        List<String> list = Lists.newArrayList();
-
-        for (Object obj : GameData.getBlockRegistry()) {
-            if (obj instanceof Block) {
-                String blockName = ((Block) obj).getUnlocalizedName();
-                if (blockName.startsWith("tile."))
-                    blockName = blockName.substring(5, blockName.length());
-
-                list.add(blockName);
-            }
-        }
-
-        return list;
+        ServerTools.instance.tickHandler.registerTask(new RemoveAllTickTask(player, range, blocksToClear, blockUpdate));
     }
 }

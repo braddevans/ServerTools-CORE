@@ -29,27 +29,21 @@ public class TickHandler {
     private final ConcurrentLinkedQueue<ITickTask> tasks = new ConcurrentLinkedQueue<>();
 
     public TickHandler() {
-
         FMLCommonHandler.instance().bus().register(this);
     }
 
     public void registerTask(ITickTask task) {
-
         tasks.offer(task);
     }
 
     @SubscribeEvent
     public void tickStart(TickEvent.ServerTickEvent event) {
-
         if (event.phase != TickEvent.Phase.START) { return; }
-
         for (ITickTask task : tasks) {
-
             if (task.isComplete()) {
-                task.onComplete();
                 tasks.remove(task);
+                continue;
             }
-
             task.tick();
         }
     }

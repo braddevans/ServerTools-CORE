@@ -19,7 +19,7 @@
 package info.servertools.core.config;
 
 import info.servertools.core.STVersion;
-import info.servertools.core.ServerTools;
+import info.servertools.core.lib.Environment;
 
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +37,7 @@ public class STConfig {
     public static final String CATEGORY_WORLD = "world";
     public static final String CATEGORY_CHAT = "chat";
 
-    private static final File configFile = new File(ServerTools.serverToolsDir, "servertools.cfg");
+    private static final File configFile = new File(Environment.SERVERTOOLS_DIR, "servertools.cfg");
 
     private static Settings settings;
     
@@ -77,17 +77,17 @@ public class STConfig {
         ).getBoolean();
 
         public final boolean ENABLE_BLOCK_BREAK_LOG = config.get(
-                CATEGORY_WORLD, "enable-block-break-log", true, "Enables logging whenever a block is broken on the server"
+                CATEGORY_WORLD, "enable-block-break-log", false, "Enables logging whenever a block is broken on the server"
         ).getBoolean();
 
         public final boolean ENABLE_BLOCK_PLACE_LOG = config.get(
-                CATEGORY_WORLD, "enable-block-place-log", true, "Enables logging whenever a block is placed on the server"
+                CATEGORY_WORLD, "enable-block-place-log", false, "Enables logging whenever a block is placed on the server"
         ).getBoolean();
 
         // Chat
 
         public final boolean ENABLE_MOTD_LOGIN = config.get(
-                CATEGORY_CHAT, "enable-motd-on-login", true, "Enables sending the MOTD to players when the log onto the server"
+                CATEGORY_CHAT, "enable-motd-on-login", true, "Enables sending the MOTD to players when they log onto the server"
         ).getBoolean();
 
         public final boolean ENABLE_OP_PREFIX = config.get(

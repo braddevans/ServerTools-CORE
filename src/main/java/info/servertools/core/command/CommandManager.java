@@ -18,7 +18,6 @@
  */
 package info.servertools.core.command;
 
-import info.servertools.core.ServerTools;
 import info.servertools.core.command.corecommands.CommandDisarm;
 import info.servertools.core.command.corecommands.CommandEntityCount;
 import info.servertools.core.command.corecommands.CommandHeal;
@@ -39,6 +38,7 @@ import info.servertools.core.command.corecommands.CommandTPS;
 import info.servertools.core.command.corecommands.CommandVoice;
 import info.servertools.core.command.corecommands.CommandWhereIs;
 import info.servertools.core.config.STConfig;
+import info.servertools.core.lib.Environment;
 
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.CommandHelp;
@@ -46,94 +46,33 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 
+import gnu.trove.procedure.TObjectProcedure;
+import gnu.trove.set.hash.THashSet;
 import net.minecraftforge.common.config.Configuration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 
 public class CommandManager {
 
+    private static final Logger log = LogManager.getLogger(CommandManager.class);
+
     private static final String ENABLE_COMMAND_CONFIG_CATEGORY = "enableCommand";
     private static final String COMMAND_NAME_CONFIG_CATEGORY = "commandName";
 
-    private static final Configuration commandConfig = new Configuration(new File(ServerTools.serverToolsDir, "command.cfg"));
+    private static final Configuration commandConfig = new Configuration(new File(Environment.SERVERTOOLS_DIR, "command.cfg"));
+
+    private static final THashSet<ServerToolsCommand> commandsToLoad = new THashSet<>();
 
     static {
         commandConfig.load();
 
         commandConfig.addCustomCategoryComment(ENABLE_COMMAND_CONFIG_CATEGORY, "Allows you to disable any command registered with ServerTools");
         commandConfig.addCustomCategoryComment(COMMAND_NAME_CONFIG_CATEGORY, "Allows you to rename any command registered with ServerTools");
-
-        if (commandConfig.hasChanged()) { commandConfig.save(); }
-    }
-
-    private static final Collection<ServerToolsCommand> commandsToLoad = new HashSet<>();
-
-    private static boolean commandsLoaded = false;
-
-    /**
-     * Registers a command with ServerTools
-     *
-     * @param command A command that extends ServerToolsCommand
-     */
-    public static void registerSTCommand(ServerToolsCommand command) {
-
-        if (commandsLoaded) {
-            throw new IllegalStateException("Tried to register ServerTools Command after FMLServerStarting Event");
-        }
-
-        boolean enableCommand = commandConfig.get("enableCommand", command.getClass().getName(), true).getBoolean(true);
-        command.name = commandConfig.get("commandName", command.getClass().getName(), command.defaultName).getString();
-
-        if (enableCommand) {
-            commandsToLoad.add(command);
-        }
-
-        if (commandConfig.hasChanged()) {
-            commandConfig.save();
-        }
-
-    }
-
-    public static void registerCommands(CommandHandler commandHandler) {
-
-        for (ServerToolsCommand command : commandsToLoad) {
-            ServerTools.LOG.trace(String.format("Command: %s , has name: %s", command.getClass(), command.name));
-            ServerTools.LOG.info("Registering Command: " + command.name);
-            commandHandler.registerCommand(command);
-        }
-
-        if (STConfig.settings().ENABLE_HELP_OVERRIDE) {
-            commandHandler.registerCommand(new CommandHelp() {
-                @SuppressWarnings("unchecked")
-                @Override
-                protected List getSortedPossibleCommands(ICommandSender sender) {
-                    List<ICommand> list = MinecraftServer.getServer().getCommandManager().getPossibleCommands(sender);
-                    Collections.sort(list, new Comparator<ICommand>() {
-                        @Override
-                        public int compare(ICommand o1, ICommand o2) {
-                            return o1.getCommandName().compareTo(o2.getCommandName());
-                        }
-                    });
-                    return list;
-                }
-            });
-        }
-
-        commandsLoaded = true;
-    }
-
-    public static void onServerStopped() {
-
-        commandsLoaded = false;
-        commandsToLoad.clear();
-    }
-
-    public static void initCoreCommands() {
 
         registerSTCommand(new CommandMotd("motd"));
         registerSTCommand(new CommandVoice("voice"));
@@ -154,10 +93,57 @@ public class CommandManager {
         registerSTCommand(new CommandNick("nick"));
         registerSTCommand(new CommandSetNick("setnick"));
         registerSTCommand(new CommandReloadConfig("reloadconfig"));
+
+        if (commandConfig.hasChanged()) {
+            commandConfig.save();
+        }
     }
 
-    public static boolean areCommandsLoaded() {
+    /**
+     * Registers a command with ServerTools
+     *
+     * @param command A command that extends ServerToolsCommand
+     */
+    public static void registerSTCommand(ServerToolsCommand command) {
+        boolean enableCommand = commandConfig.get("enableCommand", command.getClass().getName(), true).getBoolean(true);
+        command.name = commandConfig.get("commandName", command.getClass().getName(), command.defaultName).getString();
 
-        return commandsLoaded;
+        if (enableCommand) {
+            commandsToLoad.add(command);
+        }
+
+        if (commandConfig.hasChanged()) {
+            commandConfig.save();
+        }
+    }
+
+    public static void registerCommands(final CommandHandler commandHandler) {
+
+        commandsToLoad.forEach(new TObjectProcedure<ServerToolsCommand>() {
+            @Override
+            public boolean execute(final ServerToolsCommand command) {
+                log.trace("Registering Command: {} , with name: {}", command.getClass(), command.name);
+                commandHandler.registerCommand(command);
+                return true;
+            }
+        });
+        commandsToLoad.clear();
+
+        if (STConfig.settings().ENABLE_HELP_OVERRIDE) {
+            commandHandler.registerCommand(new CommandHelp() {
+                @SuppressWarnings("unchecked")
+                @Override
+                protected List getSortedPossibleCommands(ICommandSender sender) {
+                    List<ICommand> list = MinecraftServer.getServer().getCommandManager().getPossibleCommands(sender);
+                    Collections.sort(list, new Comparator<ICommand>() {
+                        @Override
+                        public int compare(ICommand o1, ICommand o2) {
+                            return o1.getCommandName().compareTo(o2.getCommandName());
+                        }
+                    });
+                    return list;
+                }
+            });
+        }
     }
 }

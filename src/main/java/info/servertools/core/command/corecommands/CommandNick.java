@@ -18,7 +18,7 @@
  */
 package info.servertools.core.command.corecommands;
 
-import info.servertools.core.chat.NickHandler;
+import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 
@@ -51,10 +51,10 @@ public class CommandNick extends ServerToolsCommand {
         EntityPlayer player = getCommandSenderAsPlayer(sender);
 
         if (args.length == 0) {
-            NickHandler.instance.setNick(player, player.getGameProfile().getName());
+            ServerTools.instance.nickHandler.setNick(player, player.getGameProfile().getName());
             addChatMessage(sender, "Removed nickname", EnumChatFormatting.GOLD);
         } else if (args.length == 1) {
-            NickHandler.instance.setNick(player, args[0]);
+            ServerTools.instance.nickHandler.setNick(player, args[0]);
         } else {
             throw new WrongUsageException(getCommandUsage(sender));
         }

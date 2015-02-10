@@ -16,19 +16,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.core.task;
+package info.servertools.core.lib;
 
-public interface ITickTask {
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.relauncher.FMLInjectionData;
+
+import java.io.File;
+
+/**
+ * Reference values that will changed based on the installed environment
+ */
+public final class Environment {
 
     /**
-     * Get if this task has completed
-     *
-     * @return {@code true} if the task has completed, {@code false} if not
+     * The location where Minecraft is installed
      */
-    boolean isComplete();
+    public static final File MINECRAFT_DIR = (File) FMLInjectionData.data()[6];
 
     /**
-     * Tick this task. Called once per Minecraft tick.
+     * The location where ServerTools configs are located
      */
-    void tick();
+    public static final File SERVERTOOLS_DIR = new File(Loader.instance().getConfigDir(), "servertools");
+
+
+
+    static {
+        SERVERTOOLS_DIR.mkdirs();
+    }
+
+    private Environment() {}
 }

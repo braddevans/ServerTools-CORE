@@ -18,9 +18,11 @@
  */
 package info.servertools.core;
 
+import static info.servertools.core.lib.Environment.SERVERTOOLS_DIR;
+
 import info.servertools.core.chat.Motd;
 import info.servertools.core.chat.NickHandler;
-import info.servertools.core.chat.VoiceHandler;
+import info.servertools.core.chat.VoiceSilenceHandler;
 import info.servertools.core.command.CommandManager;
 import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
@@ -34,10 +36,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.FMLInjectionData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,41 +50,39 @@ import java.io.File;
 )
 public class ServerTools {
 
-    public static final File minecraftDir = (File) FMLInjectionData.data()[6];
-    public static final File serverToolsDir = new File(minecraftDir, "servertools");
-
-    public static final Logger LOG = LogManager.getLogger(Reference.MOD_NAME);
-
-    static {
-        serverToolsDir.mkdirs();
-    }
+    public static final Logger LOG = LogManager.getLogger(ServerTools.class);
 
     @Mod.Instance(Reference.MOD_ID)
     public static ServerTools instance;
 
     public Motd motd;
-
-    public VoiceHandler voiceHandler;
-
+    public VoiceSilenceHandler voiceSilenceHandler;
+    public NickHandler nickHandler;
     public TickHandler tickHandler;
-
     public BlockLogger blockLogger;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        /* Initialize the Core Configuration */
         STConfig.load();
 
-        /* Initialize the save file for nicknames */
-        NickHandler.instance.init(new File(serverToolsDir, "nicks.json"));
-
-        /* Create a new TickHandler Instance */
+        motd = new Motd(new File(SERVERTOOLS_DIR, "motd.txt"));
+        voiceSilenceHandler = new VoiceSilenceHandler(
+                new File(SERVERTOOLS_DIR, "voice.json"),
+                new File(SERVERTOOLS_DIR, "silence.json")
+        );
+        nickHandler = new NickHandler(new File(SERVERTOOLS_DIR, "nicks.json"));
         tickHandler = new TickHandler();
+
+        if (STConfig.settings().ENABLE_BLOCK_BREAK_LOG || STConfig.settings().ENABLE_BLOCK_PLACE_LOG) {
+            blockLogger = new BlockLogger(
+                    new File(SERVERTOOLS_DIR, "blockBreaks"), STConfig.settings().ENABLE_BLOCK_BREAK_LOG,
+                    new File(SERVERTOOLS_DIR, "blockPlaces"), STConfig.settings().ENABLE_BLOCK_PLACE_LOG
+            );
+        }
     }
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        /* Register the Flat Bedrock Generator */
+    public void init(final FMLInitializationEvent event) {
         if (STConfig.settings().ENABLE_FLAT_BEDROCK) {
             LOG.info("Registering Flat Bedrock Generator");
             GameRegistry.registerWorldGenerator(new FlatBedrockGenerator(), 1);
@@ -93,37 +90,8 @@ public class ServerTools {
     }
 
     @Mod.EventHandler
-    public void serverStarting(FMLServerStartingEvent event) {
-        /* Initialize the Message of the Day */
-        if (motd == null) { motd = new Motd(new File(serverToolsDir, "motd.txt")); }
-
-        /* Initialize the Voice Handler */
-        if (voiceHandler == null) { voiceHandler = new VoiceHandler(); }
-
-        /* Initialize the Block Logger */
-        if (blockLogger == null && (STConfig.settings().ENABLE_BLOCK_BREAK_LOG ||
-                                    STConfig.settings().ENABLE_BLOCK_PLACE_LOG)) {
-            blockLogger = new BlockLogger(
-                    new File(serverToolsDir, "blockBreaks"),
-                    STConfig.settings().ENABLE_BLOCK_BREAK_LOG,
-                    new File(serverToolsDir, "blockPlaces"),
-                    STConfig.settings().ENABLE_BLOCK_PLACE_LOG
-            );
-        }
-
-        /* Initialize the Core Commands to be Registered */
-        CommandManager.initCoreCommands();
-    }
-
-    @Mod.EventHandler
-    public void serverStarted(FMLServerStartedEvent event) {
-        /* Register All Commands In Queue */
+    public void serverStarted(final FMLServerStartedEvent event) {
         CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
         CommandManager.registerCommands(ch);
-    }
-
-    @Mod.EventHandler
-    public void serverStopped(FMLServerStoppedEvent event) {
-        CommandManager.onServerStopped();
     }
 }

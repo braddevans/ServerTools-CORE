@@ -19,7 +19,7 @@
 package info.servertools.core.command.corecommands;
 
 import info.servertools.core.ServerTools;
-import info.servertools.core.chat.VoiceHandler;
+import info.servertools.core.chat.VoiceSilenceHandler;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.util.ServerUtils;
@@ -70,7 +70,7 @@ public class CommandSilence extends ServerToolsCommand {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        final VoiceHandler voiceHandler = ServerTools.instance.voiceHandler;
+        final VoiceSilenceHandler voiceSilenceHandler = ServerTools.instance.voiceSilenceHandler;
 
         if (args.length >= 1) {
             switch (args[0]) {
@@ -80,7 +80,7 @@ public class CommandSilence extends ServerToolsCommand {
                         if (uuid == null) {
                             throw new PlayerNotFoundException();
                         } else {
-                            if (voiceHandler.addSilence(uuid)) {
+                            if (voiceSilenceHandler.setSilence(uuid)) {
                                 notifyOperators(sender, this, "Set silence on %s", args[1]);
                             } else {
                                 throw new CommandException("That player was already silenced");
@@ -96,7 +96,7 @@ public class CommandSilence extends ServerToolsCommand {
                         if (uuid == null) {
                             throw new PlayerNotFoundException();
                         } else {
-                            if (voiceHandler.removeSilence(uuid)) {
+                            if (voiceSilenceHandler.removeSilence(uuid)) {
                                 notifyOperators(sender, this, "Removed silence from %s", args[1]);
                             } else {
                                 throw new CommandException("That player wasn't silenced");
@@ -107,7 +107,7 @@ public class CommandSilence extends ServerToolsCommand {
                     }
                     break;
                 case "reload":
-                    voiceHandler.loadSilenceList();
+                    voiceSilenceHandler.loadSilenceList();
                     notifyOperators(sender, this, "Reloaded silenced players");
                     break;
                 default:

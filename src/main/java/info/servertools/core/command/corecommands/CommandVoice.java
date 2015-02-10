@@ -19,7 +19,7 @@
 package info.servertools.core.command.corecommands;
 
 import info.servertools.core.ServerTools;
-import info.servertools.core.chat.VoiceHandler;
+import info.servertools.core.chat.VoiceSilenceHandler;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.util.ServerUtils;
@@ -71,7 +71,7 @@ public class CommandVoice extends ServerToolsCommand {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        final VoiceHandler voiceHandler = ServerTools.instance.voiceHandler;
+        final VoiceSilenceHandler voiceSilenceHandler = ServerTools.instance.voiceSilenceHandler;
 
         if (args.length >= 1) {
             switch (args[0]) {
@@ -81,7 +81,7 @@ public class CommandVoice extends ServerToolsCommand {
                         if (uuid == null) {
                             throw new PlayerNotFoundException();
                         } else {
-                            if (voiceHandler.addVoice(uuid)) {
+                            if (voiceSilenceHandler.giveVoice(uuid)) {
                                 notifyOperators(sender, this, "Gave voice to %s", args[1]);
                             } else {
                                 throw new CommandException("That player was already voiced");
@@ -97,7 +97,7 @@ public class CommandVoice extends ServerToolsCommand {
                         if (uuid == null) {
                             throw new PlayerNotFoundException();
                         } else {
-                            if (voiceHandler.removeVoice(uuid)) {
+                            if (voiceSilenceHandler.removeVoice(uuid)) {
                                 notifyOperators(sender, this, "Removed voice from %s", args[1]);
                             } else {
                                 throw new CommandException("That player wasn't voiced");
@@ -108,7 +108,7 @@ public class CommandVoice extends ServerToolsCommand {
                     }
                     break;
                 case "reload":
-                    voiceHandler.loadVoiceList();
+                    voiceSilenceHandler.loadVoiceList();
                     notifyOperators(sender, this, "Reloaded voiced players");
                     break;
                 default:

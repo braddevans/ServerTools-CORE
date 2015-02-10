@@ -18,6 +18,9 @@
  */
 package info.servertools.core.task;
 
+import static net.minecraft.util.EnumChatFormatting.GOLD;
+
+import info.servertools.core.util.ChatMessage;
 import info.servertools.core.util.ChatUtils;
 
 import net.minecraft.block.Block;
@@ -41,11 +44,13 @@ public class RemoveAllTickTask implements ITickTask {
     private final Collection<BlockPos> blocksToRemove;
     private final World world;
     private int blockCounter;
+    private boolean blockUpdate;
 
-    public RemoveAllTickTask(EntityPlayer player, int radius, Collection<Block> blocksToClear) {
+    public RemoveAllTickTask(EntityPlayer player, int radius, Collection<Block> blocksToClear, boolean blockUpdate) {
 
         this.player = player;
         world = player.worldObj;
+        this.blockUpdate = blockUpdate;
 
         int centerX = (int) player.posX;
         int centerY = (int) player.posY;
@@ -65,39 +70,36 @@ public class RemoveAllTickTask implements ITickTask {
             }
         }
 
-        player.addChatComponentMessage(ChatUtils.getChatComponent(String.format("Removing %s blocks", blockCounter), EnumChatFormatting.GOLD));
+        player.addChatComponentMessage(ChatMessage.builder()
+                                               .color(GOLD).add("Removing ").color(EnumChatFormatting.AQUA).add(String.valueOf(blockCounter)).color(GOLD).add(" blocks")
+                                               .build());
 
-        if (blockCounter > LAG_THREASHOLD) { player.addChatComponentMessage(ChatUtils.getChatComponent("Removing a lot of blocks, Incomming lag", EnumChatFormatting.RED)); }
+        if (blockCounter > LAG_THREASHOLD) {
+            player.addChatMessage(ChatMessage.builder().color(EnumChatFormatting.RED).add("Removing large amount of blocks").build());
+        }
     }
 
     @Override
     public void tick() {
+        if (blocksToRemove.isEmpty()) {
+            isComplete = true;
+            player.addChatComponentMessage(ChatUtils.getChatComponent("Finished removing blocks", EnumChatFormatting.GREEN));
+            return;
+        }
 
         Iterator<BlockPos> iterator = blocksToRemove.iterator();
 
         for (int i = 0; i < BLOCKS_PER_TICK; i++) {
-
             if (iterator.hasNext()) {
                 BlockPos pos = iterator.next();
-                world.setBlockState(pos, Blocks.air.getDefaultState(), 2);
+                world.setBlockState(pos, Blocks.air.getDefaultState(), blockUpdate ? 3 : 2);
                 iterator.remove();
             }
         }
-
-        if (blocksToRemove.isEmpty()) {
-            isComplete = true;
-        }
-    }
-
-    @Override
-    public void onComplete() {
-
-        player.addChatComponentMessage(ChatUtils.getChatComponent("Finished removing blocks", EnumChatFormatting.GREEN));
     }
 
     @Override
     public boolean isComplete() {
-
         return isComplete;
     }
 }

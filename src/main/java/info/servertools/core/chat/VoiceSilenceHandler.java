@@ -18,11 +18,11 @@
  */
 package info.servertools.core.chat;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static net.minecraft.util.EnumChatFormatting.BLUE;
 import static net.minecraft.util.EnumChatFormatting.RED;
 import static net.minecraft.util.EnumChatFormatting.RESET;
 
-import info.servertools.core.ServerTools;
 import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatUtils;
@@ -33,11 +33,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumChatFormatting;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import gnu.trove.set.hash.THashSet;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
@@ -48,22 +48,28 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
+import java.lang.reflect.Type;
 import java.util.Set;
 import java.util.UUID;
 
-public class VoiceHandler {
+import javax.annotation.Nullable;
 
-    private static final Logger log = LogManager.getLogger(VoiceHandler.class);
+public class VoiceSilenceHandler {
 
-    private final File voiceFile = new File(ServerTools.serverToolsDir, "voice.json");
-    private final File silenceFile = new File(ServerTools.serverToolsDir, "silence.json");
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Logger log = LogManager.getLogger(VoiceSilenceHandler.class);
 
-    private Set<UUID> voicedUsers = new HashSet<>();
-    private Set<UUID> silencedUsers = new HashSet<>();
+    private final File voiceFile;
+    private final File silenceFile;
 
-    public VoiceHandler() {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Type setType = new TypeToken<THashSet<UUID>>() {}.getType();
+
+    private final THashSet<UUID> voicedUsers = new THashSet<>();
+    private final THashSet<UUID> silencedUsers = new THashSet<>();
+
+    public VoiceSilenceHandler(File voiceFile, File silenceFile) {
+        this.voiceFile = checkNotNull(voiceFile, "voiceFile");
+        this.silenceFile = checkNotNull(silenceFile, "silenceFile");
         loadSilenceList();
         loadVoiceList();
         MinecraftForge.EVENT_BUS.register(this);
@@ -76,7 +82,7 @@ public class VoiceHandler {
      *
      * @return {@code true} if the player is voiced, {@code false} if not
      */
-    public boolean isUserVoiced(UUID uuid) {
+    public boolean isPlayerVoiced(UUID uuid) {
         return voicedUsers.contains(uuid);
     }
 
@@ -87,7 +93,7 @@ public class VoiceHandler {
      *
      * @return {@code true} if the entry was added, {@code false} if it already existed
      */
-    public boolean addVoice(UUID uuid) {
+    public boolean giveVoice(UUID uuid) {
         if (voicedUsers.add(uuid)) {
             saveVoiceList();
             ServerUtils.refreshPlayerDisplayName(uuid);
@@ -120,7 +126,7 @@ public class VoiceHandler {
      *
      * @return {@code true} if the player is silenced, {@code false} if not
      */
-    public boolean isUserSilenced(UUID uuid) {
+    public boolean isPlayerSilenced(UUID uuid) {
         return silencedUsers.contains(uuid);
     }
 
@@ -131,7 +137,7 @@ public class VoiceHandler {
      *
      * @return {@code true} if the entry was added, {@code false} if it already existed
      */
-    public boolean addSilence(UUID uuid) {
+    public boolean setSilence(UUID uuid) {
         if (silencedUsers.add(uuid)) {
             saveSilenceList();
             return true;
@@ -156,20 +162,20 @@ public class VoiceHandler {
     }
 
     /**
-     * Get an {@link ImmutableSet immutable} set of the voiced users.
+     * Get an {@link ImmutableSet immutable} set of the voiced players.
      *
-     * @return A set of voiced users
+     * @return A set of voiced players
      */
-    public ImmutableSet<UUID> getVoicedUsers() {
+    public ImmutableSet<UUID> getVoicedPlayers() {
         return ImmutableSet.copyOf(voicedUsers);
     }
 
     /**
-     * Get an {@link ImmutableSet immutable} set of the silenced users.
+     * Get an {@link ImmutableSet immutable} set of the silenced players.
      *
-     * @return A set of voiced users
+     * @return A set of voiced players
      */
-    public ImmutableSet<UUID> getSilencedUsers() {
+    public ImmutableSet<UUID> getSilencedPlayers() {
         return ImmutableSet.copyOf(silencedUsers);
     }
 
@@ -199,12 +205,13 @@ public class VoiceHandler {
         if (!voiceFile.exists()) { return; }
         try {
             final String json = Files.toString(voiceFile, Reference.CHARSET);
-            voicedUsers = gson.fromJson(json, new TypeToken<Set<UUID>>() {}.getType());
-        } catch (Exception e) {
+            @Nullable final Set<UUID> set = gson.fromJson(json, setType);
+            if (set != null) {
+                voicedUsers.clear();
+                voicedUsers.addAll(set);
+            }
+        } catch (IOException e) {
             log.error("Failed to load voiced players from file " + voiceFile, e);
-        } finally {
-            //noinspection ConstantConditions
-            if (voicedUsers == null) { voicedUsers = Sets.newHashSet(); }
         }
     }
 
@@ -234,8 +241,12 @@ public class VoiceHandler {
         if (!silenceFile.exists()) { return; }
         try {
             final String json = Files.toString(silenceFile, Reference.CHARSET);
-            silencedUsers = gson.fromJson(json, new TypeToken<Set<UUID>>() {}.getType());
-        } catch (Exception e) {
+            @Nullable final Set<UUID> set = gson.fromJson(json, setType);
+            if (set != null) {
+                silencedUsers.clear();
+                silencedUsers.addAll(set);
+            }
+        } catch (IOException e) {
             log.error("Failed to load silenced players from file " + silenceFile, e);
         }
     }
@@ -248,14 +259,14 @@ public class VoiceHandler {
             }
         }
 
-        if (isUserVoiced(event.entityPlayer.getPersistentID())) {
+        if (isPlayerVoiced(event.entityPlayer.getPersistentID())) {
             event.displayname = String.valueOf(BLUE) + "[" + STConfig.settings().VOICE_PREFIX + "] " + RESET + event.displayname;
         }
     }
 
     @SubscribeEvent
     public void serverChat(ServerChatEvent event) {
-        if (isUserSilenced(event.player.getPersistentID())) {
+        if (isPlayerSilenced(event.player.getPersistentID())) {
             event.setCanceled(true);
             event.player.addChatComponentMessage(ChatUtils.getChatComponent("You are silenced on this server", EnumChatFormatting.RED));
         }
@@ -265,7 +276,7 @@ public class VoiceHandler {
     public void command(CommandEvent event) {
 
         if (event.sender instanceof EntityPlayerMP &&
-            isUserSilenced(((EntityPlayerMP) event.sender).getPersistentID()) &&
+            isPlayerSilenced(((EntityPlayerMP) event.sender).getPersistentID()) &&
             STConfig.settings().SILENCE_BLACKLISTED_COMMANDS.contains(event.command.getCommandName())) {
 
             event.setCanceled(true);
