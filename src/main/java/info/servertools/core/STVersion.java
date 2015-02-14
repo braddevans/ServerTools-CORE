@@ -16,28 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.util.test;
+package info.servertools.core;
 
-import static org.junit.Assert.assertEquals;
+public final class STVersion {
 
-import info.servertools.core.util.GsonUtils;
-import org.junit.Test;
+    public static final String MAJOR = "@MAJOR@";
 
-import java.util.ArrayList;
-import java.util.List;
+    public static final String MINOR = "@MINOR@";
 
-public class GsonUtilsTest {
+    public static final String REVISION = "@REV@";
 
-    @Test
-    public void test() {
-        List<String> list = new ArrayList<>();
-        list.add("matt");
-        list.add("notch");
-        list.add("minecraft");
+    public static final String BUILD = "@BUILD@";
 
-        String listJson = GsonUtils.toJson(list, false);
-        String expectedJson = "[\"matt\",\"notch\",\"minecraft\"]";
+    public static final String VERSION = MAJOR + '.' + MINOR + '.' + REVISION + '.' + BUILD;
 
-        assertEquals(listJson, expectedJson);
-    }
+    private STVersion() {}
 }

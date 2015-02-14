@@ -16,28 +16,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.util.test;
+package info.servertools.core.lib;
 
-import static org.junit.Assert.assertEquals;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.relauncher.FMLInjectionData;
 
-import info.servertools.core.util.GsonUtils;
-import org.junit.Test;
+import java.io.File;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Reference values that will changed based on the installed environment
+ */
+public final class Environment {
 
-public class GsonUtilsTest {
+    /**
+     * The location where Minecraft is installed
+     */
+    public static final File MINECRAFT_DIR = (File) FMLInjectionData.data()[6];
 
-    @Test
-    public void test() {
-        List<String> list = new ArrayList<>();
-        list.add("matt");
-        list.add("notch");
-        list.add("minecraft");
+    /**
+     * The location where ServerTools configs are located
+     */
+    public static final File SERVERTOOLS_DIR = new File(Loader.instance().getConfigDir(), "servertools");
 
-        String listJson = GsonUtils.toJson(list, false);
-        String expectedJson = "[\"matt\",\"notch\",\"minecraft\"]";
 
-        assertEquals(listJson, expectedJson);
+
+    static {
+        SERVERTOOLS_DIR.mkdirs();
     }
+
+    private Environment() {}
 }

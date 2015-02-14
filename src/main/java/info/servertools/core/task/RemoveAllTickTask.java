@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +18,15 @@
  */
 package info.servertools.core.task;
 
-import info.servertools.core.ServerTools;
+import static net.minecraft.util.EnumChatFormatting.GOLD;
+
+import info.servertools.core.util.ChatMessage;
 import info.servertools.core.util.ChatUtils;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 
@@ -35,20 +41,16 @@ public class RemoveAllTickTask implements ITickTask {
 
     private boolean isComplete;
     private final EntityPlayer player;
-    private Collection<TempBlock> blocksToRemove;
+    private final Collection<BlockPos> blocksToRemove;
     private final World world;
     private int blockCounter;
+    private boolean blockUpdate;
 
-    public RemoveAllTickTask(EntityPlayer player, int radius, Collection<Block> blocksToClear) {
+    public RemoveAllTickTask(EntityPlayer player, int radius, Collection<Block> blocksToClear, boolean blockUpdate) {
 
         this.player = player;
         world = player.worldObj;
-
-        if (world == null) {
-            ServerTools.LOG.warn(String.format("Player: %s tried to start a removeall task, but their worldObj was null", player.getDisplayName()));
-            isComplete = true;
-            return;
-        }
+        this.blockUpdate = blockUpdate;
 
         int centerX = (int) player.posX;
         int centerY = (int) player.posY;
@@ -58,63 +60,46 @@ public class RemoveAllTickTask implements ITickTask {
 
         for (int x = centerX - radius; x < centerX + radius; x++) {
             for (int y = centerY - radius; y < centerY + radius; y++) {
-                for (int z = centerZ - radius; z < centerZ + radius; z++)
-                    if (blocksToClear.contains(world.getBlock(x, y, z))) {
-                        blocksToRemove.add(new TempBlock(x, y, z));
+                for (int z = centerZ - radius; z < centerZ + radius; z++) {
+                    final BlockPos pos = new BlockPos(x, y, z);
+                    if (blocksToClear.contains(world.getBlockState(pos).getBlock())) {
+                        blocksToRemove.add(pos);
                         blockCounter++;
                     }
+                }
             }
         }
 
-        player.addChatComponentMessage(ChatUtils.getChatComponent(String.format("Removing %s blocks", blockCounter), EnumChatFormatting.GOLD));
+        player.addChatComponentMessage(ChatMessage.builder()
+                                               .color(GOLD).add("Removing ").color(EnumChatFormatting.AQUA).add(String.valueOf(blockCounter)).color(GOLD).add(" blocks")
+                                               .build());
 
-        if (blockCounter > LAG_THREASHOLD)
-            player.addChatComponentMessage(ChatUtils.getChatComponent("Removing a lot of blocks, Incomming lag", EnumChatFormatting.RED));
+        if (blockCounter > LAG_THREASHOLD) {
+            player.addChatMessage(ChatMessage.builder().color(EnumChatFormatting.RED).add("Removing large amount of blocks").build());
+        }
     }
 
     @Override
     public void tick() {
+        if (blocksToRemove.isEmpty()) {
+            isComplete = true;
+            player.addChatComponentMessage(ChatUtils.getChatComponent("Finished removing blocks", EnumChatFormatting.GREEN));
+            return;
+        }
 
-        Iterator<TempBlock> iterator = blocksToRemove.iterator();
+        Iterator<BlockPos> iterator = blocksToRemove.iterator();
 
         for (int i = 0; i < BLOCKS_PER_TICK; i++) {
-
             if (iterator.hasNext()) {
-                TempBlock block = iterator.next();
-                world.setBlock(block.x, block.y, block.z, Blocks.air, 0, 2);
+                BlockPos pos = iterator.next();
+                world.setBlockState(pos, Blocks.air.getDefaultState(), blockUpdate ? 3 : 2);
                 iterator.remove();
             }
         }
-
-        if (blocksToRemove.isEmpty()) {
-            isComplete = true;
-        }
-    }
-
-    @Override
-    public void onComplete() {
-
-        player.addChatComponentMessage(ChatUtils.getChatComponent("Finished removing blocks", EnumChatFormatting.GREEN));
     }
 
     @Override
     public boolean isComplete() {
-
         return isComplete;
-    }
-
-    /**
-     * Used to reference an actaul block in world
-     */
-    private static class TempBlock {
-        final int x;
-        final int y;
-        final int z;
-
-        TempBlock(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
     }
 }

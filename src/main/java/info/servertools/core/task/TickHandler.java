@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +18,9 @@
  */
 package info.servertools.core.task;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -26,28 +29,21 @@ public class TickHandler {
     private final ConcurrentLinkedQueue<ITickTask> tasks = new ConcurrentLinkedQueue<>();
 
     public TickHandler() {
-
         FMLCommonHandler.instance().bus().register(this);
     }
 
     public void registerTask(ITickTask task) {
-
         tasks.offer(task);
     }
 
     @SubscribeEvent
     public void tickStart(TickEvent.ServerTickEvent event) {
-
-        if (event.phase != TickEvent.Phase.START)
-            return;
-
+        if (event.phase != TickEvent.Phase.START) { return; }
         for (ITickTask task : tasks) {
-
             if (task.isComplete()) {
-                task.onComplete();
                 tasks.remove(task);
+                continue;
             }
-
             task.tick();
         }
     }

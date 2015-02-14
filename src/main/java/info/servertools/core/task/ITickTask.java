@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +20,15 @@ package info.servertools.core.task;
 
 public interface ITickTask {
 
+    /**
+     * Get if this task has completed
+     *
+     * @return {@code true} if the task has completed, {@code false} if not
+     */
     boolean isComplete();
 
+    /**
+     * Tick this task. Called once per Minecraft tick.
+     */
     void tick();
-
-    void onComplete();
 }

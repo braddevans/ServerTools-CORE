@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +18,9 @@
  */
 package info.servertools.core.command;
 
-import info.servertools.core.CoreConfig;
-import info.servertools.core.ServerTools;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import info.servertools.core.command.corecommands.CommandDisarm;
 import info.servertools.core.command.corecommands.CommandEntityCount;
 import info.servertools.core.command.corecommands.CommandHeal;
@@ -27,6 +31,7 @@ import info.servertools.core.command.corecommands.CommandMemory;
 import info.servertools.core.command.corecommands.CommandMotd;
 import info.servertools.core.command.corecommands.CommandNick;
 import info.servertools.core.command.corecommands.CommandPing;
+import info.servertools.core.command.corecommands.CommandReloadConfig;
 import info.servertools.core.command.corecommands.CommandReloadMotd;
 import info.servertools.core.command.corecommands.CommandRemoveAll;
 import info.servertools.core.command.corecommands.CommandSetNick;
@@ -35,6 +40,7 @@ import info.servertools.core.command.corecommands.CommandSpawnMob;
 import info.servertools.core.command.corecommands.CommandTPS;
 import info.servertools.core.command.corecommands.CommandVoice;
 import info.servertools.core.command.corecommands.CommandWhereIs;
+import info.servertools.core.config.STConfig;
 
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.CommandHelp;
@@ -42,50 +48,56 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 
+import gnu.trove.procedure.TObjectProcedure;
+import gnu.trove.set.hash.THashSet;
 import net.minecraftforge.common.config.Configuration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 
 public class CommandManager {
 
-    private static final String ENABLE_COMMAND_CONFIG_CATEGORY = "enableCommand";
-    private static final String COMMAND_NAME_CONFIG_CATEGORY = "commandName";
+    private static final Logger log = LogManager.getLogger(CommandManager.class);
 
-    private static final Configuration commandConfig = new Configuration(new File(ServerTools.serverToolsDir, "command.cfg"));
+    private static final String
+            ENABLE_COMMAND_CATEGORY = "enableCommand",
+            COMMAND_NAME_CATEGORY = "commandName";
 
-    static {
-        commandConfig.load();
+    private final Configuration commandConfig;
+    private final THashSet<ServerToolsCommand> commandsToLoad = new THashSet<>();
 
-        commandConfig.addCustomCategoryComment(ENABLE_COMMAND_CONFIG_CATEGORY, "Allows you to disable any command registered with ServerTools");
-        commandConfig.addCustomCategoryComment(COMMAND_NAME_CONFIG_CATEGORY, "Allows you to rename any command registered with ServerTools");
+    public CommandManager(final File configFile) {
+        checkNotNull(configFile, "configFile");
+        checkArgument(!configFile.exists() || configFile.isFile(), "A directory exists with the same name as the command config file: " + configFile);
 
-        if (commandConfig.hasChanged()) commandConfig.save();
+        commandConfig = new Configuration(configFile);
+
+        commandConfig.addCustomCategoryComment(ENABLE_COMMAND_CATEGORY, "Allows you to disable any command registered with ServerTools");
+        commandConfig.addCustomCategoryComment(COMMAND_NAME_CATEGORY, "Allows you to rename any command registered with ServerTools");
+
+        registerCoreCommands();
+
+        if (commandConfig.hasChanged()) {
+            commandConfig.save();
+        }
     }
 
-    private static final Collection<ServerToolsCommand> commandsToLoad = new HashSet<>();
-
-    private static boolean commandsLoaded = false;
-
     /**
-     * Registers a command with ServerTools
+     * Register a command with ServerTools
      *
-     * @param command
-     *         A command that extends ServerToolsCommand
+     * @param command A command that extends ServerToolsCommand
      */
-    public static void registerSTCommand(ServerToolsCommand command) {
+    public void registerCommand(final ServerToolsCommand command) {
+        final boolean enableCommand = commandConfig.get(ENABLE_COMMAND_CATEGORY, command.getClass().getName(), true).getBoolean(true);
+        final String name = commandConfig.get(COMMAND_NAME_CATEGORY, command.getClass().getName(), command.defaultName).getString();
 
-        if (commandsLoaded) {
-            throw new IllegalStateException("Tried to register ServerTools Command after FMLServerStarting Event");
-        }
+        log.debug("RegisterCommand Default Name: {}, Configured Name: {}, Enable?: {}", command.defaultName, name, enableCommand);
 
-        boolean enableCommand = commandConfig.get("enableCommand", command.getClass().getName(), true).getBoolean(true);
-        command.name = commandConfig.get("commandName", command.getClass().getName(), command.defaultName).getString();
-
+        command.name = name;
         if (enableCommand) {
             commandsToLoad.add(command);
         }
@@ -93,18 +105,20 @@ public class CommandManager {
         if (commandConfig.hasChanged()) {
             commandConfig.save();
         }
-
     }
 
-    public static void registerCommands(CommandHandler commandHandler) {
+    public void registerCommands() {
+        final CommandHandler commandHandler = (CommandHandler) MinecraftServer.getServer().getCommandManager();
+        commandsToLoad.forEach(new TObjectProcedure<ServerToolsCommand>() {
+            @Override
+            public boolean execute(final ServerToolsCommand command) {
+                commandHandler.registerCommand(command);
+                return true;
+            }
+        });
+        commandsToLoad.clear();
 
-        for (ServerToolsCommand command : commandsToLoad) {
-            ServerTools.LOG.trace(String.format("Command: %s , has name: %s", command.getClass(), command.name));
-            ServerTools.LOG.info("Registering Command: " + command.name);
-            commandHandler.registerCommand(command);
-        }
-
-        if (CoreConfig.ENABLE_HELP_OVERRIDE) {
+        if (STConfig.settings().ENABLE_HELP_OVERRIDE) {
             commandHandler.registerCommand(new CommandHelp() {
                 @SuppressWarnings("unchecked")
                 @Override
@@ -120,40 +134,27 @@ public class CommandManager {
                 }
             });
         }
-
-        commandsLoaded = true;
     }
 
-    public static void onServerStopped() {
-
-        commandsLoaded = false;
-        commandsToLoad.clear();
-    }
-
-    public static void initCoreCommands() {
-
-        registerSTCommand(new CommandMotd("motd"));
-        registerSTCommand(new CommandVoice("voice"));
-        registerSTCommand(new CommandSilence("silence"));
-        registerSTCommand(new CommandDisarm("disarm"));
-        registerSTCommand(new CommandEntityCount("entitycount"));
-        registerSTCommand(new CommandHeal("heal"));
-        registerSTCommand(new CommandInventory("inventory"));
-        registerSTCommand(new CommandKillPlayer("killplayer"));
-        registerSTCommand(new CommandKillAll("killall"));
-        registerSTCommand(new CommandReloadMotd("reloadmotd"));
-        registerSTCommand(new CommandSpawnMob("spawnmob"));
-        registerSTCommand(new CommandWhereIs("whereis"));
-        registerSTCommand(new CommandTPS("tps"));
-        registerSTCommand(new CommandRemoveAll("removeall"));
-        registerSTCommand(new CommandMemory("memory"));
-        registerSTCommand(new CommandPing("ping"));
-        registerSTCommand(new CommandNick("nick"));
-        registerSTCommand(new CommandSetNick("setnick"));
-    }
-
-    public static boolean areCommandsLoaded() {
-
-        return commandsLoaded;
+    private void registerCoreCommands() {
+        registerCommand(new CommandMotd("motd"));
+        registerCommand(new CommandVoice("voice"));
+        registerCommand(new CommandSilence("silence"));
+        registerCommand(new CommandDisarm("disarm"));
+        registerCommand(new CommandEntityCount("entitycount"));
+        registerCommand(new CommandHeal("heal"));
+        registerCommand(new CommandInventory("inventory"));
+        registerCommand(new CommandKillPlayer("killplayer"));
+        registerCommand(new CommandKillAll("killall"));
+        registerCommand(new CommandReloadMotd("reloadmotd"));
+        registerCommand(new CommandSpawnMob("spawnmob"));
+        registerCommand(new CommandWhereIs("whereis"));
+        registerCommand(new CommandTPS("tps"));
+        registerCommand(new CommandRemoveAll("removeall"));
+        registerCommand(new CommandMemory("memory"));
+        registerCommand(new CommandPing("ping"));
+        registerCommand(new CommandNick("nick"));
+        registerCommand(new CommandSetNick("setnick"));
+        registerCommand(new CommandReloadConfig("reloadconfig"));
     }
 }

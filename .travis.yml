@@ -1,10 +1,10 @@
+sudo: false
 language: java
+jdk:
+  - oraclejdk7
+  - oraclejdk8
 notifications:
   email: false
 install: true
 script:
-  - gradle clean setupCIWorkspace build --refresh-dependencies
-  - git diff --exit-code
-matrix:
-  include:
-  - jdk: openjdk7
+  - gradle build --info -s

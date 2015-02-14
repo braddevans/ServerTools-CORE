@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +21,15 @@ package info.servertools.core.command.corecommands;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class CommandDisarm extends ServerToolsCommand {
 
@@ -31,35 +39,36 @@ public class CommandDisarm extends ServerToolsCommand {
 
     @Override
     public CommandLevel getCommandLevel() {
-
         return CommandLevel.OP;
     }
 
     @Override
-    public String getCommandUsage(ICommandSender icommandsender) {
-
+    public String getCommandUsage(ICommandSender sender) {
         return "/" + name + " {username}";
     }
 
+    @Nullable
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] par2ArrayOfStr) {
-
-        return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return args.length >= 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 
     @Override
-    public boolean isUsernameIndex(String[] par1ArrayOfStr, int par2) {
-
-        return par2 == 0;
+    public boolean isUsernameIndex(String[] args, int index) {
+        return index == 0;
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] astring) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
-        if (astring.length < 1) {
-            getCommandSenderAsPlayer(sender).inventory.dropAllItems();
+        EntityPlayerMP player;
+        if (args.length < 1) {
+            player = getCommandSenderAsPlayer(sender);
         } else {
-            getPlayer(sender, astring[0]).inventory.dropAllItems();
+            player = getPlayer(sender, args[0]);
         }
+
+        player.inventory.dropAllItems();
+        notifyOperators(sender, this, "Disarming %s", player.getName());
     }
 }

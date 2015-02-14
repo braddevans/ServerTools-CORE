@@ -16,28 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.util.test;
+@NonNullByDefault package info.servertools.core.chat;
 
-import static org.junit.Assert.assertEquals;
-
-import info.servertools.core.util.GsonUtils;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class GsonUtilsTest {
-
-    @Test
-    public void test() {
-        List<String> list = new ArrayList<>();
-        list.add("matt");
-        list.add("notch");
-        list.add("minecraft");
-
-        String listJson = GsonUtils.toJson(list, false);
-        String expectedJson = "[\"matt\",\"notch\",\"minecraft\"]";
-
-        assertEquals(listJson, expectedJson);
-    }
-}
+import info.servertools.core.util.NonNullByDefault;

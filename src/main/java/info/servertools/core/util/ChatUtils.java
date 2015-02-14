@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +21,15 @@ package info.servertools.core.util;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
+import javax.annotation.Nullable;
+
 public final class ChatUtils {
 
     public static ChatComponentText getChatComponent(String message) {
         return getChatComponent(message, null);
     }
 
-    public static ChatComponentText getChatComponent(String message, EnumChatFormatting formatting) {
+    public static ChatComponentText getChatComponent(String message, @Nullable EnumChatFormatting formatting) {
         ChatComponentText text = new ChatComponentText(message);
         if (formatting != null)
             text.getChatStyle().setColor(formatting);

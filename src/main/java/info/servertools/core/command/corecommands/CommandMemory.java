@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +20,10 @@ package info.servertools.core.command.corecommands;
 
 import static net.minecraft.util.EnumChatFormatting.AQUA;
 import static net.minecraft.util.EnumChatFormatting.RESET;
-import static net.minecraft.util.EnumChatFormatting.WHITE;
 
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.util.ChatUtils;
+import info.servertools.core.util.ChatMessage;
 
 import net.minecraft.command.ICommandSender;
 
@@ -50,6 +52,8 @@ public class CommandMemory extends ServerToolsCommand {
         long freeMemory = Runtime.getRuntime().freeMemory() / 1048576L;
         long usedMemory = totalMemory - freeMemory;
 
-        sender.addChatMessage(ChatUtils.getChatComponent(String.format("%s%s MB%s out of %s%s MB%s Used", AQUA, usedMemory, RESET, AQUA, totalMemory, RESET), WHITE));
+        sender.addChatMessage(ChatMessage.builder()
+                                      .color(AQUA).add(String.format("%d", usedMemory)).color(RESET).add(" out of ").color(AQUA).add(String.format("%d", totalMemory)).color(RESET).add(" MB used")
+                                      .build());
     }
 }

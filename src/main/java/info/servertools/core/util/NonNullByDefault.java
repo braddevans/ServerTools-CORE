@@ -16,28 +16,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.util.test;
+package info.servertools.core.util;
 
-import static org.junit.Assert.assertEquals;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
 
-import info.servertools.core.util.GsonUtils;
-import org.junit.Test;
+import javax.annotation.Nonnull;
+import javax.annotation.meta.TypeQualifierDefault;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class GsonUtilsTest {
-
-    @Test
-    public void test() {
-        List<String> list = new ArrayList<>();
-        list.add("matt");
-        list.add("notch");
-        list.add("minecraft");
-
-        String listJson = GsonUtils.toJson(list, false);
-        String expectedJson = "[\"matt\",\"notch\",\"minecraft\"]";
-
-        assertEquals(listJson, expectedJson);
-    }
+@Nonnull
+@TypeQualifierDefault({
+        FIELD,
+        LOCAL_VARIABLE,
+        METHOD,
+        PARAMETER
+})
+public @interface NonNullByDefault {
 }

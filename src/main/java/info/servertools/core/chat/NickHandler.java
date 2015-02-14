@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +31,10 @@ import com.google.common.io.Files;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import gnu.trove.map.hash.THashMap;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,13 +50,7 @@ public class NickHandler {
     private File saveFile;
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public static final NickHandler instance = new NickHandler();
-
-    public NickHandler() {
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    public void init(File saveFile) {
+    public NickHandler(File saveFile) {
         this.saveFile = saveFile;
 
         if (saveFile.exists()) {
@@ -64,10 +61,11 @@ public class NickHandler {
             } catch (IOException e) {
                 ServerTools.LOG.error("Failed to load nicknames from disk", e);
             } finally {
-                if (nickMap == null)
-                    nickMap = new HashMap<>();
+                //noinspection ConstantConditions
+                if (nickMap == null) { nickMap = new HashMap<>(); }
             }
         }
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     public void save() {

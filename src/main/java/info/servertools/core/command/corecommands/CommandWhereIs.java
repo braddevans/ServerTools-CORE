@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +18,27 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static net.minecraft.util.EnumChatFormatting.AQUA;
+import static net.minecraft.util.EnumChatFormatting.GOLD;
+import static net.minecraft.util.EnumChatFormatting.GRAY;
+import static net.minecraft.util.EnumChatFormatting.RESET;
+
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.util.ChatUtils;
+import info.servertools.core.util.ChatMessage;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.BlockPos;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class CommandWhereIs extends ServerToolsCommand {
 
@@ -37,41 +48,47 @@ public class CommandWhereIs extends ServerToolsCommand {
 
     @Override
     public CommandLevel getCommandLevel() {
-
         return CommandLevel.ANYONE;
     }
 
     @Override
-    public boolean isUsernameIndex(String[] par1ArrayOfStr, int par2) {
+    public boolean isUsernameIndex(String[] args, int index) {
+        return index == 0;
+    }
 
-        return par2 == 0;
+    @Nullable
+    @Override
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return args.length >= 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr) {
-
-        return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
-    }
-
-    @Override
-    public String getCommandUsage(ICommandSender icommandsender) {
-
+    public String getCommandUsage(ICommandSender sender) {
         return "/" + name + " [username]";
     }
 
     @Override
-    public void processCommand(ICommandSender icommandsender, String[] astring) {
+    public void processCommand(ICommandSender icommandsender, String[] args) throws CommandException {
 
-        if (astring.length < 1)
+        if (args.length == 1) {
+            EntityPlayerMP player = getPlayer(icommandsender, args[0]);
+            NumberFormat f = new DecimalFormat("#");
+            final String xPos = f.format(player.posX);
+            final String yPos = f.format(player.posY);
+            final String zPos = f.format(player.posZ);
+            final String dim = f.format(player.worldObj.provider.getDimensionId());
+            final String dimName = player.worldObj.provider.getDimensionName();
+
+            icommandsender.addChatMessage(ChatMessage.builder()
+                                                  .color(GOLD).add(player.getName() + " ").color(RESET).add("is at")
+                                                  .add(" X:").color(AQUA).add(xPos).color(RESET)
+                                                  .add(" Y:").color(AQUA).add(yPos).color(RESET)
+                                                  .add(" Z:").color(AQUA).add(zPos).color(RESET)
+                                                  .add(" In DIM:").color(AQUA).add(dim).color(RESET)
+                                                  .add(" ").color(GRAY).add('(' + dimName + ')')
+                                                  .build());
+        } else {
             throw new WrongUsageException(getCommandUsage(icommandsender));
-
-        EntityPlayerMP player = getPlayer(icommandsender, astring[0]);
-        NumberFormat f = new DecimalFormat("#");
-
-        String str = String.format("Player: %s is at X:%s Y:%s Z:%s in Dim:%s", player.getDisplayName(),
-                f.format(player.posX), f.format(player.posY), f.format(player.posZ),
-                player.worldObj.provider.dimensionId + "-" + player.worldObj.provider.getDimensionName());
-
-        icommandsender.addChatMessage(ChatUtils.getChatComponent(str, EnumChatFormatting.WHITE));
+        }
     }
 }

@@ -18,42 +18,32 @@
  */
 package info.servertools.core.command.corecommands;
 
-import static net.minecraft.util.EnumChatFormatting.AQUA;
-import static net.minecraft.util.EnumChatFormatting.RESET;
-
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.util.ChatMessage;
+import info.servertools.core.config.STConfig;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayerMP;
 
-public class CommandPing extends ServerToolsCommand {
+public class CommandReloadConfig extends ServerToolsCommand {
 
-    public CommandPing(String defaultName) {
+    public CommandReloadConfig(String defaultName) {
         super(defaultName);
     }
 
     @Override
     public CommandLevel getCommandLevel() {
-
-        return CommandLevel.ANYONE;
+        return CommandLevel.OP;
     }
 
     @Override
-    public String getCommandUsage(ICommandSender var1) {
-
+    public String getCommandUsage(ICommandSender sender) {
         return "/" + name;
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-
-        if (!(sender instanceof EntityPlayerMP)) { throw new WrongUsageException("Must be used by a player"); }
-
-        final EntityPlayerMP player = (EntityPlayerMP) sender;
-        sender.addChatMessage(ChatMessage.builder().add("Your ping to the server is ").color(AQUA).add(String.format("%d", player.ping)).color(RESET).add(" ms").build());
+        STConfig.load();
+        notifyOperators(sender, this, "Reloaded ServerTools configuration");
     }
 }

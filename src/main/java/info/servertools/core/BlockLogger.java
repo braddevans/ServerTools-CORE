@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +22,9 @@ import info.servertools.core.lib.Reference;
 import info.servertools.core.util.SaveThread;
 
 import com.google.common.io.Files;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +45,7 @@ public class BlockLogger {
     private final boolean logBlockBreaks;
 
 
-    public BlockLogger(File breakDirectory, File placeDirectory, boolean logBlockBreaks, boolean logBlockPlaces) {
+    public BlockLogger(File breakDirectory, boolean logBlockBreaks, File placeDirectory, boolean logBlockPlaces) {
         this.logBlockBreaks = logBlockBreaks;
         this.logBlockPlaces = logBlockPlaces;
         this.breakDirectory = breakDirectory;
@@ -70,11 +73,11 @@ public class BlockLogger {
                 "%s,%s,%s,%s,%s,%s,%s",
                 TIME_FORMAT.format(Calendar.getInstance().getTime()), //When was it placed
                 event.getPlayer().getPersistentID(), // Who placed it (UUID)
-                event.world.provider.dimensionId, // What dimension was it in
-                event.x, // XCoord
-                event.y, // YCoord
-                event.z, // ZCoord
-                event.block.getUnlocalizedName() // What block was it
+                event.world.provider.getDimensionId(), // What dimension was it in
+                event.pos.getX(), // XCoord
+                event.pos.getY(), // YCoord
+                event.pos.getZ(), // ZCoord
+                event.state.getBlock().getUnlocalizedName() // What block was it
 
         ) + Reference.LINE_SEPARATOR) {
             @Override
@@ -101,11 +104,11 @@ public class BlockLogger {
                 "%s,%s,%s,%s,%s,%s,%s",
                 TIME_FORMAT.format(Calendar.getInstance().getTime()), //When was it placed
                 event.player.getPersistentID(), // Who placed it (UUID)
-                event.world.provider.dimensionId, // What dimension was it in
-                event.x, // XCoord
-                event.y, // YCoord
-                event.z, // ZCoord
-                event.block.getUnlocalizedName() // What block was it
+                event.world.provider.getDimensionId(), // What dimension was it in
+                event.pos.getX(), // XCoord
+                event.pos.getY(), // YCoord
+                event.pos.getZ(), // ZCoord
+                event.state.getBlock().getUnlocalizedName() // What block was it
 
         ) + Reference.LINE_SEPARATOR) {
             @Override

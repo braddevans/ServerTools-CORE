@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +21,9 @@ package info.servertools.util.test;
 import static org.junit.Assert.assertEquals;
 
 import info.servertools.core.util.Location;
-import net.minecraft.util.ChunkCoordinates;
+
+import net.minecraft.util.BlockPos;
+
 import org.junit.Test;
 
 public class LocationTest {
@@ -27,7 +32,7 @@ public class LocationTest {
     public void test() {
         Location loc1 = new Location(0, 1, 2, 3);
         Location loc2 = new Location(0, 1, 2, 3);
-        Location loc3 = new Location(0, new ChunkCoordinates(1, 2, 3));
+        Location loc3 = new Location(0, new BlockPos(1, 2, 3));
 
         assertEquals(loc1, loc2);
         assertEquals(loc2, loc3);

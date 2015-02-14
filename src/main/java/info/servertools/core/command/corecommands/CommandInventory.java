@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +20,8 @@ package info.servertools.core.command.corecommands;
 
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.lib.Strings;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,9 +29,13 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.IChatComponent;
 
 import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class CommandInventory extends ServerToolsCommand {
 
@@ -43,14 +50,14 @@ public class CommandInventory extends ServerToolsCommand {
     }
 
     @Override
-    public List getCommandAliases() {
+    public List getAliases() {
 
         return Collections.singletonList("inv");
     }
 
+    @Nullable
     @Override
-    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr) {
-
+    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos) {
         return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 
@@ -67,22 +74,19 @@ public class CommandInventory extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] astring) {
+    public void processCommand(ICommandSender sender, String[] astring) throws CommandException {
 
-        if (!(sender instanceof EntityPlayerMP))
-            throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER);
+        if (!(sender instanceof EntityPlayerMP)) { throw new WrongUsageException("Only players can use that command"); }
 
         EntityPlayerMP player;
 
-        if (astring.length == 0)
-            player = (EntityPlayerMP) sender;
-        else
-            player = getPlayer(sender, astring[0]);
+        if (astring.length == 0) { player = (EntityPlayerMP) sender; } else { player = getPlayer(sender, astring[0]); }
 
-        ((EntityPlayerMP)sender).displayGUIChest(new InvPlayerWrapper((EntityPlayerMP) sender, player));
+        ((EntityPlayerMP) sender).displayGUIChest(new InvPlayerWrapper((EntityPlayerMP) sender, player));
     }
 
     public static class InvPlayerWrapper implements IInventory {
+
         private final EntityPlayerMP viewer;
         private final EntityPlayer player;
 
@@ -93,16 +97,17 @@ public class CommandInventory extends ServerToolsCommand {
 
         @Override
         public int getSizeInventory() {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
             }
 
             return 45;
         }
 
+        @Nullable
         @Override
         public ItemStack getStackInSlot(int var1) {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return null;
             }
@@ -113,17 +118,18 @@ public class CommandInventory extends ServerToolsCommand {
                 return player.inventory.mainInventory[var1 - 27];
             } else if (var1 >= 36 && var1 < 40) {
                 return player.inventory.armorInventory[39 - var1];
-            } else return null;
+            } else { return null; }
         }
 
+        @Nullable
         @Override
         public ItemStack decrStackSize(int i, int j) {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return null;
             }
 
-            ItemStack stack = getStackInSlot(i);
+            @Nullable ItemStack stack = getStackInSlot(i);
             if (stack != null) {
                 if (stack.stackSize <= j) {
                     setInventorySlotContents(i, null);
@@ -136,28 +142,30 @@ public class CommandInventory extends ServerToolsCommand {
                 }
                 markDirty();
                 return stack1;
-            } else
-                return null;
+            } else { return null; }
         }
 
+        @Nullable
         @Override
         public ItemStack getStackInSlotOnClosing(int var1) {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return null;
             }
 
-            ItemStack stack = getStackInSlot(var1);
+            @Nullable ItemStack stack = getStackInSlot(var1);
             if (stack != null) {
                 setInventorySlotContents(var1, null);
                 return stack;
-            } else return null;
+            } else { return null; }
         }
 
         @Override
-        public void setInventorySlotContents(int var1, ItemStack var2) {
-            if (player == null || player.isDead) {
-                viewer.entityDropItem(var2, 0.5F);
+        public void setInventorySlotContents(int var1, @Nullable ItemStack var2) {
+            if (player.isDead) {
+                if (var2 != null) {
+                    viewer.entityDropItem(var2, 0.5F);
+                }
                 viewer.closeScreen();
                 return;
             }
@@ -168,58 +176,73 @@ public class CommandInventory extends ServerToolsCommand {
                 player.inventory.mainInventory[var1 - 27] = var2;
             } else if (var1 >= 36 && var1 < 40) {
                 player.inventory.armorInventory[39 - var1] = var2;
-            } else {
+            } else if (var2 != null) {
                 viewer.entityDropItem(var2, 0.5F);
             }
         }
 
         @Override
-        public String getInventoryName() {
-
-            return player.getCommandSenderName();
+        public String getName() {
+            return player.getName();
         }
 
         @Override
-        public boolean isCustomInventoryName() {
-
+        public boolean hasCustomName() {
             return false;
+        }
+
+        @Nullable
+        @Override
+        public IChatComponent getDisplayName() {
+            return null;
         }
 
         @Override
         public int getInventoryStackLimit() {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return 64;
             }
-
             return player.inventory.getInventoryStackLimit();
         }
 
         @Override
-        public void markDirty() {
-        }
+        public void markDirty() {}
 
         @Override
         public boolean isUseableByPlayer(EntityPlayer var1) {
-            if (player == null || player.isDead) {
+            if (player.isDead) {
                 viewer.closeScreen();
                 return false;
             }
-
             return true;
         }
 
         @Override
-        public void openChest() {
-        }
+        public void openInventory(EntityPlayer player) {}
 
         @Override
-        public void closeChest() {
-        }
+        public void closeInventory(EntityPlayer player) {}
 
         @Override
         public boolean isItemValidForSlot(int i, ItemStack itemstack) {
             return true;
         }
+
+        @Override
+        public int getField(int id) {
+            return 0;
+        }
+
+        @Override
+        public void setField(int id, int value) {}
+
+        @Override
+        public int getFieldCount() {
+            return 0;
+        }
+
+        @Override
+        public void clear() {}
     }
 }

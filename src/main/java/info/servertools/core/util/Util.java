@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,27 +75,5 @@ public class Util {
     public static void teleportPlayer(EntityPlayerMP entityPlayer, Location location) {
 
         ServerUtils.teleportPlayer(entityPlayer, location);
-    }
-
-    /**
-     * Sanity check to make sure an object is not <code>null</code>
-     *
-     * @param obj
-     *         the object
-     *
-     * @throws NullPointerException
-     *         if the object is <code>null</code>
-     */
-    public static void checkNotNull(Object... obj) {
-
-        if (obj == null) {
-            throw new NullPointerException();
-        }
-
-        for (Object object : obj) {
-            if (object == null) {
-                throw new NullPointerException();
-            }
-        }
     }
 }

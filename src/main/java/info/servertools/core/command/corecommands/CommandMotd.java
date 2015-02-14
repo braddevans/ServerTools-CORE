@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +21,8 @@ package info.servertools.core.command.corecommands;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.lib.Strings;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,17 +40,17 @@ public class CommandMotd extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
         if (sender instanceof EntityPlayer) {
 
             ServerTools.instance.motd.serveMotd((EntityPlayer) sender);
         } else
-            throw new WrongUsageException(Strings.COMMAND_ERROR_ONLYPLAYER);
+            throw new WrongUsageException("Only players can use that command");
     }
 
     @Override
-    public String getCommandUsage(ICommandSender var1) {
+    public String getCommandUsage(ICommandSender sender) {
         return "/" + name;
     }
 }

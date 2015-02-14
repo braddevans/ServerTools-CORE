@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,76 +18,77 @@
  */
 package info.servertools.core.chat;
 
-import info.servertools.core.CoreConfig;
-import info.servertools.core.ServerTools;
+import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
-import info.servertools.core.lib.Strings;
 import info.servertools.core.util.ChatUtils;
-import info.servertools.core.util.FileUtils;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
-import org.apache.logging.log4j.Level;
+import com.google.common.io.Files;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
 public class Motd {
 
+    private static final Logger log = LogManager.getLogger(Motd.class);
+
+    public static final String[] MOTD_DEFAULT = new String[]{
+            "Hello, $PLAYER$!",
+            "This is the default MOTD. In order to change it,",
+            "edit the motd.txt in the servertools directory"
+    };
+
     private Collection<String> motd = new ArrayList<>();
     private final File motdFile;
 
     public Motd(File motdFile) {
-
         this.motdFile = motdFile;
         loadMotd();
         FMLCommonHandler.instance().bus().register(this);
     }
 
     public void loadMotd() {
-
         if (!motdFile.exists()) {
-            try (Writer out = new OutputStreamWriter(new FileOutputStream(motdFile), Reference.FILE_ENCODING)) {
-                for (String line : Strings.MOTD_DEFAULT) {
-                    out.write(line);
-                    out.write(System.lineSeparator());
+            try {
+                for (String line : MOTD_DEFAULT) {
+                    Files.append(line + Reference.LINE_SEPARATOR, motdFile, Reference.CHARSET);
                 }
             } catch (IOException e) {
-                ServerTools.LOG.log(Level.WARN, "Failed to create default MOTD", e);
+                log.error("Failed to save default MOTD to file: " + motdFile, e);
             }
-
-            Collections.addAll(motd, Strings.MOTD_DEFAULT);
+            Collections.addAll(motd, MOTD_DEFAULT);
         } else {
             try {
-                motd = FileUtils.readFileToString(motdFile);
+                motd = Files.readLines(motdFile, Reference.CHARSET);
             } catch (IOException e) {
-                ServerTools.LOG.log(Level.ERROR, "Failed to read MOTD from file", e);
+                log.error("Failed to read MOTD from file: " + motdFile, e);
             }
         }
     }
 
     public void serveMotd(EntityPlayer player) {
-
         for (String line : motd) {
-            line = line.replace("$PLAYER$", player.getDisplayName());
-            player.addChatComponentMessage(ChatUtils.getChatComponent(line, EnumChatFormatting.WHITE));
+            line = line.replace("$PLAYER$", player.getDisplayNameString());
+            for (final EnumChatFormatting formatting : EnumChatFormatting.values()) {
+                line = line.replace('$' + formatting.getFriendlyName().toUpperCase() + '$', formatting.toString());
+            }
+            player.addChatComponentMessage(ChatUtils.getChatComponent(line));
         }
     }
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-
-        if (CoreConfig.SEND_MOTD_ON_LOGIN) {
+        if (STConfig.settings().ENABLE_MOTD_LOGIN) {
             serveMotd(event.player);
         }
     }

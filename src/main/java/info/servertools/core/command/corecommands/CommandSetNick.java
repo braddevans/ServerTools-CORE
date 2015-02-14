@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +18,20 @@
  */
 package info.servertools.core.command.corecommands;
 
-import info.servertools.core.chat.NickHandler;
+import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class CommandSetNick extends ServerToolsCommand {
 
@@ -43,26 +50,27 @@ public class CommandSetNick extends ServerToolsCommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
         if (args.length == 1) {
             EntityPlayer player = getPlayer(sender, args[0]);
-            NickHandler.instance.setNick(player, player.getGameProfile().getName());
+            ServerTools.instance.nickHandler.setNick(player, player.getGameProfile().getName());
+            notifyOperators(sender, this, "Removed %s's nickname", player.getName());
         } else if (args.length == 2) {
             EntityPlayer player = getPlayer(sender, args[0]);
-            NickHandler.instance.setNick(player, args[1]);
+            ServerTools.instance.nickHandler.setNick(player, args[1]);
+            notifyOperators(sender, this, "Set %s's nickname to %s", player.getName(), args[1]);
         } else {
             throw new WrongUsageException(getCommandUsage(sender));
         }
     }
 
+    @Nullable
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
-
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         if (args.length == 1) {
             return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
         }
-
         return null;
     }
 

@@ -1,5 +1,8 @@
 /*
- * Copyright 2014 ServerTools
+ * This file is a part of ServerTools <http://servertools.info>
+ *
+ * Copyright (c) 2014 ServerTools
+ * Copyright (c) 2014 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +29,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+
+import javax.annotation.Nullable;
 
 /**
  * Variety of helper methods for dealing with serializing/deserializing via {@link com.google.gson.Gson Gson}
@@ -69,7 +74,7 @@ public final class GsonUtils {
      * @param prettyPrinting
      *         if 'pretty priniting' should be used in the generated JSON
      */
-    public static void writeToFile(Object object, File toFile, Logger logger, boolean prettyPrinting) {
+    public static void writeToFile(Object object, File toFile, @Nullable Logger logger, boolean prettyPrinting) {
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(toFile), Reference.FILE_ENCODING))) {
             writer.write(toJson(object, prettyPrinting));
