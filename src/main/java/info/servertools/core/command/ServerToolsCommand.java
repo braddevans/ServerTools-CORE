@@ -18,28 +18,49 @@
  */
 package info.servertools.core.command;
 
-import info.servertools.core.util.ServerUtils;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static info.servertools.core.util.ServerUtils.isOP;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 
+/**
+ * The ServerTools implementation of the Minecraft {@link net.minecraft.command.ICommand command}
+ *
+ * <p>
+ * Commands extending this class can have their name changed via a user-configurable config file. The command can also be disabled from the file.
+ * </p>
+ */
 public abstract class ServerToolsCommand extends CommandBase {
 
-    public String name;
-    public final String defaultName;
+    /**
+     * The default name of this command
+     */
+    protected final String defaultName;
 
-    public ServerToolsCommand(String defaultName) {
+    /**
+     * The registered name of this command. Will be {@link #defaultName} unless configuration is changed
+     */
+    protected String name;
 
-        this.defaultName = defaultName;
+    /**
+     * Construct a new instance with the provided {@link #defaultName}
+     *
+     * @param defaultName The default name
+     */
+    public ServerToolsCommand(final String defaultName) {
+        this.defaultName = checkNotNull(defaultName, "defaultName");
     }
 
+    /**
+     * Get the registered name of this command
+     *
+     * @return The registered name
+     */
     @Override
     public final String getCommandName() {
-
         return name;
     }
 
@@ -50,49 +71,45 @@ public abstract class ServerToolsCommand extends CommandBase {
      */
     public abstract CommandLevel getCommandLevel();
 
-    @SuppressWarnings("RedundantIfStatement")
     @Override
-    public boolean canCommandSenderUseCommand(ICommandSender sender) {
-
-        if (!(sender instanceof EntityPlayerMP))
+    public boolean canCommandSenderUseCommand(final ICommandSender sender) {
+        if (sender instanceof EntityPlayerMP) {
+            final EntityPlayerMP player = (EntityPlayerMP) sender;
+            final CommandLevel requiredLevel = getCommandLevel();
+            return CommandLevel.ANYONE.equals(requiredLevel)
+                   || CommandLevel.OP.equals(requiredLevel) && isOP(player.getGameProfile())
+                   || MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile());
+        } else {
             return true;
-
-        EntityPlayerMP player = (EntityPlayerMP) sender;
-
-        if (getCommandLevel().equals(CommandLevel.ANYONE))
-            return true;
-
-        if (getCommandLevel().equals(CommandLevel.OP) && ServerUtils.isOP(player.getGameProfile()))
-            return true;
-
-        if (MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile()))
-            return true;
-
-        return false;
+        }
     }
 
     @Override
     public int getRequiredPermissionLevel() {
-
         switch (getCommandLevel()) {
-            case OP:
-                return 4;
             case ANYONE:
                 return 0;
+            case OP:
             default:
                 return 4;
         }
     }
 
-    public static void addChatMessage(ICommandSender sender, Object message) {
-
-        sender.addChatMessage(new ChatComponentText(String.valueOf(message)));
+    /**
+     * Set the name of this command. <b>This will only take effect before the command is registered with Minecraft</b>
+     *
+     * @param name The new registered name
+     */
+    public void setName(final String name) {
+        this.name = name;
     }
 
-    public static void addChatMessage(ICommandSender sender, Object message, EnumChatFormatting formatting) {
-
-        ChatComponentText componentText = new ChatComponentText(String.valueOf(message));
-        componentText.getChatStyle().setColor(formatting);
-        sender.addChatMessage(componentText);
+    /**
+     * The registered name of this command. Will be {@link #defaultName} unless configuration is changed
+     *
+     * @return The default name
+     */
+    public String getDefaultName() {
+        return defaultName;
     }
 }

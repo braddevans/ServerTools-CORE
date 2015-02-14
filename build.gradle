@@ -1,3 +1,8 @@
+import org.ajoberstar.grgit.Grgit
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
 buildscript {
     repositories {
         mavenCentral()
@@ -56,10 +61,10 @@ minecraft {
 
     replaceIn 'info/servertools/core/STVersion.java'
 
-    replace '@MAJOR@', project.version.major
-    replace '@MINOR@', project.version.minor
-    replace '@REV@', project.version.revision
-    replace '@BUILD@', project.version.build
+    replace '@MAJOR@': project.version.major
+    replace '@MINOR@': project.version.minor
+    replace '@REV@': project.version.revision
+    replace '@BUILD@': project.version.build
 }
 
 processResources {
@@ -101,8 +106,7 @@ license {
     mapping { java = 'SLASHSTAR_STYLE' }
 }
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
+
 
 DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ")
 format.setTimeZone(TimeZone.getTimeZone("UTC"))
@@ -117,6 +121,7 @@ def commonManifest = [
         'Version-Minor'         : project.version.minor,
         'Version-Revision'      : project.version.revision,
         'Version-Build'         : project.version.build,
+        'Git-Hash'              : project.version.gitHash,
         'Minecraft-Version'     : project.version.minecraft,
         'Forge-Version'         : project.version.forge,
         'FMLAT'                 : 'servertools_at.cfg'
@@ -178,7 +183,7 @@ curse {
 
     projectId = '64744'
     changelog = project.hasProperty('changelog') ? project.changelog : ''
-    releaseType = project.hasProperty('releaseType') ? project.releaseType : 'release'
+    releaseType = project.hasProperty('releaseType') ? project.releaseType : 'alpha'
 
     additionalArtifact sourcesJar, javadocJar, deobfJar
 }
@@ -199,12 +204,27 @@ class ProjectVersion {
 
     String forge, minecraft
     String major, minor, revision
-    String build = System.getenv().BUILD_NUMBER != null ? System.getenv().BUILD_NUMBER : 'CUSTOM'
+    String build = System.getenv().BUILD_NUMBER != null ? System.getenv().BUILD_NUMBER : '0'
+
+    String gitHash = getGitHash()
 
     String mappings
 
     @Override
     String toString() {
-        return "$minecraft-$major.$minor.$revision.$build"
+        if (!'0'.equals(build)) {
+            return "$minecraft-$major.$minor.$revision.$build"
+        } else {
+            return "$minecraft-$major.$minor.$revision.$gitHash"
+        }
+    }
+
+    static String getGitHash() {
+        if (new File('.git').exists()) {
+            Grgit repo = Grgit.open('.')
+            return repo.log().find().abbreviatedId
+        } else {
+            return 'none'
+        }
     }
 }

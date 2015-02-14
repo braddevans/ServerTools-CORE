@@ -41,7 +41,7 @@ public class STConfig {
 
     private static Settings settings;
     
-    private static Configuration config = new Configuration(configFile, STVersion.VERSION);
+    private static final Configuration config = new Configuration(configFile, STVersion.VERSION);
 
     public static Settings settings() {
         return settings;

@@ -29,9 +29,6 @@ import info.servertools.core.lib.Reference;
 import info.servertools.core.task.TickHandler;
 import info.servertools.core.util.FlatBedrockGenerator;
 
-import net.minecraft.command.CommandHandler;
-import net.minecraft.server.MinecraftServer;
-
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -60,11 +57,13 @@ public class ServerTools {
     public NickHandler nickHandler;
     public TickHandler tickHandler;
     public BlockLogger blockLogger;
+    public CommandManager commandManager;
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
+    public void preInit(final FMLPreInitializationEvent event) {
         STConfig.load();
 
+        commandManager = new CommandManager(new File(SERVERTOOLS_DIR, "command.cfg"));
         motd = new Motd(new File(SERVERTOOLS_DIR, "motd.txt"));
         voiceSilenceHandler = new VoiceSilenceHandler(
                 new File(SERVERTOOLS_DIR, "voice.json"),
@@ -91,7 +90,6 @@ public class ServerTools {
 
     @Mod.EventHandler
     public void serverStarted(final FMLServerStartedEvent event) {
-        CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
-        CommandManager.registerCommands(ch);
+        commandManager.registerCommands();
     }
 }

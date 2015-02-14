@@ -18,15 +18,17 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static net.minecraft.util.EnumChatFormatting.GREEN;
+
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
+import info.servertools.core.util.ChatMessage;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumChatFormatting;
 
 //TODO more limiting of nicknames
 public class CommandNick extends ServerToolsCommand {
@@ -52,7 +54,7 @@ public class CommandNick extends ServerToolsCommand {
 
         if (args.length == 0) {
             ServerTools.instance.nickHandler.setNick(player, player.getGameProfile().getName());
-            addChatMessage(sender, "Removed nickname", EnumChatFormatting.GOLD);
+            sender.addChatMessage(ChatMessage.builder().color(GREEN).add("Removed nickname").build());
         } else if (args.length == 1) {
             ServerTools.instance.nickHandler.setNick(player, args[0]);
         } else {

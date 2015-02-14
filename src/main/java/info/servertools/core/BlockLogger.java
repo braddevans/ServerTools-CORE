@@ -22,9 +22,9 @@ import info.servertools.core.lib.Reference;
 import info.servertools.core.util.SaveThread;
 
 import com.google.common.io.Files;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.File;
 import java.io.IOException;
