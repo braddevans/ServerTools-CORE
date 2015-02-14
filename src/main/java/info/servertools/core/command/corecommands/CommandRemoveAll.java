@@ -82,7 +82,7 @@ public class CommandRemoveAll extends ServerToolsCommand {
         EntityPlayerMP player = (EntityPlayerMP) sender;
 
         if (strings.length >= 2 && !"-u".equals(strings[1])) {
-            range = Integer.parseInt(strings[1]);
+            range = parseInt(strings[1]);
         }
 
         Set<Block> blocksToClear = new THashSet<>();
