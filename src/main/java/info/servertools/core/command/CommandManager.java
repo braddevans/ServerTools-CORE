@@ -79,8 +79,6 @@ public class CommandManager {
         commandConfig.addCustomCategoryComment(ENABLE_COMMAND_CATEGORY, "Allows you to disable any command registered with ServerTools");
         commandConfig.addCustomCategoryComment(COMMAND_NAME_CATEGORY, "Allows you to rename any command registered with ServerTools");
 
-        registerCoreCommands();
-
         if (commandConfig.hasChanged()) {
             commandConfig.save();
         }
@@ -136,7 +134,7 @@ public class CommandManager {
         }
     }
 
-    private void registerCoreCommands() {
+    public void registerCoreCommands() {
         registerCommand(new CommandMotd("motd"));
         registerCommand(new CommandVoice("voice"));
         registerCommand(new CommandSilence("silence"));

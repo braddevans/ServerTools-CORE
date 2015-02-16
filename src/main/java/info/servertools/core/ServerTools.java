@@ -90,6 +90,7 @@ public class ServerTools {
 
     @Mod.EventHandler
     public void serverStarted(final FMLServerStartedEvent event) {
+        commandManager.registerCoreCommands();
         commandManager.registerCommands();
     }
 }
