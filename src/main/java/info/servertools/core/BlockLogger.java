@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BlockLogger {
 
@@ -39,7 +41,10 @@ public class BlockLogger {
     private static final DateFormat TIME_FORMAT = new SimpleDateFormat("kk-mm-ss");
 
     private final File breakDirectory;
+    private final Lock breakFileLock = new ReentrantLock();
+
     private final File placeDirectory;
+    private final Lock placeFileLock = new ReentrantLock();
 
     private final boolean logBlockPlaces;
     private final boolean logBlockBreaks;
@@ -82,15 +87,16 @@ public class BlockLogger {
         ) + Reference.LINE_SEPARATOR) {
             @Override
             public void run() {
-                synchronized (breakDirectory) {
-                    try {
-                        if (!logFile.exists()) {
-                            writeHeader(logFile);
-                        }
-                        Files.append(data, logFile, Reference.CHARSET);
-                    } catch (IOException e) {
-                        super.log.warn("Failed to save block break file to disk", e);
+                breakFileLock.lock();
+                try {
+                    if (!logFile.exists()) {
+                        writeHeader(logFile);
                     }
+                    Files.append(data, logFile, Reference.CHARSET);
+                } catch (IOException e) {
+                    super.log.warn("Failed to save block break file to disk", e);
+                } finally {
+                    breakFileLock.unlock();
                 }
             }
         }.start();
@@ -113,15 +119,16 @@ public class BlockLogger {
         ) + Reference.LINE_SEPARATOR) {
             @Override
             public void run() {
-                synchronized (placeDirectory) {
-                    try {
-                        if (!logFile.exists()) {
-                            writeHeader(logFile);
-                        }
-                        Files.append(data, logFile, Reference.CHARSET);
-                    } catch (IOException e) {
-                        super.log.warn("Failed to save block place file to disk", e);
+                placeFileLock.unlock();
+                try {
+                    if (!logFile.exists()) {
+                        writeHeader(logFile);
                     }
+                    Files.append(data, logFile, Reference.CHARSET);
+                } catch (IOException e) {
+                    super.log.warn("Failed to save block place file to disk", e);
+                } finally {
+                    placeFileLock.unlock();
                 }
             }
         }.start();

@@ -51,6 +51,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
 
@@ -59,7 +61,10 @@ public class VoiceSilenceHandler {
     private static final Logger log = LogManager.getLogger(VoiceSilenceHandler.class);
 
     private final File voiceFile;
+    private final Lock voiceFileLock = new ReentrantLock();
+
     private final File silenceFile;
+    private final Lock silenceFileLock = new ReentrantLock();
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final Type setType = new TypeToken<THashSet<UUID>>() {}.getType();
@@ -187,12 +192,13 @@ public class VoiceSilenceHandler {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (voiceFile) {
-                    try {
-                        Files.write(json, voiceFile, Reference.CHARSET);
-                    } catch (IOException e) {
-                        log.error("Failed to save voice file " + voiceFile + " to disk", e);
-                    }
+                voiceFileLock.lock();
+                try {
+                    Files.write(json, voiceFile, Reference.CHARSET);
+                } catch (IOException e) {
+                    log.error("Failed to save voice file " + voiceFile + " to disk", e);
+                } finally {
+                    voiceFileLock.unlock();
                 }
             }
         }).start();
@@ -203,6 +209,7 @@ public class VoiceSilenceHandler {
      */
     public void loadVoiceList() {
         if (!voiceFile.exists()) { return; }
+        voiceFileLock.lock();
         try {
             final String json = Files.toString(voiceFile, Reference.CHARSET);
             @Nullable final Set<UUID> set = gson.fromJson(json, setType);
@@ -212,6 +219,8 @@ public class VoiceSilenceHandler {
             }
         } catch (IOException e) {
             log.error("Failed to load voiced players from file " + voiceFile, e);
+        } finally {
+            voiceFileLock.unlock();
         }
     }
 
@@ -223,12 +232,13 @@ public class VoiceSilenceHandler {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (silenceFile) {
-                    try {
-                        Files.write(json, silenceFile, Reference.CHARSET);
-                    } catch (IOException e) {
-                        log.error("Failed to save silence file " + silenceFile + " to disk", e);
-                    }
+                silenceFileLock.lock();
+                try {
+                    Files.write(json, silenceFile, Reference.CHARSET);
+                } catch (IOException e) {
+                    log.error("Failed to save silence file " + silenceFile + " to disk", e);
+                } finally {
+                    silenceFileLock.unlock();
                 }
             }
         }).start();
@@ -239,6 +249,7 @@ public class VoiceSilenceHandler {
      */
     public void loadSilenceList() {
         if (!silenceFile.exists()) { return; }
+        silenceFileLock.lock();
         try {
             final String json = Files.toString(silenceFile, Reference.CHARSET);
             @Nullable final Set<UUID> set = gson.fromJson(json, setType);
@@ -248,6 +259,8 @@ public class VoiceSilenceHandler {
             }
         } catch (IOException e) {
             log.error("Failed to load silenced players from file " + silenceFile, e);
+        } finally {
+            silenceFileLock.unlock();
         }
     }
 
