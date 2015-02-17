@@ -21,6 +21,7 @@ package info.servertools.core.chat;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import info.servertools.core.config.STConfig;
+import info.servertools.core.lib.Environment;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatUtils;
 
@@ -98,6 +99,7 @@ public class Motd {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    fileLock.lock();
                     motdLock.writeLock().lock();
                     try {
                         motd.clear();
@@ -105,6 +107,7 @@ public class Motd {
                     } catch (IOException e) {
                         log.error("Failed to read MOTD from file: " + motdFile, e);
                     } finally {
+                        fileLock.unlock();
                         motdLock.writeLock().unlock();
                     }
                 }
@@ -123,7 +126,7 @@ public class Motd {
                 try {
                     motdFile.delete();
                     for (final String line : MOTD_DEFAULT) {
-                        Files.append(line + Reference.LINE_SEPARATOR, motdFile, Reference.CHARSET);
+                        Files.append(line + Environment.LINE_SEPARATOR, motdFile, Reference.CHARSET);
                     }
                 } catch (IOException e) {
                     log.error("Failed to generate the default MOTD to file: " + motdFile, e);

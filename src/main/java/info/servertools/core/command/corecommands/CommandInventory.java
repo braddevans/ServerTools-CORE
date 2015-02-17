@@ -50,7 +50,7 @@ public class CommandInventory extends ServerToolsCommand {
     }
 
     @Override
-    public List getAliases() {
+    public List getCommandAliases() {
 
         return Collections.singletonList("inv");
     }
@@ -182,8 +182,8 @@ public class CommandInventory extends ServerToolsCommand {
         }
 
         @Override
-        public String getName() {
-            return player.getName();
+        public String getCommandSenderName() {
+            return player.getCommandSenderName();
         }
 
         @Override

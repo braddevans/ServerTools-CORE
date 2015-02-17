@@ -69,6 +69,6 @@ public class CommandDisarm extends ServerToolsCommand {
         }
 
         player.inventory.dropAllItems();
-        notifyOperators(sender, this, "Disarming %s", player.getName());
+        notifyOperators(sender, this, "Disarming %s", player.getCommandSenderName());
     }
 }

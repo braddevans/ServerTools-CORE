@@ -38,11 +38,15 @@ public final class Environment {
      */
     public static final File SERVERTOOLS_DIR = new File(Loader.instance().getConfigDir(), "servertools");
 
-
+    /**
+     * The system line separator
+     */
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     static {
         SERVERTOOLS_DIR.mkdirs();
     }
+
 
     private Environment() {}
 }

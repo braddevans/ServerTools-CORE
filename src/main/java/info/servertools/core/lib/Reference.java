@@ -18,23 +18,32 @@
  */
 package info.servertools.core.lib;
 
-import com.google.common.collect.ImmutableList;
-
 import java.nio.charset.Charset;
-import java.util.List;
 
 public class Reference {
 
-
+    /**
+     * Our unique Mod ID
+     */
     public static final String MOD_ID = "ServerTools";
+
+    /**
+     * The user-friendly name of the mod
+     */
     public static final String MOD_NAME = MOD_ID;
-    public static final String DEPENDENCIES = "required-after:Forge@[10.12.1.1060,)";
-    public static final String FINGERPRINT = "@FINGERPRINT@";
 
-    public static final List<String> AUTHORS = ImmutableList.of("info");
+    /**
+     * Our dependencies
+     */
+    public static final String DEPENDENCIES = "required-after:Forge@[11.14.1.1319,)";
 
-    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
-
+    /**
+     * The file encoding we save and read with
+     */
     public static final String FILE_ENCODING = "UTF-8";
+
+    /**
+     * The {@link Charset} that represents the {@link #FILE_ENCODING}
+     */
     public static final Charset CHARSET = Charset.forName(FILE_ENCODING);
 }

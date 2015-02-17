@@ -80,7 +80,7 @@ public class CommandWhereIs extends ServerToolsCommand {
             final String dimName = player.worldObj.provider.getDimensionName();
 
             icommandsender.addChatMessage(ChatMessage.builder()
-                                                  .color(GOLD).add(player.getName() + " ").color(RESET).add("is at")
+                                                  .color(GOLD).add(player.getDisplayNameString() + " ").color(RESET).add("is at")
                                                   .add(" X:").color(AQUA).add(xPos).color(RESET)
                                                   .add(" Y:").color(AQUA).add(yPos).color(RESET)
                                                   .add(" Z:").color(AQUA).add(zPos).color(RESET)

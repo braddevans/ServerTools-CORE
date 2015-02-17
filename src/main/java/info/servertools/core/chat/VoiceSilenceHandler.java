@@ -21,16 +21,18 @@ package info.servertools.core.chat;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static net.minecraft.util.EnumChatFormatting.BLUE;
 import static net.minecraft.util.EnumChatFormatting.RED;
-import static net.minecraft.util.EnumChatFormatting.RESET;
 
 import info.servertools.core.config.STConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatUtils;
 import info.servertools.core.util.ServerUtils;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
@@ -41,8 +43,9 @@ import gnu.trove.set.hash.THashSet;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -72,12 +75,18 @@ public class VoiceSilenceHandler {
     private final THashSet<UUID> voicedUsers = new THashSet<>();
     private final THashSet<UUID> silencedUsers = new THashSet<>();
 
+    final IChatComponent opPrefix = new ChatComponentText('[' + STConfig.settings().OP_PREFIX + "] ");
+    final IChatComponent voicePrefix = new ChatComponentText('[' + STConfig.settings().VOICE_PREFIX + "] ");
+
     public VoiceSilenceHandler(File voiceFile, File silenceFile) {
         this.voiceFile = checkNotNull(voiceFile, "voiceFile");
         this.silenceFile = checkNotNull(silenceFile, "silenceFile");
         loadSilenceList();
         loadVoiceList();
         MinecraftForge.EVENT_BUS.register(this);
+        FMLCommonHandler.instance().bus().register(this);
+        opPrefix.getChatStyle().setColor(RED);
+        voicePrefix.getChatStyle().setColor(BLUE);
     }
 
     /**
@@ -101,7 +110,10 @@ public class VoiceSilenceHandler {
     public boolean giveVoice(UUID uuid) {
         if (voicedUsers.add(uuid)) {
             saveVoiceList();
-            ServerUtils.refreshPlayerDisplayName(uuid);
+            @Nullable EntityPlayer player = ServerUtils.getPlayerForUUID(uuid);
+            if (player != null) {
+                refreshTags(player);
+            }
             return true;
         }
         return false;
@@ -118,7 +130,10 @@ public class VoiceSilenceHandler {
         if (voicedUsers.contains(uuid)) {
             voicedUsers.remove(uuid);
             saveVoiceList();
-            ServerUtils.refreshPlayerDisplayName(uuid);
+            @Nullable EntityPlayer player = ServerUtils.getPlayerForUUID(uuid);
+            if (player != null) {
+                refreshTags(player);
+            }
             return true;
         }
         return false;
@@ -264,17 +279,27 @@ public class VoiceSilenceHandler {
         }
     }
 
-    @SubscribeEvent
-    public void nameFormat(PlayerEvent.NameFormat event) {
-        if (STConfig.settings().ENABLE_OP_PREFIX) {
-            if (!MinecraftServer.getServer().isSinglePlayer() && ServerUtils.isOP(event.entityPlayer.getGameProfile())) {
-                event.displayname = String.valueOf(RED) + '[' + STConfig.settings().OP_PREFIX + "] " + RESET + event.displayname;
+    public void refreshTags(EntityPlayer player) {
+        if (isPlayerVoiced(player.getPersistentID())) {
+            if (!player.getPrefixes().contains(voicePrefix)) {
+                player.addPrefix(voicePrefix);
             }
+        } else {
+            player.getPrefixes().remove(voicePrefix);
         }
 
-        if (isPlayerVoiced(event.entityPlayer.getPersistentID())) {
-            event.displayname = String.valueOf(BLUE) + "[" + STConfig.settings().VOICE_PREFIX + "] " + RESET + event.displayname;
+        if (!MinecraftServer.getServer().isSinglePlayer() && ServerUtils.isOP(player.getGameProfile())) {
+            if (!player.getPrefixes().contains(opPrefix)) {
+                player.addPrefix(opPrefix);
+            }
+        } else {
+            player.getPrefixes().remove(opPrefix);
         }
+    }
+
+    @SubscribeEvent
+    public void playerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        refreshTags(event.player);
     }
 
     @SubscribeEvent

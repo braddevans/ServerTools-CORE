@@ -18,6 +18,7 @@
  */
 package info.servertools.core;
 
+import info.servertools.core.lib.Environment;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.SaveThread;
 
@@ -84,7 +85,7 @@ public class BlockLogger {
                 event.pos.getZ(), // ZCoord
                 event.state.getBlock().getUnlocalizedName() // What block was it
 
-        ) + Reference.LINE_SEPARATOR) {
+        ) + Environment.LINE_SEPARATOR) {
             @Override
             public void run() {
                 breakFileLock.lock();
@@ -116,7 +117,7 @@ public class BlockLogger {
                 event.pos.getZ(), // ZCoord
                 event.state.getBlock().getUnlocalizedName() // What block was it
 
-        ) + Reference.LINE_SEPARATOR) {
+        ) + Environment.LINE_SEPARATOR) {
             @Override
             public void run() {
                 placeFileLock.unlock();
@@ -135,6 +136,6 @@ public class BlockLogger {
     }
 
     private static void writeHeader(File file) throws IOException {
-        Files.append(FILE_HEADER + Reference.LINE_SEPARATOR, file, Reference.CHARSET);
+        Files.append(FILE_HEADER + Environment.LINE_SEPARATOR, file, Reference.CHARSET);
     }
 }

@@ -39,6 +39,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
+import javax.annotation.Nullable;
+
 @Mod(
         modid = Reference.MOD_ID,
         name = Reference.MOD_NAME,
@@ -56,7 +58,7 @@ public class ServerTools {
     public VoiceSilenceHandler voiceSilenceHandler;
     public NickHandler nickHandler;
     public TickHandler tickHandler;
-    public BlockLogger blockLogger;
+    @Nullable public BlockLogger blockLogger;
     public CommandManager commandManager;
 
     @Mod.EventHandler

@@ -45,7 +45,7 @@ public class CommandKillPlayer extends ServerToolsCommand {
     }
 
     @Override
-    public List getAliases() {
+    public List getCommandAliases() {
         return Collections.singletonList("kp");
     }
 

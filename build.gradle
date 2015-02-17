@@ -30,13 +30,13 @@ apply plugin: 'license'
 
 version = new ProjectVersion(
         minecraft: '1.8',
-        forge: '11.14.1.1306',
+        forge: '11.14.1.1319',
 
         major: '2',
         minor: '3',
         revision: '0',
 
-        mappings: 'snapshot_20150208'
+        mappings: 'stable_16'
 )
 
 apply from: 'gradle/maven.gradle'
