@@ -18,6 +18,17 @@
  */
 package info.servertools.core.command;
 
+/**
+ * Represents a permission level for commands
+ */
 public enum CommandLevel {
-    OP, ANYONE
+    /**
+     * Only server operators can use the command
+     */
+    OP,
+
+    /**
+     * Anyone can use the command
+     */
+    ANYONE
 }

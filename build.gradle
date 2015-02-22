@@ -30,7 +30,7 @@ apply plugin: 'license'
 
 version = new ProjectVersion(
         minecraft: '1.8',
-        forge: '11.14.1.1319',
+        forge: '11.14.1.1325',
 
         major: '2',
         minor: '3',

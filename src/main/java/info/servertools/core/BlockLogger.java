@@ -120,7 +120,7 @@ public class BlockLogger {
         ) + Environment.LINE_SEPARATOR) {
             @Override
             public void run() {
-                placeFileLock.unlock();
+                placeFileLock.lock();
                 try {
                     if (!logFile.exists()) {
                         writeHeader(logFile);
