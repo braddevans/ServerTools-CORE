@@ -118,6 +118,24 @@ public final class ServerUtils {
     }
 
     /**
+     * Get if the current server is single player
+     *
+     * @return {@code true} if the server is single player, {@code false} if multi player
+     */
+    public static boolean isSinglePlayer() {
+        return MinecraftServer.getServer().isSinglePlayer();
+    }
+
+    /**
+     * Get if the current server is multi player
+     *
+     * @return {@code true} if the server is multi player, {@code false} if single player
+     */
+    public static boolean isMultiplayer() {
+        return !isSinglePlayer();
+    }
+
+    /**
      * Teleport a player to a given location
      *
      * @param entityPlayer the player

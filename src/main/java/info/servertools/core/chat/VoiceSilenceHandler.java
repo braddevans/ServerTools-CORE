@@ -22,14 +22,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static net.minecraft.util.EnumChatFormatting.BLUE;
 import static net.minecraft.util.EnumChatFormatting.RED;
 
-import info.servertools.core.config.STConfig;
+import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatUtils;
 import info.servertools.core.util.ServerUtils;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
@@ -75,8 +74,8 @@ public class VoiceSilenceHandler {
     private final THashSet<UUID> voicedUsers = new THashSet<>();
     private final THashSet<UUID> silencedUsers = new THashSet<>();
 
-    final IChatComponent opPrefix = new ChatComponentText('[' + STConfig.settings().OP_PREFIX + "] ");
-    final IChatComponent voicePrefix = new ChatComponentText('[' + STConfig.settings().VOICE_PREFIX + "] ");
+    final IChatComponent opPrefix = new ChatComponentText('[' + CoreConfig.OP_PREFIX + "] ");
+    final IChatComponent voicePrefix = new ChatComponentText('[' + CoreConfig.VOICE_PREFIX + "] ");
 
     public VoiceSilenceHandler(File voiceFile, File silenceFile) {
         this.voiceFile = checkNotNull(voiceFile, "voiceFile");
@@ -287,14 +286,6 @@ public class VoiceSilenceHandler {
         } else {
             player.getPrefixes().remove(voicePrefix);
         }
-
-        if (!MinecraftServer.getServer().isSinglePlayer() && ServerUtils.isOP(player.getGameProfile())) {
-            if (!player.getPrefixes().contains(opPrefix)) {
-                player.addPrefix(opPrefix);
-            }
-        } else {
-            player.getPrefixes().remove(opPrefix);
-        }
     }
 
     @SubscribeEvent
@@ -315,7 +306,7 @@ public class VoiceSilenceHandler {
 
         if (event.sender instanceof EntityPlayerMP &&
             isPlayerSilenced(((EntityPlayerMP) event.sender).getPersistentID()) &&
-            STConfig.settings().SILENCE_BLACKLISTED_COMMANDS.contains(event.command.getCommandName())) {
+            CoreConfig.SILENCE_BLACKLISTED_COMMANDS.contains(event.command.getCommandName())) {
 
             event.setCanceled(true);
             event.sender.addChatMessage(ChatUtils.getChatComponent("You are silenced on this server", EnumChatFormatting.RED));

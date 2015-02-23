@@ -40,7 +40,7 @@ import info.servertools.core.command.corecommands.CommandSpawnMob;
 import info.servertools.core.command.corecommands.CommandTPS;
 import info.servertools.core.command.corecommands.CommandVoice;
 import info.servertools.core.command.corecommands.CommandWhereIs;
-import info.servertools.core.config.STConfig;
+import info.servertools.core.config.CoreConfig;
 
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.CommandHelp;
@@ -63,10 +63,6 @@ public class CommandManager {
 
     private static final Logger log = LogManager.getLogger(CommandManager.class);
 
-    private static final String
-            ENABLE_COMMAND_CATEGORY = "enableCommand",
-            COMMAND_NAME_CATEGORY = "commandName";
-
     private final Configuration commandConfig;
     private final THashSet<ServerToolsCommand> commandsToLoad = new THashSet<>();
 
@@ -74,14 +70,7 @@ public class CommandManager {
         checkNotNull(configFile, "configFile");
         checkArgument(!configFile.exists() || configFile.isFile(), "A directory exists with the same name as the command config file: " + configFile);
 
-        commandConfig = new Configuration(configFile);
-
-        commandConfig.addCustomCategoryComment(ENABLE_COMMAND_CATEGORY, "Allows you to disable any command registered with ServerTools");
-        commandConfig.addCustomCategoryComment(COMMAND_NAME_CATEGORY, "Allows you to rename any command registered with ServerTools");
-
-        if (commandConfig.hasChanged()) {
-            commandConfig.save();
-        }
+        commandConfig = new Configuration(configFile, true);
     }
 
     /**
@@ -90,8 +79,8 @@ public class CommandManager {
      * @param command A command that extends ServerToolsCommand
      */
     public void registerCommand(final ServerToolsCommand command) {
-        final boolean enableCommand = commandConfig.get(ENABLE_COMMAND_CATEGORY, command.getClass().getName(), true).getBoolean(true);
-        final String name = commandConfig.get(COMMAND_NAME_CATEGORY, command.getClass().getName(), command.defaultName).getString();
+        final boolean enableCommand = commandConfig.get(command.getClass().getName(), "enable", true).getBoolean(true);
+        final String name = commandConfig.get(command.getClass().getName(), "name", command.defaultName).getString();
 
         log.debug("RegisterCommand Default Name: {}, Configured Name: {}, Enable?: {}", command.defaultName, name, enableCommand);
 
@@ -116,7 +105,7 @@ public class CommandManager {
         });
         commandsToLoad.clear();
 
-        if (STConfig.settings().ENABLE_HELP_OVERRIDE) {
+        if (CoreConfig.ENABLE_HELP_OVERRIDE) {
             commandHandler.registerCommand(new CommandHelp() {
                 @SuppressWarnings("unchecked")
                 @Override

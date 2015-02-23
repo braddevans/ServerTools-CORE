@@ -22,9 +22,10 @@ import static info.servertools.core.lib.Environment.SERVERTOOLS_DIR;
 
 import info.servertools.core.chat.Motd;
 import info.servertools.core.chat.NickHandler;
+import info.servertools.core.chat.OPChatFormatter;
 import info.servertools.core.chat.VoiceSilenceHandler;
 import info.servertools.core.command.CommandManager;
-import info.servertools.core.config.STConfig;
+import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.task.TickHandler;
 import info.servertools.core.util.FlatBedrockGenerator;
@@ -58,12 +59,12 @@ public class ServerTools {
     public VoiceSilenceHandler voiceSilenceHandler;
     public NickHandler nickHandler;
     public TickHandler tickHandler;
-    @Nullable public BlockLogger blockLogger;
+    @Nullable
+    public BlockLogger blockLogger;
     public CommandManager commandManager;
 
     @Mod.EventHandler
     public void preInit(final FMLPreInitializationEvent event) {
-        STConfig.load();
 
         commandManager = new CommandManager(new File(SERVERTOOLS_DIR, "command.cfg"));
         motd = new Motd(new File(SERVERTOOLS_DIR, "motd.txt"));
@@ -72,19 +73,22 @@ public class ServerTools {
                 new File(SERVERTOOLS_DIR, "silence.json")
         );
         nickHandler = new NickHandler(new File(SERVERTOOLS_DIR, "nicks.json"));
+        if (CoreConfig.ENABLE_OP_PREFIX) {
+            new OPChatFormatter();
+        }
         tickHandler = new TickHandler();
 
-        if (STConfig.settings().ENABLE_BLOCK_BREAK_LOG || STConfig.settings().ENABLE_BLOCK_PLACE_LOG) {
+        if (CoreConfig.ENABLE_BLOCK_BREAK_LOG || CoreConfig.ENABLE_BLOCK_PLACE_LOG) {
             blockLogger = new BlockLogger(
-                    new File(SERVERTOOLS_DIR, "blockBreaks"), STConfig.settings().ENABLE_BLOCK_BREAK_LOG,
-                    new File(SERVERTOOLS_DIR, "blockPlaces"), STConfig.settings().ENABLE_BLOCK_PLACE_LOG
+                    new File(SERVERTOOLS_DIR, "blockBreaks"), CoreConfig.ENABLE_BLOCK_BREAK_LOG,
+                    new File(SERVERTOOLS_DIR, "blockPlaces"), CoreConfig.ENABLE_BLOCK_PLACE_LOG
             );
         }
     }
 
     @Mod.EventHandler
     public void init(final FMLInitializationEvent event) {
-        if (STConfig.settings().ENABLE_FLAT_BEDROCK) {
+        if (CoreConfig.ENABLE_FLAT_BEDROCK) {
             LOG.info("Registering Flat Bedrock Generator");
             GameRegistry.registerWorldGenerator(new FlatBedrockGenerator(), 1);
         }

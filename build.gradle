@@ -59,7 +59,7 @@ minecraft {
     mappings = project.version.mappings
     runDir = 'run'
 
-    replaceIn 'info/servertools/core/STVersion.java'
+    replaceIn 'info/servertools/core/Version.java'
 
     replace '@MAJOR@': project.version.major
     replace '@MINOR@': project.version.minor

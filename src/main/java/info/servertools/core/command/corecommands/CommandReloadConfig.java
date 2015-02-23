@@ -20,7 +20,7 @@ package info.servertools.core.command.corecommands;
 
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
-import info.servertools.core.config.STConfig;
+import info.servertools.core.config.CoreConfig;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -43,7 +43,7 @@ public class CommandReloadConfig extends ServerToolsCommand {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        STConfig.load();
+        CoreConfig.load();
         notifyOperators(sender, this, "Reloaded ServerTools configuration");
     }
 }

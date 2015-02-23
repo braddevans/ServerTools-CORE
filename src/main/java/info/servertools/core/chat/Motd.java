@@ -20,7 +20,7 @@ package info.servertools.core.chat;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import info.servertools.core.config.STConfig;
+import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Environment;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatUtils;
@@ -139,7 +139,7 @@ public class Motd {
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (STConfig.settings().ENABLE_MOTD_LOGIN) {
+        if (CoreConfig.ENABLE_MOTD_ON_LOGIN) {
             serveMotd(event.player);
         }
     }
