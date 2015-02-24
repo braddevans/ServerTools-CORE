@@ -28,6 +28,7 @@ import info.servertools.core.command.CommandManager;
 import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.task.TickHandler;
+import info.servertools.core.teleport.TeleportHandler;
 import info.servertools.core.util.FlatBedrockGenerator;
 
 import net.minecraftforge.fml.common.Mod;
@@ -63,6 +64,8 @@ public class ServerTools {
     public BlockLogger blockLogger;
     public CommandManager commandManager;
 
+    public TeleportHandler teleportHandler;
+
     @Mod.EventHandler
     public void preInit(final FMLPreInitializationEvent event) {
 
@@ -84,6 +87,8 @@ public class ServerTools {
                     new File(SERVERTOOLS_DIR, "blockPlaces"), CoreConfig.ENABLE_BLOCK_PLACE_LOG
             );
         }
+
+        teleportHandler = new TeleportHandler(new File(SERVERTOOLS_DIR, "teleports.json"));
     }
 
     @Mod.EventHandler

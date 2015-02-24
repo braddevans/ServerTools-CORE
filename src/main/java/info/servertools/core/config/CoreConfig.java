@@ -20,6 +20,7 @@ package info.servertools.core.config;
 
 import static info.servertools.core.util.STConfig.CATEGORY_CHAT;
 import static info.servertools.core.util.STConfig.CATEGORY_GENERAL;
+import static info.servertools.core.util.STConfig.CATEGORY_TELEPORT;
 import static info.servertools.core.util.STConfig.CATEGORY_WORLD;
 
 import info.servertools.core.STVersion;
@@ -46,6 +47,11 @@ public final class CoreConfig {
     public static String OP_PREFIX;
     public static String VOICE_PREFIX;
     public static List<String> SILENCE_BLACKLISTED_COMMANDS;
+
+    // Teleport
+    public static boolean ENABLE_INTERDIM_TELEPORT;
+
+    public static boolean ENABLE_INTERDIM_TPREQUEST;
 
     static {
         stConfig = new STConfig(new File(Environment.SERVERTOOLS_DIR, "core.cfg"), STVersion.VERSION);
@@ -111,6 +117,17 @@ public final class CoreConfig {
             prop = config.get(category, "op-prefix", "OP");
             prop.comment = "The prefix to use for OPs in chat";
             OP_PREFIX = prop.getString();
+        }
+
+        category = CATEGORY_TELEPORT;
+        {
+            prop = config.get(category, "enable-interdimension-teleport", false);
+            prop.comment = "If enabled, teleports will work across dimensions";
+            ENABLE_INTERDIM_TELEPORT = prop.getBoolean();
+
+            prop = config.get(category, "enable-interdimension-tprequest", false);
+            prop.comment = "If enabled, the /tprequest command will work across dimensions";
+            ENABLE_INTERDIM_TPREQUEST = prop.getBoolean();
         }
 
         stConfig.saveIfChanged();

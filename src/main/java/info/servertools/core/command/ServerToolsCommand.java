@@ -23,8 +23,14 @@ import static info.servertools.core.util.ServerUtils.isOP;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
+
+import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  * The ServerTools implementation of the Minecraft {@link net.minecraft.command.ICommand command}
@@ -95,6 +101,12 @@ public abstract class ServerToolsCommand extends CommandBase {
         }
     }
 
+    @Nullable
+    @Override
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return super.addTabCompletionOptions(sender, args, pos);
+    }
+
     /**
      * Set the name of this command. <b>This will only take effect before the command is registered with Minecraft</b>
      *
@@ -111,5 +123,13 @@ public abstract class ServerToolsCommand extends CommandBase {
      */
     public String getDefaultName() {
         return defaultName;
+    }
+
+    // Utilities
+
+    public static void requirePlayer(final ICommandSender sender) throws WrongUsageException {
+        if (!(sender instanceof EntityPlayerMP)) {
+            throw new WrongUsageException("That command must be used by a player");
+        }
     }
 }

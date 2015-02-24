@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import info.servertools.core.command.corecommands.CommandDisarm;
+import info.servertools.core.command.corecommands.CommandEditTeleport;
 import info.servertools.core.command.corecommands.CommandEntityCount;
 import info.servertools.core.command.corecommands.CommandHeal;
 import info.servertools.core.command.corecommands.CommandInventory;
@@ -38,6 +39,7 @@ import info.servertools.core.command.corecommands.CommandSetNick;
 import info.servertools.core.command.corecommands.CommandSilence;
 import info.servertools.core.command.corecommands.CommandSpawnMob;
 import info.servertools.core.command.corecommands.CommandTPS;
+import info.servertools.core.command.corecommands.CommandTeleport;
 import info.servertools.core.command.corecommands.CommandVoice;
 import info.servertools.core.command.corecommands.CommandWhereIs;
 import info.servertools.core.config.CoreConfig;
@@ -143,5 +145,7 @@ public class CommandManager {
         registerCommand(new CommandNick("nick"));
         registerCommand(new CommandSetNick("setnick"));
         registerCommand(new CommandReloadConfig("reloadconfig"));
+        registerCommand(new CommandEditTeleport("editteleport"));
+        registerCommand(new CommandTeleport("teleport"));
     }
 }

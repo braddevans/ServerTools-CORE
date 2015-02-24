@@ -142,11 +142,12 @@ public final class ServerUtils {
      * @param location     the location
      */
     public static void teleportPlayer(EntityPlayerMP entityPlayer, Location location) {
-
         checkNotNull(entityPlayer, "entityPlayer");
         checkNotNull(location, "location");
 
-        if (entityPlayer.worldObj.provider.getDimensionId() != location.dimID) { entityPlayer.travelToDimension(location.dimID); }
+        if (entityPlayer.worldObj.provider.getDimensionId() != location.dimID) {
+            entityPlayer.travelToDimension(location.dimID);
+        }
 
         entityPlayer.setPositionAndUpdate(location.x, location.y, location.z);
     }

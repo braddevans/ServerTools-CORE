@@ -35,6 +35,7 @@ public class STConfig {
     public static final String CATEGORY_GENERAL = "General";
     public static final String CATEGORY_WORLD = "World";
     public static final String CATEGORY_CHAT = "Chat";
+    public static final String CATEGORY_TELEPORT = "Teleport";
 
     private final File saveFile;
     private final Configuration configuration;

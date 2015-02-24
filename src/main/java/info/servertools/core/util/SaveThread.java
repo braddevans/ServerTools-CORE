@@ -52,7 +52,7 @@ public class SaveThread extends Thread {
             try {
                 Files.write(data, file, Reference.CHARSET);
             } catch (IOException e) {
-                log.warn("Failed to save file to disk", e);
+                log.error("Failed to save file to disk: " + file, e);
             }
         }
     }
