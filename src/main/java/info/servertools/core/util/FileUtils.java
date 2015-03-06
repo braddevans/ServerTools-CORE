@@ -18,125 +18,45 @@
  */
 package info.servertools.core.util;
 
-import org.apache.commons.io.comparator.LastModifiedFileComparator;
-import org.apache.commons.io.filefilter.FileFileFilter;
+import static java.nio.file.FileVisitResult.CONTINUE;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.annotation.Nullable;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 public final class FileUtils {
 
     /**
-     * Check the size of a directory
+     * Get the size of a file or directory
      *
-     * @param directory the directory to check
+     * @param file the file or directory to measure
      *
-     * @return the size of the directory in bytes
+     * @return the size in bytes
      */
-    public static long getFolderSize(File directory) {
-        long length = 0;
-        if (directory.exists() && directory.isDirectory()) {
-            @Nullable File[] files = directory.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile()) { length += file.length(); } else { length += getFolderSize(file); }
+    public static long getSize(final Path file) throws IOException {
+        if (Files.isRegularFile(file)) {
+            return Files.size(file);
+        } else {
+            final TLongList sizes = new TLongArrayList();
+            Files.walkFileTree(file, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path f, BasicFileAttributes attrs) throws IOException {
+                    sizes.add(attrs.size());
+                    return CONTINUE;
                 }
+            });
+
+            long sum = 0;
+            for (final long val : sizes.toArray()) {
+                sum += val;
             }
-        }
-        return length;
-    }
-
-    /**
-     * Retrieve the oldest file in a directory
-     *
-     * @param directory the directory to check
-     *
-     * @return the oldest file
-     */
-    @Nullable
-    public static File getOldestFile(File directory) {
-
-        @Nullable File[] files = directory.listFiles((FileFilter) FileFileFilter.FILE);
-        if (files == null) { return null; }
-
-        Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR);
-
-        return files.length > 0 ? files[0] : null;
-    }
-
-    /**
-     * Zip a directory into a zip file
-     *
-     * @param directory       The directory to compress
-     * @param zipfile         The file to compress into
-     * @param fileBlacklist   An optional collection of file names to exclude
-     * @param folderBlacklist An optional collection of directory names to exclude
-     *
-     * @throws IOException If a problem occurs
-     */
-    public static void zipDirectory(File directory, File zipfile, @Nullable Collection<String> fileBlacklist, @Nullable Collection<String> folderBlacklist) throws IOException {
-        URI baseDir = directory.toURI();
-        Deque<File> queue = new LinkedList<>();
-        queue.push(directory);
-        OutputStream out = new FileOutputStream(zipfile);
-        Closeable res = out;
-        try {
-            ZipOutputStream zout = new ZipOutputStream(out);
-            res = zout;
-            while (!queue.isEmpty()) {
-                directory = queue.removeFirst();
-                @Nullable File[] dirFiles = directory.listFiles();
-                if (dirFiles != null && dirFiles.length != 0) {
-                    for (File child : dirFiles) {
-                        String name = baseDir.relativize(child.toURI()).getPath();
-                        if (child.isDirectory() && (folderBlacklist == null || !folderBlacklist.contains(child.getName()))) {
-                            queue.push(child);
-                            name = name.endsWith("/") ? name : name + "/";
-                            zout.putNextEntry(new ZipEntry(name));
-                        } else {
-                            if (fileBlacklist != null && !fileBlacklist.contains(child.getName())) {
-                                zout.putNextEntry(new ZipEntry(name));
-                                copy(child, zout);
-                                zout.closeEntry();
-                            }
-                        }
-                    }
-                }
-            }
-        } finally {
-            res.close();
-        }
-    }
-
-    public static void copy(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        while (true) {
-            int readCount = in.read(buffer);
-            if (readCount < 0) {
-                break;
-            }
-            out.write(buffer, 0, readCount);
-        }
-    }
-
-    public static void copy(File file, OutputStream out) throws IOException {
-        try (InputStream in = new FileInputStream(file)) {
-            copy(in, out);
+            return sum;
         }
     }
 

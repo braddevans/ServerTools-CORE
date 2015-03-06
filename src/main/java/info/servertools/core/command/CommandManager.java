@@ -21,6 +21,8 @@ package info.servertools.core.command;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import gnu.trove.procedure.TObjectProcedure;
+import gnu.trove.set.hash.THashSet;
 import info.servertools.core.command.corecommands.CommandDisarm;
 import info.servertools.core.command.corecommands.CommandEditTeleport;
 import info.servertools.core.command.corecommands.CommandEntityCount;
@@ -43,20 +45,17 @@ import info.servertools.core.command.corecommands.CommandTeleport;
 import info.servertools.core.command.corecommands.CommandVoice;
 import info.servertools.core.command.corecommands.CommandWhereIs;
 import info.servertools.core.config.CoreConfig;
-
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.CommandHelp;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
-
-import gnu.trove.procedure.TObjectProcedure;
-import gnu.trove.set.hash.THashSet;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -68,11 +67,11 @@ public class CommandManager {
     private final Configuration commandConfig;
     private final THashSet<ServerToolsCommand> commandsToLoad = new THashSet<>();
 
-    public CommandManager(final File configFile) {
+    public CommandManager(final Path configFile) {
         checkNotNull(configFile, "configFile");
-        checkArgument(!configFile.exists() || configFile.isFile(), "A directory exists with the same name as the command config file: " + configFile);
+        checkArgument(!Files.exists(configFile) || Files.isRegularFile(configFile), "A directory exists with the same name as the command config file: " + configFile);
 
-        commandConfig = new Configuration(configFile, true);
+        commandConfig = new Configuration(configFile.toFile(), true);
     }
 
     /**

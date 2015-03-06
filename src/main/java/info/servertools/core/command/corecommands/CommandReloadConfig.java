@@ -21,7 +21,6 @@ package info.servertools.core.command.corecommands;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.config.CoreConfig;
-
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 

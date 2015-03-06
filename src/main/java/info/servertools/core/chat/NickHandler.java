@@ -18,58 +18,87 @@
  */
 package info.servertools.core.chat;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import info.servertools.core.ServerTools;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatUtils;
-import info.servertools.core.util.GsonUtils;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumChatFormatting;
-
-import com.google.common.io.Files;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import gnu.trove.map.hash.THashMap;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.Nullable;
 
 public class NickHandler {
 
-    private Map<UUID, String> nickMap = new THashMap<>();
+    private static final Logger log = LogManager.getLogger();
 
-    private File saveFile;
+    private static final Type type = new ParameterizedType() {
+        @Override
+        public Type[] getActualTypeArguments() { return new Type[]{UUID.class, String.class}; }
+
+        @Override
+        public Type getRawType() { return ConcurrentHashMap.class; }
+
+        @Nullable
+        @Override
+        public Type getOwnerType() { return null; }
+    };
+
+    private Map<UUID, String> nickMap = new ConcurrentHashMap<>();
+
+    private Path saveFile;
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public NickHandler(File saveFile) {
-        this.saveFile = saveFile;
-
-        if (saveFile.exists()) {
-            try {
-                String data = Files.toString(saveFile, Reference.CHARSET);
-                Type type = new TypeToken<Map<UUID, String>>() {}.getType();
-                nickMap = gson.fromJson(data, type);
-            } catch (IOException e) {
-                ServerTools.LOG.error("Failed to load nicknames from disk", e);
-            } finally {
-                //noinspection ConstantConditions
-                if (nickMap == null) { nickMap = new HashMap<>(); }
-            }
-        }
+    public NickHandler(final Path saveFile) {
+        this.saveFile = checkNotNull(saveFile);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
+    public void load() {
+        ServerTools.executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (Files.exists(saveFile)) {
+                    try (BufferedReader reader = Files.newBufferedReader(saveFile, Reference.CHARSET)) {
+                        nickMap = gson.fromJson(reader, type);
+                    } catch (IOException e) {
+                        log.error("Failed to read nicknames from file " + saveFile, e);
+                    }
+                }
+            }
+        });
+    }
+
     public void save() {
-        GsonUtils.writeToFile(nickMap, saveFile, ServerTools.LOG, true);
+        ServerTools.executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try (BufferedWriter writer = Files.newBufferedWriter(saveFile, Reference.CHARSET)) {
+                    gson.toJson(nickMap, type, writer);
+                } catch (IOException e) {
+                    log.error("Failed to save nicknames to file " + saveFile, e);
+                }
+            }
+        });
     }
 
     @SubscribeEvent

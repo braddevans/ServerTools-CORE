@@ -18,19 +18,8 @@
  */
 package info.servertools.core.util;
 
-import info.servertools.core.lib.Reference;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.logging.log4j.Logger;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
-import javax.annotation.Nullable;
 
 /**
  * Variety of helper methods for dealing with serializing/deserializing via {@link com.google.gson.Gson Gson}
@@ -46,10 +35,8 @@ public final class GsonUtils {
     /**
      * Serialize an Object into it's Json representation
      *
-     * @param object
-     *         the object to serialize
-     * @param prettyPrinting
-     *         if 'pretty priniting' should be used in the generated JSON
+     * @param object         the object to serialize
+     * @param prettyPrinting if 'pretty priniting' should be used in the generated JSON
      *
      * @return the JSON
      */
@@ -59,31 +46,6 @@ public final class GsonUtils {
             return gson_pp.toJson(object);
         } else {
             return gson.toJson(object);
-        }
-    }
-
-    /**
-     * Write an object to file using GSON
-     *
-     * @param object
-     *         the object to serialize
-     * @param toFile
-     *         the file to wrtie to
-     * @param logger
-     *         the optional logger to log to (May be <code>null</code>)
-     * @param prettyPrinting
-     *         if 'pretty priniting' should be used in the generated JSON
-     */
-    public static void writeToFile(Object object, File toFile, @Nullable Logger logger, boolean prettyPrinting) {
-
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(toFile), Reference.FILE_ENCODING))) {
-            writer.write(toJson(object, prettyPrinting));
-        } catch (IOException e) {
-            if (logger != null)
-                logger.error("Failed to write file to disk", e);
-        } catch (Throwable t) {
-            if (logger != null)
-                logger.error("An unknown error occured when writing the file to disk", t);
         }
     }
 }

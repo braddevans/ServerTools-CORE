@@ -20,23 +20,23 @@ package info.servertools.core.chat;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import info.servertools.core.ServerTools;
 import info.servertools.core.config.CoreConfig;
-import info.servertools.core.lib.Environment;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatUtils;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
-
-import com.google.common.io.Files;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,13 +55,13 @@ public class Motd {
 
     private static final Logger log = LogManager.getLogger(Motd.class);
 
-    private final File motdFile;
+    private final Path motdFile;
     private final Lock fileLock = new ReentrantLock();
 
     private final Collection<String> motd = new ArrayList<>();
     private final ReadWriteLock motdLock = new ReentrantReadWriteLock();
 
-    public Motd(final File motdFile) {
+    public Motd(final Path motdFile) {
         this.motdFile = checkNotNull(motdFile, "motdFile");
         FMLCommonHandler.instance().bus().register(this);
         loadMotd();
@@ -90,20 +90,23 @@ public class Motd {
      * @see #genDefaultMotd()
      */
     public void loadMotd() {
-        if (!motdFile.exists()) {
+        if (!Files.exists(motdFile)) {
             genDefaultMotd();
             motdLock.writeLock().lock();
             Collections.addAll(motd, MOTD_DEFAULT);
             motdLock.writeLock().unlock();
         } else {
-            new Thread(new Runnable() {
+            ServerTools.executorService.execute(new Runnable() {
                 @Override
                 public void run() {
                     fileLock.lock();
                     motdLock.writeLock().lock();
-                    try {
-                        motd.clear();
-                        motd.addAll(Files.readLines(motdFile, Reference.CHARSET));
+                    motd.clear();
+                    try (BufferedReader reader = Files.newBufferedReader(motdFile, Reference.CHARSET)) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            motd.add(line);
+                        }
                     } catch (IOException e) {
                         log.error("Failed to read MOTD from file: " + motdFile, e);
                     } finally {
@@ -111,7 +114,7 @@ public class Motd {
                         motdLock.writeLock().unlock();
                     }
                 }
-            }).start();
+            });
         }
     }
 
@@ -119,14 +122,14 @@ public class Motd {
      * Generate the default MOTD and save it to disk
      */
     public void genDefaultMotd() {
-        new Thread(new Runnable() {
+        ServerTools.executorService.execute(new Runnable() {
             @Override
             public void run() {
                 fileLock.lock();
-                try {
-                    motdFile.delete();
+                try (BufferedWriter writer = Files.newBufferedWriter(motdFile, Reference.CHARSET)) {
+                    Files.delete(motdFile);
                     for (final String line : MOTD_DEFAULT) {
-                        Files.append(line + Environment.LINE_SEPARATOR, motdFile, Reference.CHARSET);
+                        writer.write(line + Reference.LINE_SEPARATOR);
                     }
                 } catch (IOException e) {
                     log.error("Failed to generate the default MOTD to file: " + motdFile, e);
@@ -134,7 +137,7 @@ public class Motd {
                     fileLock.unlock();
                 }
             }
-        }).start();
+        });
     }
 
     @SubscribeEvent

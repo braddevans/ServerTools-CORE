@@ -18,19 +18,17 @@
  */
 package info.servertools.core;
 
-import static info.servertools.core.lib.Environment.SERVERTOOLS_DIR;
-
 import info.servertools.core.chat.Motd;
 import info.servertools.core.chat.NickHandler;
 import info.servertools.core.chat.OPChatFormatter;
 import info.servertools.core.chat.VoiceSilenceHandler;
 import info.servertools.core.command.CommandManager;
 import info.servertools.core.config.CoreConfig;
+import info.servertools.core.lib.Environment;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.task.TickHandler;
 import info.servertools.core.teleport.TeleportHandler;
 import info.servertools.core.util.FlatBedrockGenerator;
-
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -39,7 +37,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.Nullable;
 
@@ -52,6 +52,8 @@ import javax.annotation.Nullable;
 public class ServerTools {
 
     public static final Logger LOG = LogManager.getLogger(ServerTools.class);
+
+    public static ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Mod.Instance(Reference.MOD_ID)
     public static ServerTools instance;
@@ -68,27 +70,27 @@ public class ServerTools {
 
     @Mod.EventHandler
     public void preInit(final FMLPreInitializationEvent event) {
+        final Path configDir = Environment.getServerToolsConfigDir();
+        final Path dataDir = Environment.getServerToolsDataDir();
 
-        commandManager = new CommandManager(new File(SERVERTOOLS_DIR, "command.cfg"));
-        motd = new Motd(new File(SERVERTOOLS_DIR, "motd.txt"));
+        commandManager = new CommandManager(configDir.resolve("command.cfg"));
+        motd = new Motd(configDir.resolve("motd.txt"));
         voiceSilenceHandler = new VoiceSilenceHandler(
-                new File(SERVERTOOLS_DIR, "voice.json"),
-                new File(SERVERTOOLS_DIR, "silence.json")
+                dataDir.resolve("voice.json"),
+                dataDir.resolve("silence.json")
         );
-        nickHandler = new NickHandler(new File(SERVERTOOLS_DIR, "nicks.json"));
+        nickHandler = new NickHandler(dataDir.resolve("nicks.json"));
+        nickHandler.load();
         if (CoreConfig.ENABLE_OP_PREFIX) {
             new OPChatFormatter();
         }
         tickHandler = new TickHandler();
 
         if (CoreConfig.ENABLE_BLOCK_BREAK_LOG || CoreConfig.ENABLE_BLOCK_PLACE_LOG) {
-            blockLogger = new BlockLogger(
-                    new File(SERVERTOOLS_DIR, "blockBreaks"), CoreConfig.ENABLE_BLOCK_BREAK_LOG,
-                    new File(SERVERTOOLS_DIR, "blockPlaces"), CoreConfig.ENABLE_BLOCK_PLACE_LOG
-            );
+            blockLogger = new BlockLogger(dataDir.resolve("blockLogging"), CoreConfig.ENABLE_BLOCK_BREAK_LOG, CoreConfig.ENABLE_BLOCK_PLACE_LOG);
         }
 
-        teleportHandler = new TeleportHandler(new File(SERVERTOOLS_DIR, "teleports.json"));
+        teleportHandler = new TeleportHandler(dataDir.resolve("teleports.json"));
     }
 
     @Mod.EventHandler

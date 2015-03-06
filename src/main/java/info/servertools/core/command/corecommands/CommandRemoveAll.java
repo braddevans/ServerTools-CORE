@@ -18,11 +18,11 @@
  */
 package info.servertools.core.command.corecommands;
 
+import gnu.trove.set.hash.THashSet;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.task.RemoveAllTickTask;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.command.CommandException;
@@ -30,8 +30,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.BlockPos;
-
-import gnu.trove.set.hash.THashSet;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.registry.GameData;
 import org.apache.commons.lang3.ArrayUtils;

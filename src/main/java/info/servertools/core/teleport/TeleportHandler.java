@@ -21,23 +21,23 @@ package info.servertools.core.teleport;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import info.servertools.core.util.Location;
-
 import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import info.servertools.core.ServerTools;
+import info.servertools.core.lib.Reference;
+import info.servertools.core.util.Location;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,21 +47,32 @@ public class TeleportHandler {
 
     private static final Logger log = LogManager.getLogger(TeleportHandler.class);
 
-    private final File saveFile;
+    private final Path saveFile;
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final Type jsonType = new TypeToken<Map<String, Location>>() {}.getType();
 
-    private final Map<String, Location> teleportMap = new ConcurrentHashMap<>();
+    private static final Type type = new ParameterizedType() {
+        @Override
+        public Type[] getActualTypeArguments() { return new Type[]{String.class, Location.class}; }
+
+        @Override
+        public Type getRawType() { return ConcurrentHashMap.class; }
+
+        @Nullable
+        @Override
+        public Type getOwnerType() { return null; }
+    };
+
+    private Map<String, Location> teleportMap = new ConcurrentHashMap<>();
 
     /**
      * Construct a new TeleportHandler
      *
-     * @param saveFile The {@link File file} that we should save to
+     * @param saveFile The {@link Path file} that we should save to
      */
-    public TeleportHandler(final File saveFile) {
+    public TeleportHandler(final Path saveFile) {
         this.saveFile = checkNotNull(saveFile, "saveFile");
-        checkArgument(!saveFile.exists() || saveFile.isFile(), "A directory exists with the name: " + saveFile);
+        checkArgument(!Files.exists(saveFile) || Files.isRegularFile(saveFile), "A directory exists with the name: " + saveFile);
         load();
     }
 
@@ -126,43 +137,39 @@ public class TeleportHandler {
      * Save the teleports to disk
      */
     public void save() {
-        final String json = gson.toJson(teleportMap, jsonType);
-        new Thread(new Runnable() {
+        ServerTools.executorService.execute(new Runnable() {
             @Override
             public void run() {
-                synchronized (saveFile) {
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(saveFile))) {
-                        writer.write(json);
-                    } catch (IOException e) {
-                        log.error("Failed to save teleport file to disk: " + saveFile, e);
-                    }
+                try (final BufferedWriter writer = Files.newBufferedWriter(saveFile, Reference.CHARSET)) {
+                    gson.toJson(teleportMap, type, writer);
+                } catch (IOException e) {
+                    log.error("Failed to save teleport file to disk: " + saveFile, e);
                 }
             }
-        }).start();
+        });
     }
 
     /**
      * Read the teleports from disk
      */
     private void load() {
-        new Thread(new Runnable() {
+        ServerTools.executorService.execute(new Runnable() {
             @Override
             public void run() {
-                synchronized (saveFile) {
-                    if (!saveFile.exists()) {
-                        return;
-                    }
-                    try (BufferedReader reader = new BufferedReader(new FileReader(saveFile))) {
-                        final Map<String, Location> map = gson.fromJson(reader, jsonType);
-                        teleportMap.clear();
-                        teleportMap.putAll(map);
-                    } catch (JsonSyntaxException e) {
-                        log.error("Failed to parse teleport file as valid JSOM: " + saveFile, e);
-                    } catch (IOException e) {
-                        log.error("Failed to load teleport file from disk: " + saveFile, e);
-                    }
+                if (!Files.exists(saveFile)) {
+                    return;
+                }
+
+                try (final BufferedReader reader = Files.newBufferedReader(saveFile, Reference.CHARSET)) {
+                    teleportMap = gson.fromJson(reader, type);
+                } catch (JsonSyntaxException e) {
+                    log.error("Failed to parse teleport file as valid JSON: " + saveFile, e);
+                } catch (IOException e) {
+                    log.error("Failed to load teleport file from disk: " + saveFile, e);
+                } finally {
+                    System.out.println("Clazz: " + teleportMap.getClass().getName());
                 }
             }
-        }).start();
+        });
     }
 }

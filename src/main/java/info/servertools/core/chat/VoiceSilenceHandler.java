@@ -22,23 +22,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static net.minecraft.util.EnumChatFormatting.BLUE;
 import static net.minecraft.util.EnumChatFormatting.RED;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatUtils;
 import info.servertools.core.util.ServerUtils;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.io.Files;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import gnu.trove.set.hash.THashSet;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
@@ -48,9 +44,13 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
@@ -62,22 +62,33 @@ public class VoiceSilenceHandler {
 
     private static final Logger log = LogManager.getLogger(VoiceSilenceHandler.class);
 
-    private final File voiceFile;
+    private static final Type type = new ParameterizedType() {
+        @Override
+        public Type[] getActualTypeArguments() { return new Type[]{UUID.class}; }
+
+        @Override
+        public Type getRawType() { return Sets.newConcurrentHashSet().getClass(); }
+
+        @Nullable
+        @Override
+        public Type getOwnerType() { return null; }
+    };
+
+    private final Path voiceFile;
     private final Lock voiceFileLock = new ReentrantLock();
 
-    private final File silenceFile;
+    private final Path silenceFile;
     private final Lock silenceFileLock = new ReentrantLock();
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private static final Type setType = new TypeToken<THashSet<UUID>>() {}.getType();
 
-    private final THashSet<UUID> voicedUsers = new THashSet<>();
-    private final THashSet<UUID> silencedUsers = new THashSet<>();
+    private Set<UUID> voicedUsers = Sets.newConcurrentHashSet();
+    private Set<UUID> silencedUsers = Sets.newConcurrentHashSet();
 
     final IChatComponent opPrefix = new ChatComponentText('[' + CoreConfig.OP_PREFIX + "] ");
     final IChatComponent voicePrefix = new ChatComponentText('[' + CoreConfig.VOICE_PREFIX + "] ");
 
-    public VoiceSilenceHandler(File voiceFile, File silenceFile) {
+    public VoiceSilenceHandler(Path voiceFile, Path silenceFile) {
         this.voiceFile = checkNotNull(voiceFile, "voiceFile");
         this.silenceFile = checkNotNull(silenceFile, "silenceFile");
         loadSilenceList();
@@ -202,13 +213,12 @@ public class VoiceSilenceHandler {
      * Save the voiced users to disk. This is done in a separate thread.
      */
     public void saveVoiceList() {
-        final String json = gson.toJson(voicedUsers);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 voiceFileLock.lock();
-                try {
-                    Files.write(json, voiceFile, Reference.CHARSET);
+                try (BufferedWriter writer = Files.newBufferedWriter(voiceFile, Reference.CHARSET)) {
+                    gson.toJson(voicedUsers, type, writer);
                 } catch (IOException e) {
                     log.error("Failed to save voice file " + voiceFile + " to disk", e);
                 } finally {
@@ -222,15 +232,12 @@ public class VoiceSilenceHandler {
      * Load the voiced users from disk. <b>This is done on the main thread!</b>
      */
     public void loadVoiceList() {
-        if (!voiceFile.exists()) { return; }
+        if (!Files.exists(voiceFile)) {
+            return;
+        }
         voiceFileLock.lock();
-        try {
-            final String json = Files.toString(voiceFile, Reference.CHARSET);
-            @Nullable final Set<UUID> set = gson.fromJson(json, setType);
-            if (set != null) {
-                voicedUsers.clear();
-                voicedUsers.addAll(set);
-            }
+        try (BufferedReader reader = Files.newBufferedReader(voiceFile, Reference.CHARSET)) {
+            voicedUsers = gson.fromJson(reader, type);
         } catch (IOException e) {
             log.error("Failed to load voiced players from file " + voiceFile, e);
         } finally {
@@ -242,13 +249,12 @@ public class VoiceSilenceHandler {
      * Save the silenced users to disk. This is done in a separate thread.
      */
     public void saveSilenceList() {
-        final String json = gson.toJson(silencedUsers);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 silenceFileLock.lock();
-                try {
-                    Files.write(json, silenceFile, Reference.CHARSET);
+                try (BufferedWriter writer = Files.newBufferedWriter(silenceFile, Reference.CHARSET)) {
+                    gson.toJson(silencedUsers, type, writer);
                 } catch (IOException e) {
                     log.error("Failed to save silence file " + silenceFile + " to disk", e);
                 } finally {
@@ -262,15 +268,12 @@ public class VoiceSilenceHandler {
      * Load the silenced users from disk. <b>This is done on the main thread!</b>
      */
     public void loadSilenceList() {
-        if (!silenceFile.exists()) { return; }
+        if (!Files.exists(silenceFile)) {
+            return;
+        }
         silenceFileLock.lock();
-        try {
-            final String json = Files.toString(silenceFile, Reference.CHARSET);
-            @Nullable final Set<UUID> set = gson.fromJson(json, setType);
-            if (set != null) {
-                silencedUsers.clear();
-                silencedUsers.addAll(set);
-            }
+        try (BufferedReader reader = Files.newBufferedReader(silenceFile, Reference.CHARSET)) {
+            silencedUsers = gson.fromJson(reader, type);
         } catch (IOException e) {
             log.error("Failed to load silenced players from file " + silenceFile, e);
         } finally {

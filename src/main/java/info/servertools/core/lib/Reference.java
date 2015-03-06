@@ -20,7 +20,10 @@ package info.servertools.core.lib;
 
 import java.nio.charset.Charset;
 
-public class Reference {
+/**
+ * Data that will be the same, no matter what system/instance ServerTools is installed in
+ */
+public final class Reference {
 
     /**
      * Our unique Mod ID
@@ -33,12 +36,17 @@ public class Reference {
     public static final String MOD_NAME = MOD_ID;
 
     /**
-     * Our dependencies
+     * The version of MinecraftForge that the current version of ServerTools requires
      */
-    public static final String DEPENDENCIES = "required-after:Forge@[11.14.1.1319,)";
+    public static final String FORGE_REQ = "11.14.1.1319";
 
     /**
-     * The file encoding we save and read with
+     * The mod dependencies that ServerTools has
+     */
+    public static final String DEPENDENCIES = "required-after:Forge@[" + FORGE_REQ + ",)";
+
+    /**
+     * The file encoding that ServerTools uses for IO
      */
     public static final String FILE_ENCODING = "UTF-8";
 
@@ -46,4 +54,11 @@ public class Reference {
      * The {@link Charset} that represents the {@link #FILE_ENCODING}
      */
     public static final Charset CHARSET = Charset.forName(FILE_ENCODING);
+
+    /**
+     * The line separator sequence that ServerTools uses
+     */
+    public static final String LINE_SEPARATOR = "\n";
+
+    private Reference() {}
 }

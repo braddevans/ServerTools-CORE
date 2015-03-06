@@ -20,11 +20,10 @@ package info.servertools.core.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-
-import com.mojang.authlib.GameProfile;
 
 import java.util.List;
 import java.util.UUID;

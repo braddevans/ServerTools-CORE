@@ -26,11 +26,9 @@ import static info.servertools.core.util.STConfig.CATEGORY_WORLD;
 import info.servertools.core.STVersion;
 import info.servertools.core.lib.Environment;
 import info.servertools.core.util.STConfig;
-
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,7 +52,7 @@ public final class CoreConfig {
     public static boolean ENABLE_INTERDIM_TPREQUEST;
 
     static {
-        stConfig = new STConfig(new File(Environment.SERVERTOOLS_DIR, "core.cfg"), STVersion.VERSION);
+        stConfig = new STConfig(Environment.getServerToolsConfigDir().resolve("core.cfg").toFile(), STVersion.VERSION);
         load();
     }
 

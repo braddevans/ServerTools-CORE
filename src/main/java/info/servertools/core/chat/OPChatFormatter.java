@@ -21,11 +21,9 @@ package info.servertools.core.chat;
 import static net.minecraft.util.EnumChatFormatting.GRAY;
 
 import info.servertools.core.util.ServerUtils;
-
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
-
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
