@@ -18,6 +18,8 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static info.servertools.core.command.CommandLevel.OP;
+
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
@@ -27,11 +29,7 @@ public class CommandReloadMotd extends ServerToolsCommand {
 
     public CommandReloadMotd(String defaultName) {
         super(defaultName);
-    }
-
-    @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.OP;
+        setRequiredLevel(OP);
     }
 
     @Override

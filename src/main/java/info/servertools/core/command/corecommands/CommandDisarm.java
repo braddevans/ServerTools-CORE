@@ -18,7 +18,8 @@
  */
 package info.servertools.core.command.corecommands;
 
-import info.servertools.core.command.CommandLevel;
+import static info.servertools.core.command.CommandLevel.OP;
+
 import info.servertools.core.command.ServerToolsCommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -34,11 +35,7 @@ public class CommandDisarm extends ServerToolsCommand {
 
     public CommandDisarm(String defaultName) {
         super(defaultName);
-    }
-
-    @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.OP;
+        setRequiredLevel(OP);
     }
 
     @Override

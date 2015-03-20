@@ -93,8 +93,7 @@ public final class Environment {
             Files.createDirectories(serverToolsConfigDir);
             Files.createDirectories(serverToolsDataDir);
         } catch (IOException e) {
-            log.fatal("Failed to create servertools directories, "
-                      + "double check that no files exist that conflict", e);
+            log.fatal("Failed to create servertools directories, double check that no files exist that conflict", e);
             throw new RuntimeException(e);
         }
     }

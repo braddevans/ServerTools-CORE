@@ -49,11 +49,6 @@ public class CommandTeleport extends ServerToolsCommand {
         return "/" + name;
     }
 
-    @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.ANYONE;
-    }
-
     @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {

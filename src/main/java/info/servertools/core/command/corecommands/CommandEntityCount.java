@@ -18,6 +18,7 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static info.servertools.core.command.CommandLevel.OP;
 import static net.minecraft.util.EnumChatFormatting.AQUA;
 import static net.minecraft.util.EnumChatFormatting.GOLD;
 import static net.minecraft.util.EnumChatFormatting.YELLOW;
@@ -45,13 +46,8 @@ public class CommandEntityCount extends ServerToolsCommand {
 
     public CommandEntityCount(String defaultName) {
         super(defaultName);
+        setRequiredLevel(OP);
     }
-
-    @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.OP;
-    }
-
 
     @Nullable
     @Override

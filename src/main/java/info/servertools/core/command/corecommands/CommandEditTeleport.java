@@ -18,6 +18,7 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static info.servertools.core.command.CommandLevel.OP;
 import static net.minecraft.util.EnumChatFormatting.AQUA;
 import static net.minecraft.util.EnumChatFormatting.RED;
 
@@ -41,11 +42,7 @@ public class CommandEditTeleport extends ServerToolsCommand {
 
     public CommandEditTeleport(String defaultName) {
         super(defaultName);
-    }
-
-    @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.OP;
+        setRequiredLevel(OP);
     }
 
     @Override
@@ -56,7 +53,7 @@ public class CommandEditTeleport extends ServerToolsCommand {
     @Nullable
     @Override
     public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, Lists.newArrayList("set", "delete")):
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, Lists.newArrayList("set", "delete")) :
                args.length == 2 ? getListOfStringsMatchingLastWord(args, ServerTools.instance.teleportHandler.getTeleports().keySet()) : null;
     }
 

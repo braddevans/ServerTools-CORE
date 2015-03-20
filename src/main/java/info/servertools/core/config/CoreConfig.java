@@ -53,10 +53,6 @@ public final class CoreConfig {
 
     static {
         stConfig = new STConfig(Environment.getServerToolsConfigDir().resolve("core.cfg").toFile(), STVersion.VERSION);
-        load();
-    }
-
-    public static void load() {
 
         final Configuration config = stConfig.getConfig();
 

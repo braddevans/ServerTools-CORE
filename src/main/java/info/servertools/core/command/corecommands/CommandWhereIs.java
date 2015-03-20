@@ -46,11 +46,6 @@ public class CommandWhereIs extends ServerToolsCommand {
     }
 
     @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.ANYONE;
-    }
-
-    @Override
     public boolean isUsernameIndex(String[] args, int index) {
         return index == 0;
     }

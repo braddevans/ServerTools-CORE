@@ -37,11 +37,6 @@ public class CommandNick extends ServerToolsCommand {
     }
 
     @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.ANYONE;
-    }
-
-    @Override
     public String getCommandUsage(ICommandSender sender) {
         return "/" + name + " {nickname}";
     }

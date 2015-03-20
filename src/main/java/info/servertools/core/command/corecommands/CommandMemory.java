@@ -18,6 +18,7 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static info.servertools.core.command.CommandLevel.OP;
 import static net.minecraft.util.EnumChatFormatting.AQUA;
 import static net.minecraft.util.EnumChatFormatting.RESET;
 
@@ -30,12 +31,7 @@ public class CommandMemory extends ServerToolsCommand {
 
     public CommandMemory(String defaultName) {
         super(defaultName);
-    }
-
-    @Override
-    public CommandLevel getCommandLevel() {
-
-        return CommandLevel.OP;
+        setRequiredLevel(OP);
     }
 
     @Override

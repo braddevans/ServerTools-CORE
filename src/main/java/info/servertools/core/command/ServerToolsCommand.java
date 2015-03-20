@@ -51,6 +51,8 @@ public abstract class ServerToolsCommand extends CommandBase {
      */
     protected String name;
 
+    protected CommandLevel requiredLevel = CommandLevel.ANYONE;
+
     /**
      * Construct a new instance with the provided {@link #defaultName}
      *
@@ -70,18 +72,20 @@ public abstract class ServerToolsCommand extends CommandBase {
         return name;
     }
 
-    /**
-     * Get the required access level to use this command
-     *
-     * @return the Access Level
-     */
-    public abstract CommandLevel getCommandLevel();
+
+    protected void setRequiredLevel(final CommandLevel level) {
+        this.requiredLevel = level;
+    }
+
+    public CommandLevel getRequiredLevel() {
+        return this.requiredLevel;
+    }
 
     @Override
     public boolean canCommandSenderUseCommand(final ICommandSender sender) {
         if (sender instanceof EntityPlayerMP) {
             final EntityPlayerMP player = (EntityPlayerMP) sender;
-            final CommandLevel requiredLevel = getCommandLevel();
+            final CommandLevel requiredLevel = getRequiredLevel();
             return CommandLevel.ANYONE.equals(requiredLevel)
                    || CommandLevel.OP.equals(requiredLevel) && isOP(player.getGameProfile())
                    || MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile());
@@ -92,7 +96,7 @@ public abstract class ServerToolsCommand extends CommandBase {
 
     @Override
     public int getRequiredPermissionLevel() {
-        switch (getCommandLevel()) {
+        switch (getRequiredLevel()) {
             case ANYONE:
                 return 0;
             case OP:
@@ -127,9 +131,20 @@ public abstract class ServerToolsCommand extends CommandBase {
 
     // Utilities
 
-    public static void requirePlayer(final ICommandSender sender) throws WrongUsageException {
+    /**
+     * Check if the supplied {@link ICommandSender} is a player. If not, throw an exception. If so, return the sender casted to a player
+     *
+     * @param sender The command sender
+     *
+     * @return The player instance
+     *
+     * @throws WrongUsageException If the sender was not an instance of {@link EntityPlayerMP}
+     */
+    public static EntityPlayerMP requirePlayer(final ICommandSender sender) throws WrongUsageException {
         if (!(sender instanceof EntityPlayerMP)) {
             throw new WrongUsageException("That command must be used by a player");
+        } else {
+            return (EntityPlayerMP) sender;
         }
     }
 }

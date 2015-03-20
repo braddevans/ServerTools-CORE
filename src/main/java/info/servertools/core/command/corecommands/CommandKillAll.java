@@ -19,6 +19,7 @@
 package info.servertools.core.command.corecommands;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static info.servertools.core.command.CommandLevel.OP;
 
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
@@ -41,11 +42,7 @@ public class CommandKillAll extends ServerToolsCommand {
 
     public CommandKillAll(String defaultName) {
         super(defaultName);
-    }
-
-    @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.OP;
+        setRequiredLevel(OP);
     }
 
     @Nullable

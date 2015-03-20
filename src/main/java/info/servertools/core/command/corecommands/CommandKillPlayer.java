@@ -18,6 +18,8 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static info.servertools.core.command.CommandLevel.OP;
+
 import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import net.minecraft.command.CommandException;
@@ -36,11 +38,7 @@ public class CommandKillPlayer extends ServerToolsCommand {
 
     public CommandKillPlayer(String defaultName) {
         super(defaultName);
-    }
-
-    @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.OP;
+        setRequiredLevel(OP);
     }
 
     @Override

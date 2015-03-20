@@ -36,12 +36,6 @@ public class CommandPing extends ServerToolsCommand {
     }
 
     @Override
-    public CommandLevel getCommandLevel() {
-
-        return CommandLevel.ANYONE;
-    }
-
-    @Override
     public String getCommandUsage(ICommandSender var1) {
 
         return "/" + name;

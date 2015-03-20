@@ -18,6 +18,8 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static info.servertools.core.command.CommandLevel.OP;
+
 import gnu.trove.set.hash.THashSet;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.CommandLevel;
@@ -43,12 +45,7 @@ public class CommandRemoveAll extends ServerToolsCommand {
 
     public CommandRemoveAll(String defaultName) {
         super(defaultName);
-    }
-
-    @Override
-    public CommandLevel getCommandLevel() {
-
-        return CommandLevel.OP;
+        setRequiredLevel(OP);
     }
 
     @Override

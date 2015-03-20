@@ -48,11 +48,6 @@ public class CommandTPS extends ServerToolsCommand {
     }
 
     @Override
-    public CommandLevel getCommandLevel() {
-        return CommandLevel.ANYONE;
-    }
-
-    @Override
     public String getCommandUsage(ICommandSender sender) {
         return "/" + name + " {DIM}";
     }
