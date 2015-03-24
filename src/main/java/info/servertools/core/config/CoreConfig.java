@@ -28,11 +28,19 @@ import info.servertools.core.lib.Environment;
 import info.servertools.core.util.STConfig;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public final class CoreConfig {
+
+    private static final Logger log = LogManager.getLogger();
 
     public static final STConfig stConfig;
 
@@ -45,6 +53,9 @@ public final class CoreConfig {
     public static String OP_PREFIX;
     public static String VOICE_PREFIX;
     public static List<String> SILENCE_BLACKLISTED_COMMANDS;
+
+    public static boolean BROADCAST_NICK_CHANGES;
+    public static final Set<Pattern> NICKNAME_BLACKLIST = new HashSet<>();
 
     // Teleport
     public static boolean ENABLE_INTERDIM_TELEPORT;
@@ -100,6 +111,22 @@ public final class CoreConfig {
             prop = config.get(category, "silence-blacklisted-commands", new String[]{"tell", "tellraw", "me", "say"});
             prop.comment = "The commands that silenced players aren't allowed to use";
             SILENCE_BLACKLISTED_COMMANDS = Arrays.asList(prop.getStringList());
+
+            prop = config.get(category, "enable-nick-change-broadcast", true);
+            prop.comment = "If the entire server should be notified when a player changes their nickname";
+            BROADCAST_NICK_CHANGES = prop.getBoolean();
+
+            prop = config.get(category, "nickname-regex-blacklist", new String[0]);
+            prop.comment = "A comma separated list of REGEX patterns to use for validating nicknames";
+            NICKNAME_BLACKLIST.clear();
+            for (final String entry : prop.getStringList()) {
+                try {
+                    final Pattern pattern = Pattern.compile(entry);
+                    NICKNAME_BLACKLIST.add(pattern);
+                } catch (PatternSyntaxException e) {
+                    log.warn("Invalid nickname REGEX pattern {}", entry);
+                }
+            }
         }
 
         category = CATEGORY_CHAT + ".OPPrefix";

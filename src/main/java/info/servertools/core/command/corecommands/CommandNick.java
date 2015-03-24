@@ -18,16 +18,15 @@
  */
 package info.servertools.core.command.corecommands;
 
-import static net.minecraft.util.EnumChatFormatting.GREEN;
-
 import info.servertools.core.ServerTools;
-import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.util.ChatMessage;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+
+import static net.minecraft.util.EnumChatFormatting.*;
 
 //TODO more limiting of nicknames
 public class CommandNick extends ServerToolsCommand {
@@ -44,13 +43,17 @@ public class CommandNick extends ServerToolsCommand {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
 
-        EntityPlayer player = getCommandSenderAsPlayer(sender);
+        EntityPlayerMP player = requirePlayer(sender);
 
         if (args.length == 0) {
             ServerTools.instance.nickHandler.setNick(player, player.getGameProfile().getName());
             sender.addChatMessage(ChatMessage.builder().color(GREEN).add("Removed nickname").build());
         } else if (args.length == 1) {
-            ServerTools.instance.nickHandler.setNick(player, args[0]);
+            if (ServerTools.instance.nickHandler.setNick(player, args[0])) {
+                player.addChatMessage(ChatMessage.builder().add("Set nickname to ").color(AQUA).add(args[0]).build());
+            } else {
+                player.addChatMessage(ChatMessage.builder().color(RED).add("The nickname ").color(AQUA).add(args[0]).color(RED).add(" isn't valid").build());
+            }
         } else {
             throw new WrongUsageException(getCommandUsage(sender));
         }

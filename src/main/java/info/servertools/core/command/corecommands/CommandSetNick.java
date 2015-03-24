@@ -18,21 +18,19 @@
  */
 package info.servertools.core.command.corecommands;
 
-import static info.servertools.core.command.CommandLevel.OP;
-
 import info.servertools.core.ServerTools;
-import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import static info.servertools.core.command.CommandLevel.OP;
 
 public class CommandSetNick extends ServerToolsCommand {
 
@@ -48,13 +46,12 @@ public class CommandSetNick extends ServerToolsCommand {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-
         if (args.length == 1) {
-            EntityPlayer player = getPlayer(sender, args[0]);
+            EntityPlayerMP player = getPlayer(sender, args[0]);
             ServerTools.instance.nickHandler.setNick(player, player.getGameProfile().getName());
             notifyOperators(sender, this, "Removed %s's nickname", player.getCommandSenderName());
         } else if (args.length == 2) {
-            EntityPlayer player = getPlayer(sender, args[0]);
+            EntityPlayerMP player = getPlayer(sender, args[0]);
             ServerTools.instance.nickHandler.setNick(player, args[1]);
             notifyOperators(sender, this, "Set %s's nickname to %s", player.getCommandSenderName(), args[1]);
         } else {

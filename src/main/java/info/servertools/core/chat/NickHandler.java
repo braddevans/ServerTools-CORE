@@ -18,22 +18,22 @@
  */
 package info.servertools.core.chat;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import info.servertools.core.ServerTools;
+import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Reference;
-import info.servertools.core.util.ChatUtils;
-import net.minecraft.entity.player.EntityPlayer;
+import info.servertools.core.util.ChatMessage;
+import info.servertools.core.util.ServerUtils;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -44,8 +44,11 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static net.minecraft.util.EnumChatFormatting.AQUA;
+import static net.minecraft.util.EnumChatFormatting.WHITE;
 
 public class NickHandler {
 
@@ -53,14 +56,20 @@ public class NickHandler {
 
     private static final Type type = new ParameterizedType() {
         @Override
-        public Type[] getActualTypeArguments() { return new Type[]{UUID.class, String.class}; }
+        public Type[] getActualTypeArguments() {
+            return new Type[]{UUID.class, String.class};
+        }
 
         @Override
-        public Type getRawType() { return ConcurrentHashMap.class; }
+        public Type getRawType() {
+            return ConcurrentHashMap.class;
+        }
 
         @Nullable
         @Override
-        public Type getOwnerType() { return null; }
+        public Type getOwnerType() {
+            return null;
+        }
     };
 
     private Map<UUID, String> nickMap = new ConcurrentHashMap<>();
@@ -103,19 +112,54 @@ public class NickHandler {
 
     @SubscribeEvent
     public void nameFormat(PlayerEvent.NameFormat event) {
-
         if (nickMap.containsKey(event.entityPlayer.getPersistentID())) {
             String nick = nickMap.get(event.entityPlayer.getPersistentID());
-
             event.displayname = event.displayname.replace(event.entityPlayer.getGameProfile().getName(), nick);
         }
     }
 
-    public void setNick(EntityPlayer player, String nick) {
+    public boolean setNick(EntityPlayerMP player, String nick) {
+        if (!verifyNickname(player, nick)) {
+            return false;
+        }
         nickMap.put(player.getPersistentID(), nick);
         player.refreshDisplayName();
         save();
-        MinecraftServer.getServer().getConfigurationManager().sendChatMsg(ChatUtils.getChatComponent(
-                String.format("%s is now known as %s", player.getGameProfile().getName(), nick), EnumChatFormatting.GRAY));
+
+        if (CoreConfig.BROADCAST_NICK_CHANGES) {
+            MinecraftServer.getServer().getConfigurationManager().sendChatMsg(ChatMessage.builder()
+                    .color(AQUA).add(player.getGameProfile().getName())
+                    .color(WHITE).add(" is now known as ")
+                    .color(AQUA).add(nick)
+                    .build());
+        }
+
+        return true;
+    }
+
+    /**
+     * Verify that the supplied nickname is valid
+     *
+     * @param nickName The nickname
+     * @return {@code true} if the nickname is valid, {@code false} if not
+     */
+    public static boolean verifyNickname(final EntityPlayerMP player, final String nickName) {
+        checkNotNull(nickName, "nickName");
+        for (final EntityPlayerMP playerMP : ServerUtils.getAllPlayers()) {
+            if (playerMP == player) {
+                continue;
+            }
+            if (nickName.equalsIgnoreCase(playerMP.getCommandSenderName())) {
+                return false;
+            }
+        }
+
+        for (final Pattern pattern : CoreConfig.NICKNAME_BLACKLIST) {
+            if (pattern.matcher(nickName).matches()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
