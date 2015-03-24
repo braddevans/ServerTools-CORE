@@ -18,17 +18,16 @@
  */
 package info.servertools.core.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helper class with methods used for server functions and checks
@@ -52,7 +51,6 @@ public final class ServerUtils {
      * Get the player for a given {@link java.util.UUID UUID}
      *
      * @param uuid the UUID
-     *
      * @return the EntityPlayer, or <code>null</code> if the player does not exist
      */
     @Nullable
@@ -73,7 +71,6 @@ public final class ServerUtils {
      * Get the player for a given username
      *
      * @param username the username
-     *
      * @return the EntityPlayer, or <code>null</code> if the player does not exist
      */
     @Nullable
@@ -98,7 +95,6 @@ public final class ServerUtils {
      * </p>
      *
      * @param username The username
-     *
      * @return The UUID, or {@code null} if a match could not be found
      */
     @Nullable
@@ -155,11 +151,22 @@ public final class ServerUtils {
      * Checks to see if a given player has server OP status
      *
      * @param profile the player's {@link com.mojang.authlib.GameProfile GameProfile}
-     *
      * @return if the player is OP
      */
     public static boolean isOP(GameProfile profile) {
         return MinecraftServer.getServer().getConfigurationManager().getOppedPlayers().hasEntry(profile);
+    }
+
+    /**
+     * Get if the current instance is single player and the given player is the owner
+     *
+     * @param username The player's username
+     * @return {@code true} if the instance is single player and the player is the owner, {@code false} if not
+     */
+    public static boolean isSinglePlayerOwner(final String username) {
+        checkNotNull(username, "username");
+        final MinecraftServer server = MinecraftServer.getServer();
+        return server.isSinglePlayer() && username.equals(server.getServerOwner());
     }
 
     /**
@@ -169,6 +176,8 @@ public final class ServerUtils {
      */
     public static void refreshPlayerDisplayName(UUID uuid) {
         @Nullable EntityPlayer player = MinecraftServer.getServer().getConfigurationManager().getPlayerByUUID(uuid);
-        if (player != null) { player.refreshDisplayName(); }
+        if (player != null) {
+            player.refreshDisplayName();
+        }
     }
 }

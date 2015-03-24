@@ -118,6 +118,11 @@ public class NickHandler {
         }
     }
 
+    @Nullable
+    public String getNick(final UUID uuid) {
+        return nickMap.get(uuid);
+    }
+
     public boolean setNick(EntityPlayerMP player, String nick) {
         if (!verifyNickname(player, nick)) {
             return false;

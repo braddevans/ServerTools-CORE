@@ -18,6 +18,7 @@
  */
 package info.servertools.core.lib;
 
+import net.minecraftforge.classloading.FMLForgePlugin;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.FMLInjectionData;
 import org.apache.logging.log4j.LogManager;
@@ -77,6 +78,15 @@ public final class Environment {
         return serverToolsDataDir;
     }
 
+    /**
+     * Get if FML runtime deobfuscation is enabled. This will be {@code true} in normal obfuscated environments, and {@code false} in development environments
+     *
+     * @return If runtime deobfuscation is enabled
+     */
+    public static boolean runtimeDeobfEnabled() {
+        return FMLForgePlugin.RUNTIME_DEOBF;
+    }
+
 
     private static final Path minecraftDir;
     private static final Path configDir;
@@ -98,5 +108,6 @@ public final class Environment {
         }
     }
 
-    private Environment() {}
+    private Environment() {
+    }
 }
