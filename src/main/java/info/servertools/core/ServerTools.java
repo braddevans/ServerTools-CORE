@@ -27,6 +27,7 @@ import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Environment;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.task.TickHandler;
+import info.servertools.core.teleport.HomeHandler;
 import info.servertools.core.teleport.TeleportHandler;
 import info.servertools.core.util.FlatBedrockGenerator;
 import net.minecraftforge.fml.common.Mod;
@@ -53,7 +54,7 @@ public class ServerTools {
 
     public static final Logger LOG = LogManager.getLogger(ServerTools.class);
 
-    public static ExecutorService executorService = Executors.newCachedThreadPool();
+    public static final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Mod.Instance(Reference.MOD_ID)
     public static ServerTools instance;
@@ -67,6 +68,7 @@ public class ServerTools {
     public CommandManager commandManager;
 
     public TeleportHandler teleportHandler;
+    public HomeHandler homeHandler;
 
     @Mod.EventHandler
     public void preInit(final FMLPreInitializationEvent event) {
@@ -91,6 +93,7 @@ public class ServerTools {
         }
 
         teleportHandler = new TeleportHandler(dataDir.resolve("teleports.json"));
+        homeHandler = new HomeHandler(dataDir.resolve("homes.json"));
     }
 
     @Mod.EventHandler

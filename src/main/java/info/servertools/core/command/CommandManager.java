@@ -23,7 +23,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static info.servertools.core.command.CommandLevel.ANYONE;
 import static info.servertools.core.command.CommandLevel.OP;
 
-import info.servertools.core.command.corecommands.*;
+import info.servertools.core.command.corecommands.CommandDisarm;
+import info.servertools.core.command.corecommands.CommandEditTeleport;
+import info.servertools.core.command.corecommands.CommandEntityCount;
+import info.servertools.core.command.corecommands.CommandHeal;
+import info.servertools.core.command.corecommands.CommandHome;
+import info.servertools.core.command.corecommands.CommandInventory;
+import info.servertools.core.command.corecommands.CommandKillAll;
+import info.servertools.core.command.corecommands.CommandKillPlayer;
+import info.servertools.core.command.corecommands.CommandMemory;
+import info.servertools.core.command.corecommands.CommandMotd;
+import info.servertools.core.command.corecommands.CommandNick;
+import info.servertools.core.command.corecommands.CommandPing;
+import info.servertools.core.command.corecommands.CommandReloadMotd;
+import info.servertools.core.command.corecommands.CommandRemoveAll;
+import info.servertools.core.command.corecommands.CommandSetNick;
+import info.servertools.core.command.corecommands.CommandSilence;
+import info.servertools.core.command.corecommands.CommandSpawnMob;
+import info.servertools.core.command.corecommands.CommandTPS;
+import info.servertools.core.command.corecommands.CommandTeleport;
+import info.servertools.core.command.corecommands.CommandVoice;
+import info.servertools.core.command.corecommands.CommandWhereIs;
+import info.servertools.core.command.corecommands.CommandWhois;
 import info.servertools.core.config.CommandConfigHandler;
 import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Environment;
@@ -133,5 +154,6 @@ public class CommandManager {
         registerCommand(new CommandEditTeleport("editteleport"));
         registerCommand(new CommandTeleport("teleport"));
         registerCommand(new CommandWhois("whois"));
+        registerCommand(new CommandHome("home"));
     }
 }

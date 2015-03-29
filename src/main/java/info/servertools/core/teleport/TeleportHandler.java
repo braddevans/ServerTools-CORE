@@ -166,8 +166,6 @@ public class TeleportHandler {
                     log.error("Failed to parse teleport file as valid JSON: " + saveFile, e);
                 } catch (IOException e) {
                     log.error("Failed to load teleport file from disk: " + saveFile, e);
-                } finally {
-                    System.out.println("Clazz: " + teleportMap.getClass().getName());
                 }
             }
         });
