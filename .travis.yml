@@ -1,5 +1,8 @@
-sudo: false
 language: java
+cache:
+  directories:
+    - $HOME/.gradle
+sudo: false
 jdk:
   - oraclejdk7
   - oraclejdk8
