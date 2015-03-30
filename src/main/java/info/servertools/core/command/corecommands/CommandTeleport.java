@@ -24,6 +24,7 @@ import static net.minecraft.util.EnumChatFormatting.GRAY;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.config.CoreConfig;
+import info.servertools.core.teleport.BackHandler;
 import info.servertools.core.util.ChatMessage;
 import info.servertools.core.util.Location;
 import info.servertools.core.util.ServerUtils;
@@ -69,6 +70,7 @@ public class CommandTeleport extends ServerToolsCommand {
             if (teleport.dimID != player.dimension && !CoreConfig.ENABLE_INTERDIM_TELEPORT) {
                 throw new CommandException("Interdimension teleporting isn't enabled on the server");
             }
+            BackHandler.instance().setBackLocation(player.getPersistentID(), new Location(player));
             ServerUtils.teleportPlayer(player, teleport);
             sender.addChatMessage(ChatMessage.builder().color(GRAY).add("Teleported to ").color(AQUA).add(args[0]).build());
         } else {

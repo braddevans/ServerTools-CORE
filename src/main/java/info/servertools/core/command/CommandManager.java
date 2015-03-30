@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static info.servertools.core.command.CommandLevel.ANYONE;
 import static info.servertools.core.command.CommandLevel.OP;
 
+import info.servertools.core.command.corecommands.CommandBack;
 import info.servertools.core.command.corecommands.CommandDisarm;
 import info.servertools.core.command.corecommands.CommandEditTeleport;
 import info.servertools.core.command.corecommands.CommandEntityCount;
@@ -158,5 +159,6 @@ public class CommandManager {
         registerCommand(new CommandWhois("whois"));
         registerCommand(new CommandHome("home"));
         registerCommand(new CommandVanish("vanish"));
+        registerCommand(new CommandBack("back"));
     }
 }

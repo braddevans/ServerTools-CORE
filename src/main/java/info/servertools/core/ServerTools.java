@@ -27,6 +27,7 @@ import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Environment;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.task.TickHandler;
+import info.servertools.core.teleport.BackHandler;
 import info.servertools.core.teleport.HomeHandler;
 import info.servertools.core.teleport.TeleportHandler;
 import info.servertools.core.util.FlatBedrockGenerator;
@@ -70,6 +71,7 @@ public class ServerTools {
 
     public TeleportHandler teleportHandler;
     public HomeHandler homeHandler;
+    public BackHandler backHandler;
 
     @Mod.EventHandler
     public void preInit(final FMLPreInitializationEvent event) {
@@ -95,6 +97,7 @@ public class ServerTools {
 
         teleportHandler = new TeleportHandler(dataDir.resolve("teleports.json"));
         homeHandler = new HomeHandler(dataDir.resolve("homes.json"));
+        backHandler = new BackHandler();
     }
 
     @Mod.EventHandler
