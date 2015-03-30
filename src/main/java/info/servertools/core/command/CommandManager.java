@@ -43,6 +43,7 @@ import info.servertools.core.command.corecommands.CommandSilence;
 import info.servertools.core.command.corecommands.CommandSpawnMob;
 import info.servertools.core.command.corecommands.CommandTPS;
 import info.servertools.core.command.corecommands.CommandTeleport;
+import info.servertools.core.command.corecommands.CommandTop;
 import info.servertools.core.command.corecommands.CommandVanish;
 import info.servertools.core.command.corecommands.CommandVoice;
 import info.servertools.core.command.corecommands.CommandWhereIs;
@@ -160,5 +161,6 @@ public class CommandManager {
         registerCommand(new CommandHome("home"));
         registerCommand(new CommandVanish("vanish"));
         registerCommand(new CommandBack("back"));
+        registerCommand(new CommandTop("top"));
     }
 }
