@@ -18,8 +18,11 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static info.servertools.core.command.CommandLevel.OP;
+
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.ServerToolsCommand;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -27,10 +30,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
-import static info.servertools.core.command.CommandLevel.OP;
+import javax.annotation.Nullable;
 
 public class CommandSetNick extends ServerToolsCommand {
 

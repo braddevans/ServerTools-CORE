@@ -22,14 +22,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static net.minecraft.util.EnumChatFormatting.BLUE;
 import static net.minecraft.util.EnumChatFormatting.RED;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatUtils;
 import info.servertools.core.util.ServerUtils;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;

@@ -30,6 +30,7 @@ import info.servertools.core.task.TickHandler;
 import info.servertools.core.teleport.HomeHandler;
 import info.servertools.core.teleport.TeleportHandler;
 import info.servertools.core.util.FlatBedrockGenerator;
+
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;

@@ -22,12 +22,12 @@ import static info.servertools.core.command.CommandLevel.OP;
 import static net.minecraft.util.EnumChatFormatting.AQUA;
 import static net.minecraft.util.EnumChatFormatting.RED;
 
-import com.google.common.collect.Lists;
 import info.servertools.core.ServerTools;
-import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.util.ChatMessage;
 import info.servertools.core.util.Location;
+
+import com.google.common.collect.Lists;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;

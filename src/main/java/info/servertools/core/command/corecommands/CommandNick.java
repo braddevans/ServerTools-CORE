@@ -18,15 +18,18 @@
  */
 package info.servertools.core.command.corecommands;
 
+import static net.minecraft.util.EnumChatFormatting.AQUA;
+import static net.minecraft.util.EnumChatFormatting.GREEN;
+import static net.minecraft.util.EnumChatFormatting.RED;
+
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.util.ChatMessage;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
-
-import static net.minecraft.util.EnumChatFormatting.*;
 
 //TODO more limiting of nicknames
 public class CommandNick extends ServerToolsCommand {

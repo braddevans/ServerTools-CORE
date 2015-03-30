@@ -31,8 +31,9 @@ public final class ChatUtils {
 
     public static ChatComponentText getChatComponent(String message, @Nullable EnumChatFormatting formatting) {
         ChatComponentText text = new ChatComponentText(message);
-        if (formatting != null)
+        if (formatting != null) {
             text.getChatStyle().setColor(formatting);
+        }
         return text;
     }
 

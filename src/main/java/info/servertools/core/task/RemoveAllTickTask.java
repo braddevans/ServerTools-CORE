@@ -22,6 +22,7 @@ import static net.minecraft.util.EnumChatFormatting.GOLD;
 
 import info.servertools.core.util.ChatMessage;
 import info.servertools.core.util.ChatUtils;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;

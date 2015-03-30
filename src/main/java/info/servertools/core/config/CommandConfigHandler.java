@@ -21,12 +21,13 @@ package info.servertools.core.config;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static info.servertools.core.command.CommandLevel.OP;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.lib.Reference;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

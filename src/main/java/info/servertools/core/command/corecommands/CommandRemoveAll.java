@@ -20,11 +20,11 @@ package info.servertools.core.command.corecommands;
 
 import static info.servertools.core.command.CommandLevel.OP;
 
-import gnu.trove.set.hash.THashSet;
 import info.servertools.core.ServerTools;
-import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.task.RemoveAllTickTask;
+
+import gnu.trove.set.hash.THashSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.command.CommandException;

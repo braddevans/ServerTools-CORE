@@ -26,6 +26,7 @@ import static info.servertools.core.util.STConfig.CATEGORY_WORLD;
 import info.servertools.core.STVersion;
 import info.servertools.core.lib.Environment;
 import info.servertools.core.util.STConfig;
+
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.LogManager;

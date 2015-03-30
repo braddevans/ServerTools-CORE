@@ -19,8 +19,8 @@
 package info.servertools.core.command.corecommands;
 
 import info.servertools.core.ServerTools;
-import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -38,8 +38,9 @@ public class CommandMotd extends ServerToolsCommand {
         if (sender instanceof EntityPlayer) {
 
             ServerTools.instance.motd.serveMotd((EntityPlayer) sender);
-        } else
+        } else {
             throw new WrongUsageException("Only players can use that command");
+        }
     }
 
     @Override

@@ -18,11 +18,15 @@
  */
 package info.servertools.core.command.corecommands;
 
-import com.mojang.authlib.GameProfile;
+import static info.servertools.core.command.CommandLevel.OP;
+import static net.minecraft.util.EnumChatFormatting.AQUA;
+
 import info.servertools.core.ServerTools;
 import info.servertools.core.command.ServerToolsCommand;
 import info.servertools.core.util.ChatMessage;
 import info.servertools.core.util.ServerUtils;
+
+import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
@@ -31,11 +35,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
-import static info.servertools.core.command.CommandLevel.OP;
-import static net.minecraft.util.EnumChatFormatting.AQUA;
+import javax.annotation.Nullable;
 
 public class CommandWhois extends ServerToolsCommand {
 

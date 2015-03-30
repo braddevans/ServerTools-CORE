@@ -18,13 +18,18 @@
  */
 package info.servertools.core.chat;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static net.minecraft.util.EnumChatFormatting.AQUA;
+import static net.minecraft.util.EnumChatFormatting.WHITE;
+
 import info.servertools.core.ServerTools;
 import info.servertools.core.config.CoreConfig;
 import info.servertools.core.lib.Reference;
 import info.servertools.core.util.ChatMessage;
 import info.servertools.core.util.ServerUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -33,7 +38,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -46,9 +50,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static net.minecraft.util.EnumChatFormatting.AQUA;
-import static net.minecraft.util.EnumChatFormatting.WHITE;
+import javax.annotation.Nullable;
 
 public class NickHandler {
 
@@ -132,11 +134,12 @@ public class NickHandler {
         save();
 
         if (CoreConfig.BROADCAST_NICK_CHANGES) {
-            MinecraftServer.getServer().getConfigurationManager().sendChatMsg(ChatMessage.builder()
-                    .color(AQUA).add(player.getGameProfile().getName())
-                    .color(WHITE).add(" is now known as ")
-                    .color(AQUA).add(nick)
-                    .build());
+            MinecraftServer.getServer().getConfigurationManager()
+                    .sendChatMsg(ChatMessage.builder()
+                                         .color(AQUA).add(player.getGameProfile().getName())
+                                         .color(WHITE).add(" is now known as ")
+                                         .color(AQUA).add(nick)
+                                         .build());
         }
 
         return true;
@@ -146,6 +149,7 @@ public class NickHandler {
      * Verify that the supplied nickname is valid
      *
      * @param nickName The nickname
+     *
      * @return {@code true} if the nickname is valid, {@code false} if not
      */
     public static boolean verifyNickname(final EntityPlayerMP player, final String nickName) {

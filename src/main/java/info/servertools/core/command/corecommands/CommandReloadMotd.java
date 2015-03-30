@@ -21,8 +21,8 @@ package info.servertools.core.command.corecommands;
 import static info.servertools.core.command.CommandLevel.OP;
 
 import info.servertools.core.ServerTools;
-import info.servertools.core.command.CommandLevel;
 import info.servertools.core.command.ServerToolsCommand;
+
 import net.minecraft.command.ICommandSender;
 
 public class CommandReloadMotd extends ServerToolsCommand {
