@@ -64,3 +64,4 @@ tasks.withType(JavaCompile) { task ->
     task.options.encoding = 'UTF-8'
     task.options.fork = true
 }
+
