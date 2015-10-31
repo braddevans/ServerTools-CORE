@@ -1,12 +1,13 @@
 [
-{
-  "modid": "ServerTools",
-  "name": "ServerTools",
-  "version": "${version}",
-  "description": "Server administration and utilities mod",
-  "url": "http://servertools.info",
-  "authorList": ["matthewprenger"],
-  "credits": "Forge, FML, and MCP for making this project possible",
-  "dependencies": []
-}
+  {
+    "modid": "ServerTools-CORE",
+    "name": "ServerTools-CORE",
+    "version": "${version}",
+    "description": "${description}",
+    "url": "${url}",
+    "authorList": [
+      "matthewprenger"
+    ],
+    "credits": "Forge, FML, and MCP for making this project possible"
+  }
 ]
