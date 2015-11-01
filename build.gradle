@@ -20,7 +20,7 @@ configurations {
 }
 
 dependencies {
-    compile (group: 'ninja.leaping.configurate', name: 'configurate-hocon', version: '2.0') {
+    compile(group: 'ninja.leaping.configurate', name: 'configurate-hocon', version: '2.0') {
         exclude module: 'guava'
     }
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -29,6 +29,8 @@ dependencies {
 minecraft {
     runDir = 'run'
 }
+
+[jar, sourceJar]*.exclude 'log4j2-test.xml'
 
 processResources {
 

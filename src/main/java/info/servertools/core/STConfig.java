@@ -38,7 +38,7 @@ public class STConfig<T> {
     private CommentedConfigurationNode root = SimpleCommentedConfigurationNode.root();
     private ObjectMapper<T>.BoundInstance configMapper;
     private T configBase;
-    private Path file;
+    private final Path file;
 
     public STConfig(final Path file, final Class<T> clazz) {
         this.file = file;

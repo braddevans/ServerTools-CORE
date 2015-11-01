@@ -18,9 +18,16 @@
  */
 package info.servertools.core;
 
+import info.servertools.core.commands.CommandMotd;
+import info.servertools.core.commands.CommandSilence;
+import info.servertools.core.feature.Motd;
+import info.servertools.core.feature.SilenceHandler;
+import info.servertools.core.util.FileIO;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,11 +56,28 @@ public final class ServerToolsCore {
         configDir = modConfigDir.toPath().resolve("ServerTools-CORE");
         Files.createDirectories(configDir);
         coreConfig = new STConfig<>(configDir.resolve("ServerTools-CORE.conf"), CoreConfig.class);
+
+        CommandManager.init(configDir.resolve("commands.conf"));
+
+        if (getConfig().getChat().isMotdEnabled()) {
+            Motd motd = new Motd(configDir.resolve("motd.txt"));
+            CommandMotd motdCommand = new CommandMotd("motd", motd);
+            CommandManager.registerCommand(motdCommand);
+        }
+
+        SilenceHandler silenceHandler = new SilenceHandler(configDir.resolve("silenced.json"));
+        CommandSilence silenceCommand = new CommandSilence(silenceHandler, "silence");
+        CommandManager.registerCommand(silenceCommand);
     }
 
     @Mod.EventHandler
     public void onServerStarted(final FMLServerStartedEvent event) {
+        CommandManager.register(MinecraftServer.getServer());
+    }
 
+    @Mod.EventHandler
+    public void onServerStoping(final FMLServerStoppingEvent event) {
+        FileIO.shutDown();
     }
 
     public static Path getConfigDir() {

@@ -21,6 +21,9 @@ package info.servertools.core;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CoreConfig {
 
     @Setting(value = "general")
@@ -55,8 +58,16 @@ public class CoreConfig {
         @Setting(value = "enable-motd", comment = "Enable a message of the day sent to users when they log in")
         private boolean motdEnabled = true;
 
+        @Setting(value = "additional-silence-banned-commands",
+                comment = "Additional class names to ban when users are silenced. The built in vanilla commands are already banned")
+        private List<String> additionalSilenceCommands = new ArrayList<>();
+
         public boolean isMotdEnabled() {
             return motdEnabled;
+        }
+
+        public List<String> getAdditionalSilenceCommands() {
+            return additionalSilenceCommands;
         }
     }
 
