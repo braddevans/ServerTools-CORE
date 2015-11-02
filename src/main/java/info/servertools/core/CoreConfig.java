@@ -50,6 +50,12 @@ public class CoreConfig {
     @ConfigSerializable
     public static class GeneralCategory extends Category {
 
+        @Setting(value = "enable-help-override", comment = "Enable an override for the /help command that makes it work with broken mod commands")
+        private boolean helpOverrideEnabled = true;
+
+        public boolean isHelpOverrideEnabled() {
+            return helpOverrideEnabled;
+        }
     }
 
     @ConfigSerializable

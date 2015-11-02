@@ -19,7 +19,11 @@
 package info.servertools.core;
 
 import net.minecraft.command.CommandHandler;
+import net.minecraft.command.CommandHelp;
+import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.Loader;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
@@ -30,8 +34,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
@@ -120,6 +123,31 @@ public final class CommandManager {
             final STCommand command = commands.pop();
             log.trace("Registering {} with Minecraft", command);
             commandHandler.registerCommand(command);
+        }
+
+        if (ServerToolsCore.getConfig().getGeneral().isHelpOverrideEnabled()) {
+            if (Loader.isModLoaded("HelpFixer")) {
+                log.info("HelpFixer detected. Not overriding /help");
+            } else {
+                log.trace("Overriding /help");
+                commandHandler.registerCommand(new CommandHelp() {
+                    protected List<ICommand> getSortedPossibleCommands(ICommandSender sender) {
+                        @SuppressWarnings("unchecked")
+                        List<ICommand> list = MinecraftServer.getServer().getCommandManager().getPossibleCommands(sender);
+
+                        Iterator<ICommand> iterator = list.iterator();
+                        while (iterator.hasNext()) {
+                            ICommand command = iterator.next();
+                            if (command.getCommandName() == null || command.getCommandUsage(sender) == null) {
+                                iterator.remove();
+                            }
+                        }
+
+                        Collections.sort(list, (o1, o2) -> o1.getCommandName().compareTo(o2.getCommandName()));
+                        return list;
+                    }
+                });
+            }
         }
     }
 }
