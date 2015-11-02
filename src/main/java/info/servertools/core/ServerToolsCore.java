@@ -21,6 +21,7 @@ package info.servertools.core;
 import info.servertools.core.commands.CommandMotd;
 import info.servertools.core.commands.CommandPing;
 import info.servertools.core.commands.CommandSilence;
+import info.servertools.core.commands.CommandWhereIs;
 import info.servertools.core.feature.Motd;
 import info.servertools.core.feature.SilenceHandler;
 import info.servertools.core.util.FileIO;
@@ -71,6 +72,7 @@ public final class ServerToolsCore {
         CommandManager.registerCommand(silenceCommand);
 
         CommandManager.registerCommand(new CommandPing("ping"));
+        CommandManager.registerCommand(new CommandWhereIs("whereis"));
     }
 
     @Mod.EventHandler
