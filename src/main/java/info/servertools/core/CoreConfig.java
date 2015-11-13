@@ -29,18 +29,11 @@ public class CoreConfig {
     @Setting(value = "general")
     private GeneralCategory general = new GeneralCategory();
 
-    @Setting(value = "logging")
-    private LoggingCategory logging = new LoggingCategory();
-
     @Setting(value = "chat")
     private ChatCategory chat = new ChatCategory();
 
     public GeneralCategory getGeneral() {
         return general;
-    }
-
-    public LoggingCategory getLogging() {
-        return logging;
     }
 
     public ChatCategory getChat() {
@@ -74,23 +67,6 @@ public class CoreConfig {
 
         public List<String> getAdditionalSilenceCommands() {
             return additionalSilenceCommands;
-        }
-    }
-
-    @ConfigSerializable
-    public static class LoggingCategory extends Category {
-        @Setting(value = "enable-block-break-logging", comment = "Enable logging to a file whenever a block is broken on the server")
-        private boolean breakLogEnabled = false;
-
-        @Setting(value = "enable-block-place-logging", comment = "Enable logging to a file whenever a block is placed on the server")
-        private boolean placeLogEnabled = false;
-
-        public boolean isBreakLogEnabled() {
-            return breakLogEnabled;
-        }
-
-        public boolean isPlaceLogEnabled() {
-            return placeLogEnabled;
         }
     }
 
