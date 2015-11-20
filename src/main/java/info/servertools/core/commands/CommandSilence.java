@@ -26,8 +26,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 
 import javax.annotation.Nullable;
@@ -65,18 +63,13 @@ public class CommandSilence extends STCommand {
     @Override
     public void processCommand(final ICommandSender sender, final String[] args) throws CommandException {
         if (args.length == 2) {
-            UUID uuid;
-            Optional<EntityPlayerMP> player = ServerUtils.getPlayerForUsername(args[1]);
-            if (player.isPresent()) {
-                uuid = player.get().getPersistentID();
-            } else {
-                @Nullable GameProfile profile = MinecraftServer.getServer().getPlayerProfileCache().getGameProfileForUsername(args[1]);
-                if (profile != null) {
-                    uuid = profile.getId();
-                } else {
-                    throw new PlayerNotFoundException();
-                }
+            Optional<GameProfile> gameProfile = ServerUtils.getGameProfile(args[1]);
+            if (!gameProfile.isPresent()) {
+                throw new PlayerNotFoundException();
             }
+
+            final UUID uuid = gameProfile.get().getId();
+
             if ("add".equals(args[0])) {
                 if (silenceHandler.addSilence(uuid)) {
                     notifyOperators(sender, this, "Silenced %s", args[1]);

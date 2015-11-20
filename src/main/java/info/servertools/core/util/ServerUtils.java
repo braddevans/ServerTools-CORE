@@ -62,8 +62,18 @@ public final class ServerUtils {
     public static Optional<EntityPlayerMP> getPlayerForUsername(final String username) {
         Objects.requireNonNull(username, "username");
         return getAllPlayers().stream()
-                .filter(player -> username.equals(player.getGameProfile().getName()))
+                .filter(player -> username.equalsIgnoreCase(player.getGameProfile().getName()))
                 .findAny();
+    }
+
+    public static Optional<GameProfile> getGameProfile(final String username) {
+        Objects.requireNonNull(username, "username");
+        final Optional<EntityPlayerMP> player = getPlayerForUsername(username);
+        if (player.isPresent()) {
+            return Optional.of(player.get().getGameProfile());
+        } else {
+            return Optional.ofNullable(server.getPlayerProfileCache().getGameProfileForUsername(username));
+        }
     }
 
     @SuppressWarnings("unchecked")
