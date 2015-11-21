@@ -21,6 +21,7 @@ package info.servertools.core;
 import info.servertools.core.commands.*;
 import info.servertools.core.feature.Motd;
 import info.servertools.core.feature.SilenceHandler;
+import info.servertools.core.feature.TeleportHandler;
 import info.servertools.core.util.FileIO;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Mod;
@@ -62,6 +63,14 @@ public final class ServerToolsCore {
             Motd motd = new Motd(configDir.resolve("motd.txt"));
             CommandMotd motdCommand = new CommandMotd("motd", motd);
             CommandManager.registerCommand(motdCommand);
+        }
+
+        if (getConfig().getTeleport().isTeleportsEnabled()) {
+            final TeleportHandler teleportHandler = new TeleportHandler(configDir.resolve("teleports.json"));
+            final CommandEditTeleport commandEditTeleport = new CommandEditTeleport(teleportHandler, "editteleport");
+            final CommandTeleport commandTeleport = new CommandTeleport(teleportHandler, "teleport");
+            CommandManager.registerCommand(commandEditTeleport);
+            CommandManager.registerCommand(commandTeleport);
         }
 
         SilenceHandler silenceHandler = new SilenceHandler(configDir.resolve("silenced.json"));

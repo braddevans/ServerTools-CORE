@@ -27,6 +27,7 @@ import net.minecraft.util.BlockPos;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -80,10 +81,16 @@ public abstract class STCommand extends CommandBase {
     /* ---------- Utilities ---------- */
 
     public static EntityPlayerMP requirePlayer(final ICommandSender sender) throws CommandException {
+        return requirePlayer(sender, "That command can only be used by a player");
+    }
+
+    public static EntityPlayerMP requirePlayer(final ICommandSender sender, final String message) throws CommandException {
+        Objects.requireNonNull(sender, "sender");
+        Objects.requireNonNull(message, "message");
         if (sender instanceof EntityPlayerMP) {
             return (EntityPlayerMP) sender;
         } else {
-            throw new CommandException("That command can only be used by a player");
+            throw new CommandException(message);
         }
     }
 }

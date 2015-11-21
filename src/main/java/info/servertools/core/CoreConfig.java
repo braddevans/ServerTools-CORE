@@ -32,12 +32,18 @@ public class CoreConfig {
     @Setting(value = "chat")
     private ChatCategory chat = new ChatCategory();
 
+    private TeleportCategory teleport = new TeleportCategory();
+
     public GeneralCategory getGeneral() {
         return general;
     }
 
     public ChatCategory getChat() {
         return chat;
+    }
+
+    public TeleportCategory getTeleport() {
+        return teleport;
     }
 
     @ConfigSerializable
@@ -67,6 +73,24 @@ public class CoreConfig {
 
         public List<String> getAdditionalSilenceCommands() {
             return additionalSilenceCommands;
+        }
+    }
+
+    @ConfigSerializable
+    public static class TeleportCategory extends Category {
+
+        @Setting(value = "enable-teleports", comment = "Enable server teleports")
+        private boolean teleportsEnabled = true;
+
+        @Setting(value = "enable-cross-dimension-teleports", comment = "Enable teleporting to a different dimension")
+        private boolean crossDimTeleportEnabled = false;
+
+        public boolean isTeleportsEnabled() {
+            return teleportsEnabled;
+        }
+
+        public boolean isCrossDimTeleportEnabled() {
+            return crossDimTeleportEnabled;
         }
     }
 
