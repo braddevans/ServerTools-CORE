@@ -32,6 +32,7 @@ public class CoreConfig {
     @Setting(value = "chat")
     private ChatCategory chat = new ChatCategory();
 
+    @Setting(value = "teleport")
     private TeleportCategory teleport = new TeleportCategory();
 
     public GeneralCategory getGeneral() {
