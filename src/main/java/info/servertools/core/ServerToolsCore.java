@@ -35,16 +35,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Mod(
-        modid = ServerToolsCore.MOD_ID,
-        name = ServerToolsCore.MOD_NAME,
+        modid = Constants.MOD_ID,
+        name = Constants.MOD_NAME,
+        dependencies = Constants.DEPENDENCIES,
         acceptableRemoteVersions = "*", // Don't require mod on client
-        acceptedMinecraftVersions = '[' + ServerToolsCore.MC_VERSION + ']'
+        acceptedMinecraftVersions = '[' + Constants.MC_VERSION + ']'
 )
 public final class ServerToolsCore {
-
-    public static final String MOD_ID = "ServerTools-CORE";
-    public static final String MOD_NAME = MOD_ID;
-    public static final String MC_VERSION = "1.8";
 
     private static Path configDir;
 

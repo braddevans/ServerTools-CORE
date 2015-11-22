@@ -21,6 +21,7 @@ package info.servertools.core.feature;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import info.servertools.core.Constants;
 import info.servertools.core.util.FileIO;
 import info.servertools.core.util.Location;
 import net.minecraft.util.ChatComponentText;
@@ -34,7 +35,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -104,7 +104,7 @@ public class TeleportHandler {
     private void load() {
         synchronized (saveFile) {
             if (!Files.exists(saveFile)) return;
-            try (BufferedReader reader = Files.newBufferedReader(saveFile, StandardCharsets.UTF_8)) {
+            try (BufferedReader reader = Files.newBufferedReader(saveFile, Constants.CHARSET)) {
                 this.locationMap = gson.fromJson(reader, type);
                 if (this.locationMap == null) this.locationMap = new HashMap<>();
             } catch (IOException e) {
@@ -119,7 +119,7 @@ public class TeleportHandler {
             synchronized (saveFile) {
                 try {
                     if (Files.exists(saveFile)) Files.delete(saveFile);
-                    try (final BufferedWriter writer = Files.newBufferedWriter(saveFile, StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW)) {
+                    try (final BufferedWriter writer = Files.newBufferedWriter(saveFile, Constants.CHARSET, StandardOpenOption.CREATE_NEW)) {
                         gson.toJson(tempMap, type, writer);
                     }
                 } catch (IOException e) {

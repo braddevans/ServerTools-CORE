@@ -21,6 +21,7 @@ package info.servertools.core.feature;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import info.servertools.core.Constants;
 import info.servertools.core.ServerToolsCore;
 import info.servertools.core.util.FileIO;
 import net.minecraft.command.server.CommandBroadcast;
@@ -43,10 +44,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -128,7 +127,7 @@ public class SilenceHandler {
                         Files.createDirectories(saveFile.getParent());
                     }
                     Files.deleteIfExists(saveFile);
-                    try (BufferedWriter writer = Files.newBufferedWriter(saveFile, StandardCharsets.UTF_8, CREATE)) {
+                    try (BufferedWriter writer = Files.newBufferedWriter(saveFile, Constants.CHARSET, CREATE)) {
                         gson.toJson(silencedUsers, type, writer);
                     }
                 } catch (IOException e) {
@@ -141,7 +140,7 @@ public class SilenceHandler {
     private void load() throws IOException {
         synchronized (saveFile) {
             if (!Files.exists(saveFile)) return;
-            try (BufferedReader reader = Files.newBufferedReader(saveFile, StandardCharsets.UTF_8)) {
+            try (BufferedReader reader = Files.newBufferedReader(saveFile, Constants.CHARSET)) {
                 this.silencedUsers = gson.fromJson(reader, type);
                 if (this.silencedUsers == null) this.silencedUsers = new HashSet<>();
             } catch (IOException e) {

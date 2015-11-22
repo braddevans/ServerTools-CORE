@@ -18,6 +18,7 @@
  */
 package info.servertools.core.feature;
 
+import info.servertools.core.Constants;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -26,7 +27,6 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
@@ -52,12 +52,12 @@ public class Motd {
         if (!Files.exists(file)) {
             genDefaultMotd();
         } else {
-            lines = new ArrayDeque<>(Files.readAllLines(file, StandardCharsets.UTF_8));
+            lines = new ArrayDeque<>(Files.readAllLines(file, Constants.CHARSET));
         }
     }
 
     private void save() throws IOException {
-        try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(file, Constants.CHARSET)) {
             for (String line : lines) {
                 writer.write(line + "\r\n");
             }
