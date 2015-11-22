@@ -18,7 +18,10 @@
  */
 package info.servertools.core.util;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraft.world.Teleporter;
 
 import java.util.Objects;
 
@@ -27,8 +30,29 @@ public final class PlayerUtils {
     public static void teleportPlayer(final EntityPlayerMP player, final Location location) {
         Objects.requireNonNull(player, "player");
         Objects.requireNonNull(location, "location");
-        // TODO
-        System.out.println("Teleport: " + player.getCommandSenderName() + " -> " + location);
+
+        final ServerConfigurationManager configurationManager = player.mcServer.getConfigurationManager();
+        if (player.dimension != location.getDim()) {
+            configurationManager.transferPlayerToDimension(player, location.getDim(), new Teleporter(player.getServerForPlayer()) {
+                @Override
+                public void placeInPortal(final Entity entity, final float rotationYaw) {}
+
+                @Override
+                public boolean placeInExistingPortal(final Entity entity, final float rotationYaw) {
+                    return false;
+                }
+
+                @Override
+                public boolean makePortal(final Entity entity) {
+                    return false;
+                }
+
+                @Override
+                public void removeStalePortalLocations(final long worldTime) {}
+            });
+        }
+
+        player.setPositionAndUpdate(location.getX(), location.getY(), location.getZ());
     }
 
     private PlayerUtils() {}
