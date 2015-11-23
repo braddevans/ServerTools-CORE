@@ -12,8 +12,8 @@ buildscript {
 }
 
 plugins {
-//    id 'net.minecraftforge.gradle.forge' version '2.0.2'
     id 'com.github.hierynomus.license' version '0.12.1'
+    id 'com.github.johnrengelman.shadow' version '1.2.2'
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
@@ -29,15 +29,11 @@ repositories {
     mavenCentral()
 }
 
-configurations {
-    shade
-    compile.extendsFrom shade
-}
-
 dependencies {
     compile(group: 'ninja.leaping.configurate', name: 'configurate-hocon', version: '2.0') {
         exclude module: 'guava'
     }
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
@@ -54,6 +50,26 @@ minecraft {
 }
 
 [jar, sourceJar]*.exclude 'log4j2-test.xml'
+
+jar {
+    classifier = 'nodeps'
+}
+
+shadowJar {
+    classifier = '' // This is now the main jar
+    relocate 'ninja.leaping.configurate', 'info.servertools.repack.ninja.leaping.configurate'
+    relocate 'com.typesafe.config', 'info.servertools.repack.com.typesafe.config'
+}
+
+reobf {
+    shadowJar { useSrgSrg() }
+}
+
+tasks.build.dependsOn reobfShadowJar
+
+artifacts {
+    archives shadowJar
+}
 
 processResources {
 
@@ -96,12 +112,4 @@ license {
 tasks.withType(JavaCompile) { task ->
     task.options.encoding = 'UTF-8'
     task.options.fork = true
-}
-
-jar {
-    configurations.shade.each { dep ->
-        from(project.zipTree(dep)) {
-            exclude 'META-INF', 'META-INF/**'
-        }
-    }
 }
