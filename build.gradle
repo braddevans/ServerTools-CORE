@@ -41,8 +41,16 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
+version = "$minecraft.version-$version"
+if (System.getenv().'BUILD_NUMBER' != null) {
+    version += ".${System.getenv().'BUILD_NUMBER'}"
+} else {
+    version += ".0"
+}
+
 minecraft {
     runDir = 'run'
+    makeObfSourceJar = false
 }
 
 [jar, sourceJar]*.exclude 'log4j2-test.xml'
