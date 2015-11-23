@@ -46,7 +46,6 @@ public class CommandEditTeleport extends STCommand {
 
     @Nullable
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> addTabCompletionOptions(final ICommandSender sender, final String[] args, final BlockPos pos) {
         switch (args.length) {
             case 0:

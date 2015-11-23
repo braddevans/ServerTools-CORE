@@ -35,9 +35,8 @@ public final class ServerUtils {
 
     private static final MinecraftServer server = MinecraftServer.getServer();
 
-    @SuppressWarnings("unchecked")
     public static List<EntityPlayerMP> getAllPlayers() {
-        return (List<EntityPlayerMP>) server.getConfigurationManager().playerEntityList;
+        return server.getConfigurationManager().playerEntityList;
     }
 
     public static List<UUID> getAllUUIDs() {
@@ -76,7 +75,6 @@ public final class ServerUtils {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> ListenableFuture<T> callFromMainThread(Callable<T> callable) {
         return server.callFromMainThread(callable);
     }

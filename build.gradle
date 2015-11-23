@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.0-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
     }
 }
 
@@ -19,8 +19,8 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = '3.0.0'
-minecraft.version = '1.8-11.14.4.1563'
-minecraft.mappings = 'stable_17'
+minecraft.version = '1.8.8-11.14.4.1576-1.8.8'
+minecraft.mappings = 'snapshot_20151122'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

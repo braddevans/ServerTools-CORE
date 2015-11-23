@@ -49,7 +49,6 @@ public class CommandTeleport extends STCommand {
 
     @Nullable
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> addTabCompletionOptions(final ICommandSender sender, final String[] args, final BlockPos pos) {
         return getListOfStringsMatchingLastWord(args, teleportHandler.getTeleportNames());
     }

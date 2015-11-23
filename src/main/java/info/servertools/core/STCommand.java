@@ -22,11 +22,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.BlockPos;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
@@ -51,17 +47,6 @@ public abstract class STCommand extends CommandBase {
      */
     void setName(final String name) {
         this.name = name;
-    }
-
-    @Override
-    public List<String> getCommandAliases() {
-        return Collections.emptyList();
-    }
-
-    @Nullable
-    @Override
-    public List<String> addTabCompletionOptions(final ICommandSender sender, final String[] args, final BlockPos pos) {
-        return null;
     }
 
     @Override

@@ -137,7 +137,6 @@ public final class CommandManager {
             log.trace("Overriding /help");
             commandHandler.registerCommand(new CommandHelp() {
                 protected List<ICommand> getSortedPossibleCommands(ICommandSender sender) {
-                    @SuppressWarnings("unchecked")
                     List<ICommand> list = MinecraftServer.getServer().getCommandManager().getPossibleCommands(sender);
 
                     Iterator<ICommand> iterator = list.iterator();

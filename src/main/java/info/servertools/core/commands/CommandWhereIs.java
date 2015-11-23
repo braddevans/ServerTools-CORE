@@ -43,7 +43,6 @@ public class CommandWhereIs extends STCommand {
 
     @Nullable
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> addTabCompletionOptions(final ICommandSender sender, final String[] args, final BlockPos pos) {
         if (args.length <= 1) {
             return getListOfStringsMatchingLastWord(args, ServerUtils.getAllUsernames());
