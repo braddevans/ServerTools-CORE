@@ -29,6 +29,13 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 import java.util.Objects;
 
+/**
+ * Base class for all ServerTools commands. A user-facing configuration file can be edited to rename, disable, and change required permission level
+ * for any command that implements this.
+ * <p>
+ * <b>Do not</b> register these commands with Minecraft yourself. Instead regsiter with {@link CommandManager#registerCommand(STCommand)}
+ * </p>
+ */
 public abstract class STCommand extends CommandBase {
 
     public static final int PERMISSION_EVERYONE = 0;

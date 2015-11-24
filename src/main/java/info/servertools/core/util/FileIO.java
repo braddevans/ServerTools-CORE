@@ -25,19 +25,40 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * A utility class for doing File IO. Provides a simple way to execute tasks on a separate tread.
+ */
 @SuppressWarnings("unused")
 public final class FileIO {
 
     private static final ExecutorService service = Executors.newSingleThreadExecutor(r -> new Thread(r, "ServerTools IO Thread"));
 
+    /**
+     * Submit a task to be run on a separate IO thread
+     *
+     * @param runnable The task
+     *
+     * @return A Future for the task
+     */
     public static Future<?> submitTask(Runnable runnable) {
         return service.submit(runnable);
     }
 
+    /**
+     * Submint a task to be run on a separate IO thread
+     *
+     * @param callable The tatsk
+     * @param <T>      The return type of the task
+     *
+     * @return A Future for the task
+     */
     public static <T> Future<T> submitTask(Callable<T> callable) {
         return service.submit(callable);
     }
 
+    /**
+     * <em>Internal Use Only!</em>
+     */
     public static void shutDown() {
         service.shutdown();
         try {

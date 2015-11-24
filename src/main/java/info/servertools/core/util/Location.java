@@ -26,6 +26,9 @@ import java.util.Objects;
 
 import javax.annotation.Nullable;
 
+/**
+ * Simple class for representing a location in a specific dimension
+ */
 public class Location {
 
     private final int dim;

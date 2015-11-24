@@ -30,6 +30,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Base class for ServerTools config. Built on Configurate by zml
+ *
+ * @param <T> The type that holds the configuration options
+ */
 public class STConfig<T> {
 
     private static final Logger log = LogManager.getLogger();

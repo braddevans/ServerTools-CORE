@@ -43,6 +43,9 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * ServerTools Command Manager. Register commands using {@link #registerCommand(STCommand)}
+ */
 public final class CommandManager {
 
     private static final Logger log = LogManager.getLogger();
@@ -58,6 +61,11 @@ public final class CommandManager {
     private static HoconConfigurationLoader loader;
     private static CommentedConfigurationNode node = SimpleCommentedConfigurationNode.root();
 
+    /**
+     * Register a {@linkplain STCommand} with ServerTools. This will handle registration with Minecraft internally.
+     *
+     * @param command The command to register
+     */
     public static void registerCommand(final STCommand command) {
         requireNonNull(command, "command");
         log.trace("registerCommand {}", command);
@@ -105,44 +113,11 @@ public final class CommandManager {
         saveConfig();
     }
 
-    public static void init(final Path configFile) throws IOException {
-        CommandManager.configFile = configFile;
-        try {
-            if (!Files.exists(configFile.getParent())) {
-                Files.createDirectories(configFile.getParent());
-            }
-            if (!Files.exists(configFile)) {
-                Files.createFile(configFile);
-            }
-
-            loader = HoconConfigurationLoader.builder().setFile(configFile.toFile()).build();
-            node = loader.load(ConfigurationOptions.defaults().setHeader(HEADER));
-
-        } catch (IOException e) {
-            log.fatal("Failed to initialize command manager");
-            throw e;
-        }
-    }
-
     private static void saveConfig() {
         try {
             loader.save(node);
         } catch (IOException e) {
             log.error("Failed to save command configuration file {}", configFile, e);
-        }
-    }
-
-    public static void doRegister(final MinecraftServer server) {
-        log.trace("Registering commands with Minecraft...");
-        CommandHandler commandHandler = (CommandHandler) server.getCommandManager();
-        while (!commands.isEmpty()) {
-            final STCommand command = commands.pop();
-            log.trace("Registering {} with Minecraft", command);
-            commandHandler.registerCommand(command);
-        }
-
-        if (ServerToolsCore.getConfig().getGeneral().isHelpOverrideEnabled()) {
-            overrideHelp(commandHandler);
         }
     }
 
@@ -167,6 +142,51 @@ public final class CommandManager {
                     return list;
                 }
             });
+        }
+    }
+
+    /**
+     * <em>Internal Use Only!</em>
+     *
+     * @param configFile The configFile
+     *
+     * @throws IOException IOException
+     */
+    public static void init(final Path configFile) throws IOException {
+        CommandManager.configFile = configFile;
+        try {
+            if (!Files.exists(configFile.getParent())) {
+                Files.createDirectories(configFile.getParent());
+            }
+            if (!Files.exists(configFile)) {
+                Files.createFile(configFile);
+            }
+
+            loader = HoconConfigurationLoader.builder().setFile(configFile.toFile()).build();
+            node = loader.load(ConfigurationOptions.defaults().setHeader(HEADER));
+
+        } catch (IOException e) {
+            log.fatal("Failed to initialize command manager");
+            throw e;
+        }
+    }
+
+    /**
+     * <em>Internal Use Only!</em>
+     *
+     * @param server The server
+     */
+    public static void doRegister(final MinecraftServer server) {
+        log.trace("Registering commands with Minecraft...");
+        CommandHandler commandHandler = (CommandHandler) server.getCommandManager();
+        while (!commands.isEmpty()) {
+            final STCommand command = commands.pop();
+            log.trace("Registering {} with Minecraft", command);
+            commandHandler.registerCommand(command);
+        }
+
+        if (ServerToolsCore.getConfig().getGeneral().isHelpOverrideEnabled()) {
+            overrideHelp(commandHandler);
         }
     }
 }
