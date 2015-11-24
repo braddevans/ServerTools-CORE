@@ -66,21 +66,23 @@ public final class PlayerUtils {
         final int oldDimId = oldWorld.provider.getDimensionId();
         final int newDimId = newWorld.provider.getDimensionId();
 
-        player.dimension = newDimId;
-        player.playerNetServerHandler.sendPacket(new S07PacketRespawn(player.dimension, newWorld.getDifficulty(), newWorld.getWorldInfo().getTerrainType(), player.theItemInWorldManager.getGameType()));
-        oldWorld.removePlayerEntityDangerously(player);
-        player.isDead = false;
-        transferEntityToWorld(player, oldWorld, newWorld);
-        configurationManager.preparePlayer(player, oldWorld);
-        player.playerNetServerHandler.setPlayerLocation(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
-        player.theItemInWorldManager.setWorld(newWorld);
-        configurationManager.updateTimeAndWeatherForPlayer(player, newWorld);
-        configurationManager.syncPlayerInventory(player);
+        if (player.dimension != location.getDim()) {
+            player.dimension = newDimId;
+            player.playerNetServerHandler.sendPacket(new S07PacketRespawn(player.dimension, newWorld.getDifficulty(), newWorld.getWorldInfo().getTerrainType(), player.theItemInWorldManager.getGameType()));
+            oldWorld.removePlayerEntityDangerously(player);
+            player.isDead = false;
+            transferEntityToWorld(player, oldWorld, newWorld);
+            configurationManager.preparePlayer(player, oldWorld);
+            player.playerNetServerHandler.setPlayerLocation(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+            player.theItemInWorldManager.setWorld(newWorld);
+            configurationManager.updateTimeAndWeatherForPlayer(player, newWorld);
+            configurationManager.syncPlayerInventory(player);
 
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-            player.playerNetServerHandler.sendPacket(new S1DPacketEntityEffect(player.getEntityId(), effect));
+            for (PotionEffect effect : player.getActivePotionEffects()) {
+                player.playerNetServerHandler.sendPacket(new S1DPacketEntityEffect(player.getEntityId(), effect));
+            }
+            FMLCommonHandler.instance().firePlayerChangedDimensionEvent(player, oldDimId, newDimId);
         }
-        FMLCommonHandler.instance().firePlayerChangedDimensionEvent(player, oldDimId, newDimId);
 
         player.setPositionAndUpdate(location.getX(), location.getY(), location.getZ());
     }
