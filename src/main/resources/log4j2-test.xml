@@ -70,7 +70,7 @@
             <AppenderRef ref="File"/>
             <AppenderRef ref="ServerGuiConsole" level="INFO"/>
         </Logger>
-        <Logger level="ALL" name="info.servertools">
+        <Logger level="ALL" name="info.servertools" additivity="false">
             <AppenderRef ref="FmlSysOut" level="ALL"/>
             <AppenderRef ref="ServerGuiConsole" level="ALL"/>
             <AppenderRef ref="FmlFile"/>
