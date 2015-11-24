@@ -84,6 +84,7 @@ public final class ServerToolsCore {
         CommandManager.registerCommand(new CommandPing("ping"));
         CommandManager.registerCommand(new CommandWhereIs("whereis"));
         CommandManager.registerCommand(new CommandInventory("inventory"));
+        CommandManager.registerCommand(new CommandUUID("uuid"));
     }
 
     @Mod.EventHandler
