@@ -16,10 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.core.commands;
+package info.servertools.core.command;
 
-import info.servertools.core.STCommand;
 import info.servertools.core.util.ServerUtils;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -27,19 +27,20 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
-public class CommandWhereIs extends STCommand {
+import javax.annotation.Nullable;
 
-    public CommandWhereIs(final String defaultName) {
-        super(defaultName);
+public class CommandPing extends STCommand {
+
+    public CommandPing() {
+        super("ping");
         setPermissionLevel(PERMISSION_EVERYONE);
     }
 
     @Override
     public String getCommandUsage(final ICommandSender sender) {
-        return "/" + getCommandName() + " <player>";
+        return "/" + getCommandName() + " [player]";
     }
 
     @Nullable
@@ -54,18 +55,15 @@ public class CommandWhereIs extends STCommand {
 
     @Override
     public void processCommand(final ICommandSender sender, final String[] args) throws CommandException {
-        if (args.length == 1) {
-            final EntityPlayerMP player = getPlayer(sender, args[0]);
-            sender.addChatMessage(new ChatComponentText(
-                    player.getGameProfile().getName() +
-                            " is at X: " + player.posX +
-                            " Y: " + player.posY +
-                            " Z: " + player.posZ +
-                            " in Dim: " + player.worldObj.provider.getDimensionId() + " (" + player.worldObj.provider.getDimensionName() + ')'
-            ));
-
+        EntityPlayerMP player;
+        if (args.length == 0) {
+            player = getCommandSenderAsPlayer(sender);
+        } else if (args.length == 1) {
+            player = getPlayer(sender, args[0]);
         } else {
             throw new WrongUsageException(getCommandUsage(sender));
         }
+
+        sender.addChatMessage(new ChatComponentText(player.getGameProfile().getName() + "\'s ping is: " + player.ping + "ms"));
     }
 }

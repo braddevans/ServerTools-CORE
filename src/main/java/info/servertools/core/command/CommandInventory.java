@@ -16,10 +16,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.core.commands;
+package info.servertools.core.command;
 
-import info.servertools.core.STCommand;
+import static java.util.Objects.requireNonNull;
+
 import info.servertools.core.util.ServerUtils;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -31,15 +33,14 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
-import static java.util.Objects.requireNonNull;
+import javax.annotation.Nullable;
 
 public class CommandInventory extends STCommand {
 
-    public CommandInventory(final String defaultName) {
-        super(defaultName);
+    public CommandInventory() {
+        super("inventory");
         setPermissionLevel(PERMISSION_OPERATOR);
     }
 

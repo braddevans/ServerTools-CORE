@@ -16,29 +16,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.core.commands;
+package info.servertools.core.command;
 
-import com.mojang.authlib.GameProfile;
-import info.servertools.core.STCommand;
 import info.servertools.core.feature.SilenceHandler;
 import info.servertools.core.util.ServerUtils;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.util.BlockPos;
 
-import javax.annotation.Nullable;
+import com.mojang.authlib.GameProfile;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 public class CommandSilence extends STCommand {
 
     private final SilenceHandler silenceHandler;
 
-    public CommandSilence(final SilenceHandler silenceHandler, final String defaultName) {
-        super(defaultName);
+    public CommandSilence(final SilenceHandler silenceHandler) {
+        super("silence");
         this.silenceHandler = silenceHandler;
         setPermissionLevel(PERMISSION_OPERATOR);
     }

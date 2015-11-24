@@ -18,17 +18,22 @@
  */
 package info.servertools.core.feature;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static info.servertools.core.feature.HomeHandler.EditHomeResult.DELETED;
+import static info.servertools.core.feature.HomeHandler.EditHomeResult.NO_HOME;
+import static info.servertools.core.feature.HomeHandler.EditHomeResult.SET;
+
 import info.servertools.core.Constants;
 import info.servertools.core.util.FileIO;
 import info.servertools.core.util.Location;
+
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -39,7 +44,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 
-import static info.servertools.core.feature.HomeHandler.EditHomeResult.*;
+import javax.annotation.Nullable;
 
 public class HomeHandler {
     private static final Logger log = LogManager.getLogger();
@@ -50,7 +55,7 @@ public class HomeHandler {
     private final Type type = new ParameterizedType() {
 
         @Override
-        public Type[] getActualTypeArguments() { return new Type[]{UUID.class, Location.class}; }
+        public Type[] getActualTypeArguments() { return new Type[]{ UUID.class, Location.class }; }
 
         @Override
         public Type getRawType() { return HashMap.class; }

@@ -18,13 +18,14 @@
  */
 package info.servertools.core.util;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
+@SuppressWarnings("unused")
 public final class FileIO {
 
     private static final ExecutorService service = Executors.newSingleThreadExecutor(r -> new Thread(r, "ServerTools IO Thread"));

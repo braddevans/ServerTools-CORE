@@ -16,6 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@NonNullByDefault package info.servertools.core.commands;
+@NonNullByDefault
+package info.servertools.core.command;
 
 import info.servertools.core.util.NonNullByDefault;

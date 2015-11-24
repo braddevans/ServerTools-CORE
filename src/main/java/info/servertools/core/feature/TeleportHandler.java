@@ -18,18 +18,24 @@
  */
 package info.servertools.core.feature;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static info.servertools.core.feature.TeleportHandler.EditTeleportResult.ALREADY_EXISTS;
+import static info.servertools.core.feature.TeleportHandler.EditTeleportResult.CREATED;
+import static info.servertools.core.feature.TeleportHandler.EditTeleportResult.DELETED;
+import static info.servertools.core.feature.TeleportHandler.EditTeleportResult.NO_EXIST;
+
 import info.servertools.core.Constants;
 import info.servertools.core.util.FileIO;
 import info.servertools.core.util.Location;
+
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -40,7 +46,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 
-import static info.servertools.core.feature.TeleportHandler.EditTeleportResult.*;
+import javax.annotation.Nullable;
 
 public class TeleportHandler {
 
@@ -52,7 +58,7 @@ public class TeleportHandler {
     private final Type type = new ParameterizedType() {
 
         @Override
-        public Type[] getActualTypeArguments() { return new Type[]{String.class, Location.class}; }
+        public Type[] getActualTypeArguments() { return new Type[]{ String.class, Location.class }; }
 
         @Override
         public Type getRawType() { return HashMap.class; }

@@ -19,8 +19,10 @@
 package info.servertools.core.feature;
 
 import info.servertools.core.Constants;
+
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
+
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;

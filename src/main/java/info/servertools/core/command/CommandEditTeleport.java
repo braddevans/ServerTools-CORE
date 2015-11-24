@@ -16,26 +16,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.core.commands;
+package info.servertools.core.command;
 
-import info.servertools.core.STCommand;
 import info.servertools.core.feature.TeleportHandler;
 import info.servertools.core.util.Location;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.BlockPos;
 
-import javax.annotation.Nullable;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class CommandEditTeleport extends STCommand {
 
     private final TeleportHandler teleportHandler;
 
-    public CommandEditTeleport(final TeleportHandler teleportHandler, final String defaultName) {
-        super(defaultName);
+    public CommandEditTeleport(final TeleportHandler teleportHandler) {
+        super("editteleport");
         this.teleportHandler = teleportHandler;
         setPermissionLevel(PERMISSION_OPERATOR);
     }

@@ -16,12 +16,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.core.commands;
+package info.servertools.core.command;
 
-import info.servertools.core.STCommand;
 import info.servertools.core.feature.HomeHandler;
 import info.servertools.core.util.Location;
 import info.servertools.core.util.PlayerUtils;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -34,8 +34,8 @@ public class CommandHome extends STCommand {
 
     private final HomeHandler homeHandler;
 
-    public CommandHome(final HomeHandler homeHandler, final String defaultName) {
-        super(defaultName);
+    public CommandHome(final HomeHandler homeHandler) {
+        super("home");
         this.homeHandler = homeHandler;
         setPermissionLevel(PERMISSION_EVERYONE);
     }

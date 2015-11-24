@@ -18,12 +18,12 @@
  */
 package info.servertools.core.feature;
 
-import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static java.nio.file.StandardOpenOption.CREATE;
+
 import info.servertools.core.Constants;
 import info.servertools.core.ServerToolsCore;
 import info.servertools.core.util.FileIO;
+
 import net.minecraft.command.server.CommandBroadcast;
 import net.minecraft.command.server.CommandEmote;
 import net.minecraft.command.server.CommandMessage;
@@ -31,14 +31,18 @@ import net.minecraft.command.server.CommandMessageRaw;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -50,7 +54,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.nio.file.StandardOpenOption.CREATE;
+import javax.annotation.Nullable;
 
 public class SilenceHandler {
 
@@ -68,9 +72,9 @@ public class SilenceHandler {
     private Set<UUID> silencedUsers = new HashSet<>();
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private Type type = new ParameterizedType() {
+    private final Type type = new ParameterizedType() {
         @Override
-        public Type[] getActualTypeArguments() { return new Type[]{UUID.class}; }
+        public Type[] getActualTypeArguments() { return new Type[]{ UUID.class }; }
 
         @Override
         public Type getRawType() { return HashSet.class; }
@@ -141,8 +145,9 @@ public class SilenceHandler {
         synchronized (saveFile) {
             if (!Files.exists(saveFile)) return;
             try (BufferedReader reader = Files.newBufferedReader(saveFile, Constants.CHARSET)) {
-                this.silencedUsers = gson.fromJson(reader, type);
-                if (this.silencedUsers == null) this.silencedUsers = new HashSet<>();
+                @Nullable Set<UUID> set = gson.fromJson(reader, type);
+                if (set == null) set = new HashSet<>();
+                this.silencedUsers = set;
             } catch (IOException e) {
                 log.error("Failed to laod silence file {}", saveFile);
                 throw e;

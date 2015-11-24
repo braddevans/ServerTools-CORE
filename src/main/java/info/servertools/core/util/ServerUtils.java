@@ -18,10 +18,11 @@
  */
 package info.servertools.core.util;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+
+import com.google.common.util.concurrent.ListenableFuture;
+import com.mojang.authlib.GameProfile;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +32,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public final class ServerUtils {
 
     private static final MinecraftServer server = MinecraftServer.getServer();

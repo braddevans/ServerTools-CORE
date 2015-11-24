@@ -24,6 +24,7 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("CanBeFinal")
 public class CoreConfig {
 
     @Setting(value = "general")

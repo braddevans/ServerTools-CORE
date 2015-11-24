@@ -16,17 +16,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.core;
+package info.servertools.core.command;
+
+import static java.util.Objects.requireNonNull;
 
 import info.servertools.core.util.ServerUtils;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import java.util.Objects;
-
-import static java.util.Objects.requireNonNull;
 
 public abstract class STCommand extends CommandBase {
 
@@ -40,7 +41,7 @@ public abstract class STCommand extends CommandBase {
     private String name;
     private int permissionLevel = PERMISSION_SUPERADMIN;
 
-    public STCommand(final String defaultName) {
+    protected STCommand(final String defaultName) {
         this.defaultName = requireNonNull(defaultName, "defaultName");
     }
 
@@ -67,11 +68,6 @@ public abstract class STCommand extends CommandBase {
         return this.permissionLevel;
     }
 
-    /**
-     * <em>Internal use only!</em>
-     *
-     * @param permissionLevel The permission level
-     */
     protected void setPermissionLevel(final int permissionLevel) {
         this.permissionLevel = permissionLevel;
     }

@@ -16,10 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.core.commands;
+package info.servertools.core.command;
 
-import info.servertools.core.STCommand;
 import info.servertools.core.feature.Motd;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 
@@ -27,8 +27,8 @@ public class CommandMotd extends STCommand {
 
     private final Motd motd;
 
-    public CommandMotd(final String name, final Motd motd) {
-        super(name);
+    public CommandMotd(final Motd motd) {
+        super("motd");
         this.motd = motd;
         setPermissionLevel(PERMISSION_EVERYONE);
     }

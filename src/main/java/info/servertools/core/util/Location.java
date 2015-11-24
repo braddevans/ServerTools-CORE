@@ -22,8 +22,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3i;
 
-import javax.annotation.Nullable;
 import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 public class Location {
 

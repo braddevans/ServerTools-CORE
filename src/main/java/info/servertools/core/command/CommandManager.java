@@ -16,14 +16,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package info.servertools.core;
+package info.servertools.core.command;
+
+import static java.util.Objects.requireNonNull;
+
+import info.servertools.core.ServerToolsCore;
 
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.CommandHelp;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+
 import net.minecraftforge.fml.common.Loader;
+
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
@@ -36,8 +42,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
-
-import static java.util.Objects.requireNonNull;
 
 public final class CommandManager {
 
@@ -101,7 +105,7 @@ public final class CommandManager {
         saveConfig();
     }
 
-    static void init(final Path configFile) throws IOException {
+    public static void init(final Path configFile) throws IOException {
         CommandManager.configFile = configFile;
         try {
             if (!Files.exists(configFile.getParent())) {
@@ -128,7 +132,7 @@ public final class CommandManager {
         }
     }
 
-    static void register(final MinecraftServer server) {
+    public static void doRegister(final MinecraftServer server) {
         log.trace("Registering commands with Minecraft...");
         CommandHandler commandHandler = (CommandHandler) server.getCommandManager();
         while (!commands.isEmpty()) {

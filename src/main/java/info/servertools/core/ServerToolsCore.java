@@ -18,13 +18,16 @@
  */
 package info.servertools.core;
 
-import info.servertools.core.commands.*;
+import info.servertools.core.command.*;
 import info.servertools.core.feature.HomeHandler;
 import info.servertools.core.feature.Motd;
 import info.servertools.core.feature.SilenceHandler;
 import info.servertools.core.feature.TeleportHandler;
 import info.servertools.core.util.FileIO;
+import info.servertools.core.util.STConfig;
+
 import net.minecraft.server.MinecraftServer;
+
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
@@ -59,37 +62,37 @@ public final class ServerToolsCore {
 
         if (getConfig().getChat().isMotdEnabled()) {
             Motd motd = new Motd(configDir.resolve("motd.txt"));
-            CommandMotd motdCommand = new CommandMotd("motd", motd);
+            CommandMotd motdCommand = new CommandMotd(motd);
             CommandManager.registerCommand(motdCommand);
         }
 
         if (getConfig().getTeleport().isTeleportsEnabled()) {
             final TeleportHandler teleportHandler = new TeleportHandler(configDir.resolve("teleports.json"));
-            final CommandEditTeleport commandEditTeleport = new CommandEditTeleport(teleportHandler, "editteleport");
-            final CommandTeleport commandTeleport = new CommandTeleport(teleportHandler, "teleport");
+            final CommandEditTeleport commandEditTeleport = new CommandEditTeleport(teleportHandler);
+            final CommandTeleport commandTeleport = new CommandTeleport(teleportHandler);
             CommandManager.registerCommand(commandEditTeleport);
             CommandManager.registerCommand(commandTeleport);
         }
 
         if (getConfig().getTeleport().isHomesEnabled()) {
             final HomeHandler homeHandler = new HomeHandler(configDir.resolve("homes.json"));
-            final CommandHome commandHome = new CommandHome(homeHandler, "home");
+            final CommandHome commandHome = new CommandHome(homeHandler);
             CommandManager.registerCommand(commandHome);
         }
 
         SilenceHandler silenceHandler = new SilenceHandler(configDir.resolve("silenced.json"));
-        CommandSilence silenceCommand = new CommandSilence(silenceHandler, "silence");
+        CommandSilence silenceCommand = new CommandSilence(silenceHandler);
         CommandManager.registerCommand(silenceCommand);
 
-        CommandManager.registerCommand(new CommandPing("ping"));
-        CommandManager.registerCommand(new CommandWhereIs("whereis"));
-        CommandManager.registerCommand(new CommandInventory("inventory"));
-        CommandManager.registerCommand(new CommandUUID("uuid"));
+        CommandManager.registerCommand(new CommandPing());
+        CommandManager.registerCommand(new CommandWhereIs());
+        CommandManager.registerCommand(new CommandInventory());
+        CommandManager.registerCommand(new CommandUUID());
     }
 
     @Mod.EventHandler
     public void onServerStarted(final FMLServerStartedEvent event) {
-        CommandManager.register(MinecraftServer.getServer());
+        CommandManager.doRegister(MinecraftServer.getServer());
     }
 
     @Mod.EventHandler
