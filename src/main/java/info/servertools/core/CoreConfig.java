@@ -83,11 +83,18 @@ public class CoreConfig {
         @Setting(value = "enable-teleports", comment = "Enable server teleports")
         private boolean teleportsEnabled = true;
 
+        @Setting(value = "enable-homes", comment = "Allow players to set a home and teleport back to it from anywhere")
+        private boolean homesEnabled = true;
+
         @Setting(value = "enable-cross-dimension-teleports", comment = "Enable teleporting to a different dimension")
         private boolean crossDimTeleportEnabled = false;
 
         public boolean isTeleportsEnabled() {
             return teleportsEnabled;
+        }
+
+        public boolean isHomesEnabled() {
+            return homesEnabled;
         }
 
         public boolean isCrossDimTeleportEnabled() {

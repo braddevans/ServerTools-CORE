@@ -19,6 +19,7 @@
 package info.servertools.core;
 
 import info.servertools.core.commands.*;
+import info.servertools.core.feature.HomeHandler;
 import info.servertools.core.feature.Motd;
 import info.servertools.core.feature.SilenceHandler;
 import info.servertools.core.feature.TeleportHandler;
@@ -68,6 +69,12 @@ public final class ServerToolsCore {
             final CommandTeleport commandTeleport = new CommandTeleport(teleportHandler, "teleport");
             CommandManager.registerCommand(commandEditTeleport);
             CommandManager.registerCommand(commandTeleport);
+        }
+
+        if (getConfig().getTeleport().isHomesEnabled()) {
+            final HomeHandler homeHandler = new HomeHandler(configDir.resolve("homes.json"));
+            final CommandHome commandHome = new CommandHome(homeHandler, "home");
+            CommandManager.registerCommand(commandHome);
         }
 
         SilenceHandler silenceHandler = new SilenceHandler(configDir.resolve("silenced.json"));
