@@ -18,6 +18,7 @@
  */
 package info.servertools.core;
 
+import info.servertools.core.util.ServerUtils;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -29,8 +30,15 @@ import static java.util.Objects.requireNonNull;
 
 public abstract class STCommand extends CommandBase {
 
+    public static final int PERMISSION_EVERYONE = 0;
+    public static final int PERMISSION_BYPASS_SPAWN = 1;
+    public static final int PERMISSION_OPERATOR = 2;
+    public static final int PERMISSION_ADMIN = 3;
+    public static final int PERMISSION_SUPERADMIN = 4;
+
     private final String defaultName;
     private String name;
+    private int permissionLevel = PERMISSION_SUPERADMIN;
 
     public STCommand(final String defaultName) {
         this.defaultName = requireNonNull(defaultName, "defaultName");
@@ -38,6 +46,11 @@ public abstract class STCommand extends CommandBase {
 
     public String getDefaultName() {
         return this.defaultName;
+    }
+
+    @Override
+    public final String getCommandName() {
+        return this.name;
     }
 
     /**
@@ -50,8 +63,28 @@ public abstract class STCommand extends CommandBase {
     }
 
     @Override
-    public final String getCommandName() {
-        return this.name;
+    public final int getRequiredPermissionLevel() {
+        return this.permissionLevel;
+    }
+
+    /**
+     * <em>Internal use only!</em>
+     *
+     * @param permissionLevel The permission level
+     */
+    protected void setPermissionLevel(final int permissionLevel) {
+        this.permissionLevel = permissionLevel;
+    }
+
+    @Override
+    public boolean canCommandSenderUseCommand(final ICommandSender sender) {
+        if (sender instanceof EntityPlayerMP) {
+            final EntityPlayerMP player = ((EntityPlayerMP) sender);
+            final int permLevel = getRequiredPermissionLevel();
+            return permLevel == 0 || ServerUtils.isEffectiveOp(player.getGameProfile());
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -59,11 +92,11 @@ public abstract class STCommand extends CommandBase {
         return "STCommand{" +
                 "defaultName='" + defaultName + '\'' +
                 ", name='" + name + '\'' +
-                ", class='" + getClass().getName() + '\'' +
+                ", permissionLevel=" + permissionLevel +
                 '}';
     }
 
-    /* ---------- Utilities ---------- */
+/* ---------- Utilities ---------- */
 
     public static EntityPlayerMP requirePlayer(final ICommandSender sender) throws CommandException {
         return requirePlayer(sender, "That command can only be used by a player");

@@ -37,6 +37,7 @@ public class CommandUUID extends STCommand {
 
     public CommandUUID(final String defaultName) {
         super(defaultName);
+        setPermissionLevel(PERMISSION_EVERYONE);
     }
 
     @Override

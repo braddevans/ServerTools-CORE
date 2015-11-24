@@ -34,6 +34,7 @@ public class CommandWhereIs extends STCommand {
 
     public CommandWhereIs(final String defaultName) {
         super(defaultName);
+        setPermissionLevel(PERMISSION_EVERYONE);
     }
 
     @Override

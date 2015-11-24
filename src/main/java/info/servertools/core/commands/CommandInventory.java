@@ -40,6 +40,7 @@ public class CommandInventory extends STCommand {
 
     public CommandInventory(final String defaultName) {
         super(defaultName);
+        setPermissionLevel(PERMISSION_OPERATOR);
     }
 
     @Override

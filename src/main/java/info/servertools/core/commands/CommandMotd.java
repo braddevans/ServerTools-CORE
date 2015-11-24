@@ -30,6 +30,7 @@ public class CommandMotd extends STCommand {
     public CommandMotd(final String name, final Motd motd) {
         super(name);
         this.motd = motd;
+        setPermissionLevel(PERMISSION_EVERYONE);
     }
 
     @Override

@@ -40,6 +40,7 @@ public class CommandSilence extends STCommand {
     public CommandSilence(final SilenceHandler silenceHandler, final String defaultName) {
         super(defaultName);
         this.silenceHandler = silenceHandler;
+        setPermissionLevel(PERMISSION_OPERATOR);
     }
 
     @Override

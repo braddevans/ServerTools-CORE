@@ -34,6 +34,7 @@ public class CommandPing extends STCommand {
 
     public CommandPing(final String defaultName) {
         super(defaultName);
+        setPermissionLevel(PERMISSION_EVERYONE);
     }
 
     @Override

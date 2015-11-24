@@ -37,6 +37,7 @@ public class CommandHome extends STCommand {
     public CommandHome(final HomeHandler homeHandler, final String defaultName) {
         super(defaultName);
         this.homeHandler = homeHandler;
+        setPermissionLevel(PERMISSION_EVERYONE);
     }
 
     @Override

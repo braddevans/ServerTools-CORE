@@ -40,6 +40,7 @@ public class CommandTeleport extends STCommand {
     public CommandTeleport(final TeleportHandler teleportHandler, final String defaultName) {
         super(defaultName);
         this.teleportHandler = teleportHandler;
+        setPermissionLevel(PERMISSION_EVERYONE);
     }
 
     @Override

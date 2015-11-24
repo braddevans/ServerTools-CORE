@@ -37,6 +37,7 @@ public class CommandEditTeleport extends STCommand {
     public CommandEditTeleport(final TeleportHandler teleportHandler, final String defaultName) {
         super(defaultName);
         this.teleportHandler = teleportHandler;
+        setPermissionLevel(PERMISSION_OPERATOR);
     }
 
     @Override

@@ -48,7 +48,8 @@ public final class CommandManager {
     private static final Deque<STCommand> commands = new ArrayDeque<>();
 
     private static final String HEADER =
-            "This configuration file can be used to both disable and rename ServerTools commands. Command names must match the REGEX [a-zA-Z0-9_\\-]";
+            "This configuration file can be used to: disable, rename, and change required permission level for ServerTools commands. " +
+                    "Command names must match the REGEX [a-zA-Z0-9_\\-]";
     private static Path configFile;
     private static HoconConfigurationLoader loader;
     private static CommentedConfigurationNode node = SimpleCommentedConfigurationNode.root();
@@ -60,6 +61,7 @@ public final class CommandManager {
         CommentedConfigurationNode commandNode = node.getNode(command.getClass().getName());
         CommentedConfigurationNode enableNode = commandNode.getNode("enable-command");
         CommentedConfigurationNode nameNode = commandNode.getNode("command-name");
+        CommentedConfigurationNode permNode = commandNode.getNode("permission-level");
 
         if (enableNode.isVirtual() || enableNode.getValue() == null) {
             enableNode.setValue(true);
@@ -67,9 +69,13 @@ public final class CommandManager {
         if (nameNode.isVirtual() || nameNode.getValue() == null) {
             nameNode.setValue(command.getDefaultName());
         }
+        if (permNode.isVirtual() || permNode.getValue() == null) {
+            permNode.setValue(command.getRequiredPermissionLevel());
+        }
 
         enableNode.setComment("Set to false to disable this command");
         nameNode.setComment("Default name: " + command.getDefaultName());
+        permNode.setComment("The required permission level for this command. 0 is everyone. 1+ requires some level of OP");
 
         final String name = nameNode.getString();
         command.setName(name);
@@ -79,6 +85,12 @@ public final class CommandManager {
         }
         if (!command.getDefaultName().equals(name)) {
             log.info("Command {} was renamed from {} to {}", command, command.getDefaultName(), command.getCommandName());
+        }
+
+        final int permLevel = permNode.getInt();
+        if (permLevel != command.getRequiredPermissionLevel()) {
+            log.info("Changing permission level of {} from {} to {}", command, command.getRequiredPermissionLevel(), permLevel);
+            command.setPermissionLevel(permLevel);
         }
 
         if (enableNode.getBoolean(true)) {

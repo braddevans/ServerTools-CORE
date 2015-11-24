@@ -93,6 +93,11 @@ public final class ServerUtils {
         return username.equals(server.getServerOwner());
     }
 
+    public static boolean isEffectiveOp(final GameProfile gameProfile) {
+        return server.getConfigurationManager().canSendCommands(gameProfile);
+
+    }
+
     public static boolean isSinglePlayer() {
         return server.isSinglePlayer();
     }
