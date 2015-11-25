@@ -52,7 +52,7 @@ public final class CommandManager {
 
     private static final Pattern validCommandPattern = Pattern.compile("[a-zA-Z0-9_\\-]+");
 
-    private static final Deque<STCommand> commands = new ArrayDeque<>();
+    private static final Collection<STCommand> commands = new ArrayList<>();
 
     private static final String HEADER =
             "This configuration file can be used to: disable, rename, and change required permission level for ServerTools commands. " +
@@ -179,11 +179,7 @@ public final class CommandManager {
     public static void doRegister(final MinecraftServer server) {
         log.trace("Registering commands with Minecraft...");
         CommandHandler commandHandler = (CommandHandler) server.getCommandManager();
-        while (!commands.isEmpty()) {
-            final STCommand command = commands.pop();
-            log.trace("Registering {} with Minecraft", command);
-            commandHandler.registerCommand(command);
-        }
+        commands.forEach(commandHandler::registerCommand);
 
         if (ServerToolsCore.getConfig().getGeneral().isHelpOverrideEnabled()) {
             overrideHelp(commandHandler);
