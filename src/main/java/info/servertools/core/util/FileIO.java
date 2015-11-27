@@ -20,6 +20,9 @@ package info.servertools.core.util;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +33,8 @@ import java.util.concurrent.Future;
  */
 @SuppressWarnings("unused")
 public final class FileIO {
+
+    private static final Logger log = LogManager.getLogger();
 
     private static final ExecutorService service = Executors.newSingleThreadExecutor(r -> new Thread(r, "ServerTools IO Thread"));
 
@@ -62,8 +67,21 @@ public final class FileIO {
     public static void shutDown() {
         service.shutdown();
         try {
-            service.awaitTermination(10, SECONDS);
-        } catch (InterruptedException ignored) {}
+            service.awaitTermination(30, SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread("ServerTool IO Shutdown Thread") {
+            @Override
+            public void run() {
+                log.trace("Shutting down FileIO");
+                shutDown();
+                log.trace("FileIO successfully shutdown");
+            }
+        });
     }
 
     private FileIO() {}
