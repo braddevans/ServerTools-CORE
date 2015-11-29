@@ -56,7 +56,7 @@ public class STConfig<T> {
                 Files.createFile(file);
             }
 
-            this.loader = HoconConfigurationLoader.builder().setFile(file.toFile()).build();
+            this.loader = HoconConfigurationLoader.builder().setPath(file).build();
             this.configMapper = ObjectMapper.forClass(clazz).bindToNew();
 
             load();

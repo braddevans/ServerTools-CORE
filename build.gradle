@@ -30,7 +30,8 @@ repositories {
 }
 
 dependencies {
-    compile(group: 'ninja.leaping.configurate', name: 'configurate-hocon', version: '2.0') {
+    // TODO: Forge ships an older version of hocon-config. Need to figure out how to handle this
+    compile(group: 'ninja.leaping.configurate', name: 'configurate-hocon', version: '3.0') {
         exclude module: 'guava'
     }
 
