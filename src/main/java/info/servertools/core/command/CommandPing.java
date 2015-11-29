@@ -64,6 +64,6 @@ public class CommandPing extends STCommand {
             throw new WrongUsageException(getCommandUsage(sender));
         }
 
-        sender.addChatMessage(new ChatComponentText(player.getGameProfile().getName() + "\'s ping is: " + player.ping + "ms"));
+        sender.addChatMessage(new ChatComponentText(player.getName() + "\'s ping is: " + player.ping + "ms"));
     }
 }

@@ -58,7 +58,7 @@ public class CommandWhereIs extends STCommand {
         if (args.length == 1) {
             final EntityPlayerMP player = getPlayer(sender, args[0]);
             sender.addChatMessage(new ChatComponentText(
-                    player.getGameProfile().getName() +
+                    player.getName() +
                             " is at X: " + player.posX +
                             " Y: " + player.posY +
                             " Z: " + player.posZ +

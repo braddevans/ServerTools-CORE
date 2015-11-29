@@ -120,7 +120,7 @@ public class CommandInventory extends STCommand {
 
         @Override
         @Nullable
-        public ItemStack getStackInSlotOnClosing(final int index) {
+        public ItemStack removeStackFromSlot(final int index) {
             ItemStack[] mainInventory = target.inventory.mainInventory;
             if (mainInventory[index] != null) {
                 ItemStack itemstack = mainInventory[index];
@@ -185,8 +185,8 @@ public class CommandInventory extends STCommand {
         }
 
         @Override
-        public String getCommandSenderName() {
-            return target.getCommandSenderName() + "'s Inventory";
+        public String getName() {
+            return target.getName() + "'s Inventory";
         }
 
         @Override
@@ -196,7 +196,7 @@ public class CommandInventory extends STCommand {
 
         @Override
         public IChatComponent getDisplayName() {
-            return new ChatComponentText(getCommandSenderName());
+            return new ChatComponentText(getName());
         }
     }
 }

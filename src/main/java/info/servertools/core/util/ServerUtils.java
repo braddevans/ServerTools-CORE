@@ -18,6 +18,7 @@
  */
 package info.servertools.core.util;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
@@ -67,7 +68,7 @@ public final class ServerUtils {
      */
     public static List<String> getAllUsernames() {
         return getAllPlayers().stream()
-                .map(player -> player.getGameProfile().getName())
+                .map(EntityPlayer::getName)
                 .collect(Collectors.toList());
     }
 
@@ -95,7 +96,7 @@ public final class ServerUtils {
     public static Optional<EntityPlayerMP> getPlayerForUsername(final String username) {
         Objects.requireNonNull(username, "username");
         return getAllPlayers().stream()
-                .filter(player -> username.equalsIgnoreCase(player.getGameProfile().getName()))
+                .filter(player -> username.equalsIgnoreCase(player.getName()))
                 .findAny();
     }
 
