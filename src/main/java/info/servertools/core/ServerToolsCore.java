@@ -19,17 +19,16 @@
 package info.servertools.core;
 
 import info.servertools.core.command.*;
-import info.servertools.core.feature.HomeHandler;
-import info.servertools.core.feature.Motd;
-import info.servertools.core.feature.SilenceHandler;
-import info.servertools.core.feature.TeleportHandler;
+import info.servertools.core.feature.*;
 import info.servertools.core.util.STConfig;
 
 import net.minecraft.server.MinecraftServer;
 
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,6 +85,13 @@ public final class ServerToolsCore {
         CommandManager.registerCommand(new CommandWhereIs());
         CommandManager.registerCommand(new CommandInventory());
         CommandManager.registerCommand(new CommandUUID());
+    }
+
+    @Mod.EventHandler
+    public void onInit(final FMLInitializationEvent event) {
+        if (getConfig().getGeneral().isFlatBedrockEnabled()) {
+            GameRegistry.registerWorldGenerator(new FlatBedrockGenerator(), 1);
+        }
     }
 
     @Mod.EventHandler

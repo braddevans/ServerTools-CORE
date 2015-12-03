@@ -54,8 +54,16 @@ public class CoreConfig {
         @Setting(value = "enable-help-override", comment = "Enable an override for the /help command that makes it work with broken mod commands")
         private boolean helpOverrideEnabled = true;
 
+        @Setting(value = "enable-flat-bedrock",
+                comment = "Enable a flat bedrock generator to cause all newly generated chunks to have a layer of bedrock one layer thick")
+        private boolean flatBedrockEnabled = true;
+
         public boolean isHelpOverrideEnabled() {
             return helpOverrideEnabled;
+        }
+
+        public boolean isFlatBedrockEnabled() {
+            return flatBedrockEnabled;
         }
     }
 
