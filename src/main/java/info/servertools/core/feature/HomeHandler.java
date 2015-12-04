@@ -65,7 +65,7 @@ public class HomeHandler {
         public Type getOwnerType() { return null; }
     };
 
-    public HomeHandler(final Path saveFile) {
+    public HomeHandler(final Path saveFile) throws IOException {
         this.saveFile = saveFile;
         load();
     }
@@ -93,7 +93,7 @@ public class HomeHandler {
         }
     }
 
-    private void load() {
+    private void load() throws IOException {
         synchronized (saveFile) {
             if (!Files.exists(saveFile)) return;
             try (BufferedReader reader = Files.newBufferedReader(saveFile, Constants.CHARSET)) {
@@ -102,6 +102,7 @@ public class HomeHandler {
                 this.homeMap = map;
             } catch (IOException e) {
                 log.error("Failed to load homes", e);
+                throw e;
             }
         }
     }

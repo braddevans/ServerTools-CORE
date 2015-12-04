@@ -30,6 +30,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -49,7 +51,7 @@ public final class ServerToolsCore {
     private static STConfig<CoreConfig> coreConfig;
 
     @Mod.EventHandler
-    public void onPreInit(final FMLPreInitializationEvent event) throws IOException {
+    public void onPreInit(final FMLPreInitializationEvent event) throws IOException, ObjectMappingException {
         final File modConfigDir = event.getModConfigurationDirectory();
         configDir = modConfigDir.toPath().resolve("ServerTools-CORE");
         Files.createDirectories(configDir);

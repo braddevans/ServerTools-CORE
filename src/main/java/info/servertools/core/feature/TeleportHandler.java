@@ -68,7 +68,7 @@ public class TeleportHandler {
         public Type getOwnerType() { return null; }
     };
 
-    public TeleportHandler(final Path saveFile) {
+    public TeleportHandler(final Path saveFile) throws IOException {
         this.saveFile = saveFile;
         load();
     }
@@ -107,7 +107,7 @@ public class TeleportHandler {
         }
     }
 
-    private void load() {
+    private void load() throws IOException {
         synchronized (saveFile) {
             if (!Files.exists(saveFile)) return;
             try (BufferedReader reader = Files.newBufferedReader(saveFile, Constants.CHARSET)) {
@@ -116,6 +116,7 @@ public class TeleportHandler {
                 this.locationMap = map;
             } catch (IOException e) {
                 log.error("Failed to load teleports", e);
+                throw e;
             }
         }
     }

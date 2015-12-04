@@ -45,7 +45,7 @@ public class STConfig<T> {
     private T configBase;
     private final Path file;
 
-    public STConfig(final Path file, final Class<T> clazz) {
+    public STConfig(final Path file, final Class<T> clazz) throws IOException, ObjectMappingException {
         this.file = file;
         try {
             if (!Files.exists(file.getParent())) {
@@ -63,6 +63,7 @@ public class STConfig<T> {
             save();
         } catch (Exception e) {
             log.error("Failed to create config file {}", file, e);
+            throw e;
         }
     }
 
