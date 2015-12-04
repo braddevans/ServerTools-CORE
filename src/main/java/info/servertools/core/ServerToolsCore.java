@@ -88,6 +88,7 @@ public final class ServerToolsCore {
         CommandManager.registerCommand(new CommandInventory());
         CommandManager.registerCommand(new CommandUUID());
         CommandManager.registerCommand(new CommandHeal());
+        CommandManager.registerCommand(new CommandKillAll());
     }
 
     @Mod.EventHandler
