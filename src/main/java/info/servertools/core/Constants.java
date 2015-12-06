@@ -20,6 +20,7 @@ package info.servertools.core;
 
 import java.nio.charset.Charset;
 
+@SuppressWarnings("WeakerAccess")
 public final class Constants {
 
     public static final String MOD_ID = "ServerTools-CORE";

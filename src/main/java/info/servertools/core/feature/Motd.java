@@ -31,13 +31,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Motd {
 
     private final Path file;
-    private Deque<String> lines = new ArrayDeque<>();
+    private List<String> lines = new ArrayList<>();
 
     public Motd(final Path file) throws IOException {
         this.file = file;
@@ -54,7 +54,7 @@ public class Motd {
         if (!Files.exists(file)) {
             genDefaultMotd();
         } else {
-            lines = new ArrayDeque<>(Files.readAllLines(file, Constants.CHARSET));
+            lines = Files.readAllLines(file, Constants.CHARSET);
         }
     }
 
@@ -67,13 +67,12 @@ public class Motd {
     }
 
     private void genDefaultMotd() {
-        ArrayDeque<String> deque = new ArrayDeque<>();
-        deque.add("This is the default ServerTools MOTD.");
-        deque.add("To change it, edit the motd.txt in the ");
-        deque.add("ServerTools-CORE configuration directory");
-        this.lines = deque;
+        final List<String> list = new ArrayList<>();
+        list.add("This is the default ServerTools MOTD.");
+        list.add("To change it, edit the motd.txt in the ");
+        list.add("ServerTools-CORE configuration directory");
+        this.lines = list;
     }
-
 
     @SubscribeEvent
     public void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {

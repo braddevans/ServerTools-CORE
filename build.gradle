@@ -50,7 +50,7 @@ minecraft {
     makeObfSourceJar = false
 }
 
-[jar, sourceJar]*.exclude 'log4j2-test.xml'
+[jar, sourceJar, shadowJar]*.exclude 'log4j2-test.xml'
 
 jar {
     classifier = 'nodeps'

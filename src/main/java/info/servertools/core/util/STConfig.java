@@ -35,6 +35,7 @@ import java.nio.file.Path;
  *
  * @param <T> The type that holds the configuration options
  */
+@SuppressWarnings("WeakerAccess")
 public class STConfig<T> {
 
     private static final Logger log = LogManager.getLogger();
@@ -45,6 +46,15 @@ public class STConfig<T> {
     private T configBase;
     private final Path file;
 
+    /**
+     * Construct a new STConfig instance
+     *
+     * @param file  The file to save to
+     * @param clazz The type that holds the configuration values
+     *
+     * @throws IOException            If a problem occurs reading or writing to and from disk
+     * @throws ObjectMappingException If a problem occurs serializing or deserializing data
+     */
     public STConfig(final Path file, final Class<T> clazz) throws IOException, ObjectMappingException {
         this.file = file;
         try {
@@ -67,25 +77,47 @@ public class STConfig<T> {
         }
     }
 
-    public void save() {
+    /**
+     * Save the configuration to disk
+     */
+    public void save() throws IOException, ObjectMappingException {
         try {
             this.configMapper.serialize(this.root);
             this.loader.save(this.root);
         } catch (IOException | ObjectMappingException e) {
             log.error("Failed to save config file {}", this.file, e);
+            throw e;
         }
     }
 
-    public void load() {
+    /**
+     * Load the configuration from disk
+     */
+    public void load() throws IOException, ObjectMappingException {
         try {
             this.root = this.loader.load();
             this.configBase = this.configMapper.populate(this.root);
         } catch (IOException | ObjectMappingException e) {
             log.error("Failed to load config file {}", this.file, e);
+            throw e;
         }
     }
 
+    /**
+     * Get the instance of the configuration Type
+     *
+     * @return The configuration instance
+     */
     public T getConfig() {
         return this.configBase;
+    }
+
+    /**
+     * Get the save file
+     *
+     * @return The save file
+     */
+    public Path getFile() {
+        return this.file;
     }
 }

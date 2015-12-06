@@ -60,7 +60,7 @@ public final class ServerToolsCore {
         CommandManager.init(configDir.resolve("commands.conf"));
 
         if (getConfig().getChat().isMotdEnabled()) {
-            Motd motd = new Motd(configDir.resolve("motd.txt"));
+            final Motd motd = new Motd(configDir.resolve("motd.txt"));
             CommandMotd motdCommand = new CommandMotd(motd);
             CommandManager.registerCommand(motdCommand);
         }
@@ -79,7 +79,7 @@ public final class ServerToolsCore {
             CommandManager.registerCommand(commandHome);
         }
 
-        SilenceHandler silenceHandler = new SilenceHandler(configDir.resolve("silenced.json"));
+        final SilenceHandler silenceHandler = new SilenceHandler(configDir.resolve("silenced.json"));
         CommandSilence silenceCommand = new CommandSilence(silenceHandler);
         CommandManager.registerCommand(silenceCommand);
 

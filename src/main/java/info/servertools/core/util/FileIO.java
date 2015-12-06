@@ -69,7 +69,7 @@ public final class FileIO {
         try {
             service.awaitTermination(30, SECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.catching(e);
         }
     }
 

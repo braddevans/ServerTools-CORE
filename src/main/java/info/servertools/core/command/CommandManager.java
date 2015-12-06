@@ -123,17 +123,22 @@ public final class CommandManager {
 
     private static void overrideHelp(final CommandHandler commandHandler) {
         if (Loader.isModLoaded("HelpFixer")) {
-            log.info("HelpFixer detected. Not overriding /help");
+            log.trace("HelpFixer detected. Not overriding /help");
         } else {
             log.trace("Overriding /help");
             commandHandler.registerCommand(new CommandHelp() {
-                protected List<ICommand> getSortedPossibleCommands(ICommandSender sender) {
-                    List<ICommand> list = MinecraftServer.getServer().getCommandManager().getPossibleCommands(sender);
 
-                    Iterator<ICommand> iterator = list.iterator();
+                @Override
+                protected List<ICommand> getSortedPossibleCommands(final ICommandSender sender) {
+                    final List<ICommand> list = MinecraftServer.getServer().getCommandManager().getPossibleCommands(sender);
+                    final Iterator<ICommand> iterator = list.iterator();
                     while (iterator.hasNext()) {
                         ICommand command = iterator.next();
-                        if (command.getCommandName() == null || command.getCommandUsage(sender) == null) {
+                        if (command.getCommandName() == null) {
+                            log.warn("Identified command with a null name: {}", command.getClass());
+                            iterator.remove();
+                        } else if (command.getCommandUsage(sender) == null) {
+                            log.warn("Identified command with null usage: {}", command.getClass());
                             iterator.remove();
                         }
                     }

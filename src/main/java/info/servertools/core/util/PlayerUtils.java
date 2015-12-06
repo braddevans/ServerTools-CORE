@@ -18,6 +18,8 @@
  */
 package info.servertools.core.util;
 
+import static java.util.Objects.requireNonNull;
+
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.S07PacketRespawn;
 import net.minecraft.network.play.server.S1DPacketEntityEffect;
@@ -30,13 +32,12 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import java.util.Objects;
-
 import javax.annotation.Nullable;
 
 /**
  * A variety of utility functions for interacting with player entities
  */
+@SuppressWarnings("WeakerAccess")
 public final class PlayerUtils {
 
     /**
@@ -46,8 +47,8 @@ public final class PlayerUtils {
      * @param location The target location
      */
     public static void teleportPlayer(final EntityPlayerMP player, final Location location) {
-        Objects.requireNonNull(player, "player");
-        Objects.requireNonNull(location, "location");
+        requireNonNull(player, "player");
+        requireNonNull(location, "location");
 
         if (player.dimension != location.getDim()) {
             transferToDimension(player, location.getDim());
@@ -63,7 +64,7 @@ public final class PlayerUtils {
      * @param dimId  The target dimension Id
      */
     public static void transferToDimension(final EntityPlayerMP player, final int dimId) {
-        Objects.requireNonNull(player, "player");
+        requireNonNull(player, "player");
 
         final ServerConfigurationManager configurationManager = player.mcServer.getConfigurationManager();
         final WorldServer oldWorld = player.getServerForPlayer();

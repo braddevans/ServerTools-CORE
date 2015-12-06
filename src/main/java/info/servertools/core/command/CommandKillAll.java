@@ -79,5 +79,7 @@ public class CommandKillAll extends STCommand {
                         removed.incrementAndGet();
                     });
         }
+
+        notifyOperators(sender, this, "Removed %s instances of %s", removed.intValue(), entityName);
     }
 }
