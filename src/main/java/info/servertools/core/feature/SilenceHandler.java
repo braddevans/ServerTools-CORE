@@ -32,7 +32,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -87,7 +86,6 @@ public class SilenceHandler {
     public SilenceHandler(final Path saveFile) throws IOException {
         this.saveFile = saveFile;
         bannedCommands.addAll(ServerToolsCore.getConfig().getChat().getAdditionalSilenceCommands());
-        MinecraftForge.EVENT_BUS.register(this);
         load();
     }
 

@@ -23,7 +23,6 @@ import info.servertools.core.Constants;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
@@ -46,8 +45,6 @@ public class Motd {
         }
         load();
         save();
-
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     private void load() throws IOException {

@@ -24,6 +24,7 @@ import info.servertools.core.util.STConfig;
 
 import net.minecraft.server.MinecraftServer;
 
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -63,6 +64,7 @@ public final class ServerToolsCore {
             final Motd motd = new Motd(configDir.resolve("motd.txt"));
             CommandMotd motdCommand = new CommandMotd(motd);
             CommandManager.registerCommand(motdCommand);
+            MinecraftForge.EVENT_BUS.register(motd);
         }
 
         if (getConfig().getTeleport().isTeleportsEnabled()) {
@@ -82,6 +84,7 @@ public final class ServerToolsCore {
         final SilenceHandler silenceHandler = new SilenceHandler(configDir.resolve("silenced.json"));
         CommandSilence silenceCommand = new CommandSilence(silenceHandler);
         CommandManager.registerCommand(silenceCommand);
+        MinecraftForge.EVENT_BUS.register(silenceHandler);
 
         CommandManager.registerCommand(new CommandPing());
         CommandManager.registerCommand(new CommandWhereIs());
