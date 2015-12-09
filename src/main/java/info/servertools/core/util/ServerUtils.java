@@ -21,6 +21,7 @@ package info.servertools.core.util;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.MathHelper;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.mojang.authlib.GameProfile;
@@ -32,6 +33,8 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 /**
  * A variety of utility functions for interacting with the Minecraft server.
@@ -196,6 +199,26 @@ public final class ServerUtils {
      */
     public static boolean isMultiPlayer() {
         return !server.isSinglePlayer();
+    }
+
+    public static double getWorldTickTime(final int dimId) {
+        @Nullable long[] times = server.worldTickTimes.get(dimId);
+        if (times == null) return -1;
+        return MathHelper.average(times) * 1.0E-6D;
+    }
+
+    public static double getMeanTickTime() {
+        return MathHelper.average(server.tickTimeArray) * 1.0E-6D;
+    }
+
+    public static double getWorldTPS(final int dimId) {
+        final double worldTickTime = getWorldTickTime(dimId);
+        if (worldTickTime == -1L) return -1;
+        return Math.min(1000.0 / worldTickTime, 20);
+    }
+
+    public static double getMeanTPS() {
+        return Math.min(1000.0 / getMeanTickTime(), 20);
     }
 
     private ServerUtils() {}
