@@ -56,7 +56,7 @@ public abstract class STCommand extends CommandBase {
      *
      * @return The default name
      */
-    public String getDefaultName() {
+    public final String getDefaultName() {
         return this.defaultName;
     }
 

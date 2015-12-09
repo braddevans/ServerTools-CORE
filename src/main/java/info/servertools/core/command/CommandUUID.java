@@ -31,7 +31,6 @@ import net.minecraft.util.EnumChatFormatting;
 import com.mojang.authlib.GameProfile;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -62,12 +61,7 @@ public class CommandUUID extends STCommand {
     public void processCommand(final ICommandSender sender, final String[] args) throws CommandException {
         GameProfile gameProfile;
         if (args.length == 1) {
-            Optional<GameProfile> optGameProfile = ServerUtils.getGameProfile(args[0]);
-            if (optGameProfile.isPresent()) {
-                gameProfile = optGameProfile.get();
-            } else {
-                throw new PlayerNotFoundException();
-            }
+            gameProfile = ServerUtils.getGameProfile(args[0]).orElseThrow(PlayerNotFoundException::new);
         } else if (args.length == 0) {
             gameProfile = getCommandSenderAsPlayer(sender).getGameProfile();
         } else {

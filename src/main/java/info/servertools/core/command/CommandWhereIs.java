@@ -55,18 +55,15 @@ public class CommandWhereIs extends STCommand {
 
     @Override
     public void processCommand(final ICommandSender sender, final String[] args) throws CommandException {
-        if (args.length == 1) {
-            final EntityPlayerMP player = getPlayer(sender, args[0]);
-            sender.addChatMessage(new ChatComponentText(
-                    player.getName() +
-                            " is at X: " + player.posX +
-                            " Y: " + player.posY +
-                            " Z: " + player.posZ +
-                            " in Dim: " + player.worldObj.provider.getDimensionId() + " (" + player.worldObj.provider.getDimensionName() + ')'
-            ));
+        if (args.length != 1) throw new WrongUsageException(getCommandUsage(sender));
+        final EntityPlayerMP player = getPlayer(sender, args[0]);
+        sender.addChatMessage(new ChatComponentText(
+                player.getName() +
+                        " is at X: " + player.posX +
+                        " Y: " + player.posY +
+                        " Z: " + player.posZ +
+                        " in Dim: " + player.worldObj.provider.getDimensionId() + " (" + player.worldObj.provider.getDimensionName() + ')'
+        ));
 
-        } else {
-            throw new WrongUsageException(getCommandUsage(sender));
-        }
     }
 }

@@ -97,7 +97,7 @@ public final class ServerUtils {
         Objects.requireNonNull(username, "username");
         return getAllPlayers().stream()
                 .filter(player -> username.equalsIgnoreCase(player.getName()))
-                .findAny();
+                .findFirst();
     }
 
     /**

@@ -30,7 +30,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.BlockPos;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -57,22 +56,14 @@ public class CommandTeleport extends STCommand {
 
     @Override
     public void processCommand(final ICommandSender sender, final String[] args) throws CommandException {
-        if (args.length == 1) {
-            final EntityPlayerMP player = requirePlayer(sender);
-            final Optional<Location> optTeleport = teleportHandler.getTeleport(args[0]);
-            if (optTeleport.isPresent()) {
-                final Location teleport = optTeleport.get();
-                if (!ServerToolsCore.getConfig().getTeleport().isCrossDimTeleportEnabled()) {
-                    if (teleport.getDim() != player.worldObj.provider.getDimensionId()) {
-                        throw new CommandException("Teleporting to a different dimension is disabled");
-                    }
-                }
-                PlayerUtils.teleportPlayer(player, teleport);
-            } else {
-                throw new CommandException("That teleport doesn't exist");
-            }
-        } else {
-            throw new WrongUsageException(getCommandUsage(sender));
+        if (args.length != 1) throw new WrongUsageException(getCommandUsage(sender));
+        final EntityPlayerMP player = requirePlayer(sender);
+        final Location teleport = teleportHandler.getTeleport(args[0]).orElseThrow(() -> new CommandException("That teleport doesn't exist"));
+        if (!ServerToolsCore.getConfig().getTeleport().isCrossDimTeleportEnabled()
+                && teleport.getDim() != player.worldObj.provider.getDimensionId()) {
+            throw new CommandException("Teleporting to a different dimension is disabled");
         }
+
+        PlayerUtils.teleportPlayer(player, teleport);
     }
 }

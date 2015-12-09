@@ -30,7 +30,6 @@ import net.minecraft.util.BlockPos;
 import com.mojang.authlib.GameProfile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -64,28 +63,20 @@ public class CommandSilence extends STCommand {
 
     @Override
     public void processCommand(final ICommandSender sender, final String[] args) throws CommandException {
-        if (args.length == 2) {
-            Optional<GameProfile> gameProfile = ServerUtils.getGameProfile(args[1]);
-            if (!gameProfile.isPresent()) {
-                throw new PlayerNotFoundException();
-            }
-
-            final UUID uuid = gameProfile.get().getId();
-
-            if ("add".equals(args[0])) {
-                if (silenceHandler.addSilence(uuid)) {
-                    notifyOperators(sender, this, "Silenced %s", args[1]);
-                } else {
-                    throw new CommandException("That player is already silenced");
-                }
-            } else if ("remove".equals(args[0])) {
-                if (silenceHandler.removeSilence(uuid)) {
-                    notifyOperators(sender, this, "Removed silence on %s", args[1]);
-                } else {
-                    throw new CommandException("That player was not silenced");
-                }
+        if (args.length != 2) throw new WrongUsageException(getCommandUsage(sender));
+        GameProfile gameProfile = ServerUtils.getGameProfile(args[1]).orElseThrow(PlayerNotFoundException::new);
+        final UUID uuid = gameProfile.getId();
+        if ("add".equals(args[0])) {
+            if (silenceHandler.addSilence(uuid)) {
+                notifyOperators(sender, this, "Silenced %s", args[1]);
             } else {
-                throw new WrongUsageException(getCommandUsage(sender));
+                throw new CommandException("That player is already silenced");
+            }
+        } else if ("remove".equals(args[0])) {
+            if (silenceHandler.removeSilence(uuid)) {
+                notifyOperators(sender, this, "Removed silence on %s", args[1]);
+            } else {
+                throw new CommandException("That player was not silenced");
             }
         } else {
             throw new WrongUsageException(getCommandUsage(sender));

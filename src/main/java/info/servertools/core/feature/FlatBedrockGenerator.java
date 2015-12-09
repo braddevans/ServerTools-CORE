@@ -26,6 +26,7 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.fml.common.IWorldGenerator;
 
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class FlatBedrockGenerator implements IWorldGenerator {
 
@@ -35,24 +36,23 @@ public class FlatBedrockGenerator implements IWorldGenerator {
 
         final boolean isNether = "hell".equals(world.getBiomeGenForCoords(new BlockPos(chunkX, 0, chunkZ)).biomeName.toLowerCase());
 
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                for (int y = 1; y < 5; y++) {
-                    BlockPos pos = new BlockPos(chunkX * 16 + x, y, chunkZ * 16 + z);
-                    if (world.getBlockState(pos).getBlock() == Blocks.bedrock) {
-                        world.setBlockState(pos, isNether ? Blocks.netherrack.getDefaultState() : Blocks.stone.getDefaultState(), 2);
-                    }
-                }
+        IntStream.range(0, 16).forEach(x -> IntStream.range(0, 16).forEach(z -> {
 
-                if (isNether) {
-                    for (int y = 121; y < 127; y++) {
-                        BlockPos pos = new BlockPos(chunkX * 16 + x, y, chunkZ * 16 + z);
-                        if (world.getBlockState(pos).getBlock() == Blocks.bedrock) {
-                            world.setBlockState(pos, Blocks.netherrack.getDefaultState(), 2);
-                        }
-                    }
+            IntStream.range(1, 5).forEach(y -> {
+                final BlockPos pos = new BlockPos(chunkX * 16 + x, y, chunkZ * 16 + z);
+                if (world.getBlockState(pos).getBlock() == Blocks.bedrock) {
+                    world.setBlockState(pos, isNether ? Blocks.netherrack.getDefaultState() : Blocks.stone.getDefaultState(), 2);
                 }
+            });
+
+            if (isNether) {
+                IntStream.range(121, 127).forEach(y -> {
+                    final BlockPos pos = new BlockPos(chunkX * 16 + x, y, chunkZ * 16 + z);
+                    if (world.getBlockState(pos).getBlock() == Blocks.bedrock) {
+                        world.setBlockState(pos, Blocks.netherrack.getDefaultState(), 2);
+                    }
+                });
             }
-        }
+        }));
     }
 }
