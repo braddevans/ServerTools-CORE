@@ -47,7 +47,6 @@ if (System.getenv().'BUILD_NUMBER' != null) {
 
 minecraft {
     runDir = 'run'
-    makeObfSourceJar = false
 }
 
 [jar, sourceJar, shadowJar]*.exclude 'log4j2-test.xml'
@@ -113,4 +112,8 @@ license {
 tasks.withType(JavaCompile) { task ->
     task.options.encoding = 'UTF-8'
     task.options.fork = true
+}
+
+if (project.hasProperty('changelog')) {
+    println "Changelog: $project.changelog"
 }
