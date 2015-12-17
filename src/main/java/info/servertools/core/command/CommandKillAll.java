@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,12 +35,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
+@Command(
+        name = "killall",
+        requiredPermissionLevel = STCommand.PERMISSION_OPERATOR
+)
 public class CommandKillAll extends STCommand {
-
-    public CommandKillAll() {
-        super("killall");
-        setPermissionLevel(PERMISSION_OPERATOR);
-    }
 
     @Override
     public String getCommandUsage(final ICommandSender sender) {

@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 package info.servertools.core.command;
 
+import info.servertools.core.feature.Features;
 import info.servertools.core.ServerToolsCore;
 import info.servertools.core.feature.TeleportHandler;
 import info.servertools.core.util.Location;
@@ -33,14 +34,17 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+@Command(
+        name = "teleport",
+        requiredPermissionLevel = STCommand.PERMISSION_EVERYONE,
+        requiredFeatures = { TeleportHandler.class }
+)
 public class CommandTeleport extends STCommand {
 
     private final TeleportHandler teleportHandler;
 
-    public CommandTeleport(final TeleportHandler teleportHandler) {
-        super("teleport");
-        this.teleportHandler = teleportHandler;
-        setPermissionLevel(PERMISSION_EVERYONE);
+    public CommandTeleport() {
+        this.teleportHandler = Features.getService(TeleportHandler.class).get();
     }
 
     @Override
@@ -59,7 +63,7 @@ public class CommandTeleport extends STCommand {
         if (args.length != 1) throw new WrongUsageException(getCommandUsage(sender));
         final EntityPlayerMP player = requirePlayer(sender);
         final Location teleport = teleportHandler.getTeleport(args[0]).orElseThrow(() -> new CommandException("That teleport doesn't exist"));
-        if (!ServerToolsCore.getConfig().getTeleport().isCrossDimTeleportEnabled()
+        if (!ServerToolsCore.instance().getConfig().getTeleport().isCrossDimTeleportEnabled()
                 && teleport.getDim() != player.worldObj.provider.getDimensionId()) {
             throw new CommandException("Teleporting to a different dimension is disabled");
         }

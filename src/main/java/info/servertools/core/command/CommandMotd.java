@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,23 @@
  */
 package info.servertools.core.command;
 
+import info.servertools.core.feature.Features;
 import info.servertools.core.feature.Motd;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 
+@Command(
+        name = "motd",
+        requiredPermissionLevel = STCommand.PERMISSION_EVERYONE,
+        requiredFeatures = { Motd.class }
+)
 public class CommandMotd extends STCommand {
 
     private final Motd motd;
 
-    public CommandMotd(final Motd motd) {
-        super("motd");
-        this.motd = motd;
-        setPermissionLevel(PERMISSION_EVERYONE);
+    public CommandMotd() {
+        this.motd = Features.getService(Motd.class).get();
     }
 
     @Override

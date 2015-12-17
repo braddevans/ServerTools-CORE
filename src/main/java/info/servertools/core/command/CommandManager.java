@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@
  */
 package info.servertools.core.command;
 
-import static java.util.Objects.requireNonNull;
-
+import info.servertools.core.feature.Features;
 import info.servertools.core.ServerToolsCore;
 
 import net.minecraft.command.CommandHandler;
@@ -29,6 +28,11 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.LoaderException;
+import net.minecraftforge.fml.common.ModClassLoader;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.common.discovery.ASMDataTable;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -44,30 +48,44 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * ServerTools Command Manager. Register commands using {@link #registerCommand(STCommand)}
+ * ServerTools Command Manager
  */
 public final class CommandManager {
 
     private static final Logger log = LogManager.getLogger();
 
-    private static final Pattern validCommandPattern = Pattern.compile("[a-zA-Z0-9_\\-]+");
-
-    private static final Collection<STCommand> commands = new ArrayList<>();
-
     private static final String HEADER =
             "This configuration file can be used to: disable, rename, and change required permission level for ServerTools commands. " +
                     "Command names must match the REGEX [a-zA-Z0-9_\\-]";
-    private static Path configFile;
-    private static HoconConfigurationLoader loader;
-    private static CommentedConfigurationNode node = SimpleCommentedConfigurationNode.root();
 
-    /**
-     * Register a {@linkplain STCommand} with ServerTools. This will handle registration with Minecraft internally.
-     *
-     * @param command The command to register
-     */
-    public static void registerCommand(final STCommand command) {
-        requireNonNull(command, "command");
+    private static final Pattern validCommandPattern = Pattern.compile("[a-zA-Z0-9_\\-]+");
+
+    private final Collection<STCommand> commands = new ArrayList<>();
+
+    private Path configFile;
+    private HoconConfigurationLoader loader;
+    private CommentedConfigurationNode node = SimpleCommentedConfigurationNode.root();
+
+    public CommandManager(final Path configFile) {
+        this.configFile = configFile;
+        try {
+            if (!Files.exists(configFile.getParent())) {
+                Files.createDirectories(configFile.getParent());
+            }
+            if (!Files.exists(configFile)) {
+                Files.createFile(configFile);
+            }
+
+            loader = HoconConfigurationLoader.builder().setFile(configFile.toFile()).build();
+            node = loader.load(ConfigurationOptions.defaults().setHeader(HEADER));
+
+        } catch (IOException e) {
+            log.fatal("Failed to initialize command manager");
+            throw new LoaderException(e);
+        }
+    }
+
+    private void registerCommand(final STCommand command, final Command commandAnnotation) {
         log.trace("registerCommand {}", command);
 
         CommentedConfigurationNode commandNode = node.getNode(command.getClass().getName());
@@ -75,35 +93,31 @@ public final class CommandManager {
         CommentedConfigurationNode nameNode = commandNode.getNode("command-name");
         CommentedConfigurationNode permNode = commandNode.getNode("permission-level");
 
-        if (enableNode.isVirtual() || enableNode.getValue() == null) {
-            enableNode.setValue(true);
-        }
-        if (nameNode.isVirtual() || nameNode.getValue() == null) {
-            nameNode.setValue(command.getDefaultName());
-        }
-        if (permNode.isVirtual() || permNode.getValue() == null) {
-            permNode.setValue(command.getRequiredPermissionLevel());
-        }
+        if (enableNode.isVirtual() || enableNode.getValue() == null) { enableNode.setValue(true); }
+        if (nameNode.isVirtual() || nameNode.getValue() == null) { nameNode.setValue(commandAnnotation.name()); }
+        if (permNode.isVirtual() || permNode.getValue() == null) { permNode.setValue(commandAnnotation.requiredPermissionLevel()); }
 
         enableNode.setComment("Set to false to disable this command");
-        nameNode.setComment("Default name: " + command.getDefaultName());
+        nameNode.setComment("Default name: " + commandAnnotation.name());
         permNode.setComment("The required permission level for this command. 0 is everyone. 1+ requires some level of OP");
 
         final String name = nameNode.getString();
-        command.setName(name);
 
         if (!validCommandPattern.matcher(name).matches()) {
             throw new RuntimeException(String.format("Command %s was configured with an invald name: %s", command, name));
         }
-        if (!command.getDefaultName().equals(name)) {
-            log.info("Command {} was renamed from {} to {}", command, command.getDefaultName(), command.getCommandName());
+
+        ReflectionHelper.setPrivateValue(STCommand.class, command, name, "name");
+
+        if (!commandAnnotation.name().equals(name)) {
+            log.info("Command {} was renamed from {} to {}", command, commandAnnotation.name(), command.getCommandName());
         }
 
         final int permLevel = permNode.getInt();
-        if (permLevel != command.getRequiredPermissionLevel()) {
-            log.info("Changing permission level of {} from {} to {}", command, command.getRequiredPermissionLevel(), permLevel);
-            command.setPermissionLevel(permLevel);
+        if (permLevel != commandAnnotation.requiredPermissionLevel()) {
+            log.info("Changing permission level of {} from {} to {}", command, commandAnnotation.requiredPermissionLevel(), permLevel);
         }
+        ObfuscationReflectionHelper.setPrivateValue(STCommand.class, command, permLevel, "permissionLevel");
 
         if (enableNode.getBoolean(true)) {
             commands.add(command);
@@ -113,7 +127,47 @@ public final class CommandManager {
         saveConfig();
     }
 
-    private static void saveConfig() {
+    public void gatherCommands(final ASMDataTable dataTable) {
+        final ModClassLoader modClassLoader = Loader.instance().getModClassLoader();
+
+        mainLoop:
+        for (final ASMDataTable.ASMData data : dataTable.getAll(Command.class.getName())) {
+            try {
+                Class<?> clazz = Class.forName(data.getClassName(), true, modClassLoader);
+                if (!STCommand.class.isAssignableFrom(clazz)) {
+                    throw new RuntimeException("Class: " + clazz.getName() + " is annotated with @Command, but doesn't extend STCommand!");
+                }
+
+                final Class<? extends STCommand> commandClass = clazz.asSubclass(STCommand.class);
+                final Command commandAnnotation = commandClass.getAnnotation(Command.class);
+
+                for (final Class<?> featureClass : commandAnnotation.requiredFeatures()) {
+                    if (Features.isRegistered(featureClass)) {
+                        log.info("Service present");
+                    } else {
+                        log.info("Not registering command {} becuase one of its required features was not enabled. Service: {}", data.getClassName(), featureClass.getName());
+                        continue mainLoop;
+                    }
+                }
+
+                final STCommand command = commandClass.newInstance();
+
+                registerCommand(command, commandAnnotation);
+
+            } catch (ClassNotFoundException e) {
+                log.fatal("Class {} could not be found", data.getClassName());
+                throw new Error(e);
+            } catch (InstantiationException e) {
+                log.error("Command class {} doesn't have a no-arg constructor", data.getClassName());
+                throw new RuntimeException("No no-arg constructor", e);
+            } catch (IllegalAccessException e) {
+                log.error("Command class {} doesn't have a public no-arg constructor", data.getClassName());
+                throw new RuntimeException("No public constructor", e);
+            }
+        }
+    }
+
+    private void saveConfig() {
         try {
             loader.save(node);
         } catch (IOException e) {
@@ -121,7 +175,7 @@ public final class CommandManager {
         }
     }
 
-    private static void overrideHelp(final CommandHandler commandHandler) {
+    private void overrideHelp(final CommandHandler commandHandler) {
         if (Loader.isModLoaded("HelpFixer")) {
             log.trace("HelpFixer detected. Not overriding /help");
         } else {
@@ -153,40 +207,14 @@ public final class CommandManager {
     /**
      * <em>Internal Use Only!</em>
      *
-     * @param configFile The configFile
-     *
-     * @throws IOException IOException
-     */
-    public static void init(final Path configFile) throws IOException {
-        CommandManager.configFile = configFile;
-        try {
-            if (!Files.exists(configFile.getParent())) {
-                Files.createDirectories(configFile.getParent());
-            }
-            if (!Files.exists(configFile)) {
-                Files.createFile(configFile);
-            }
-
-            loader = HoconConfigurationLoader.builder().setFile(configFile.toFile()).build();
-            node = loader.load(ConfigurationOptions.defaults().setHeader(HEADER));
-
-        } catch (IOException e) {
-            log.fatal("Failed to initialize command manager");
-            throw e;
-        }
-    }
-
-    /**
-     * <em>Internal Use Only!</em>
-     *
      * @param server The server
      */
-    public static void doRegister(final MinecraftServer server) {
+    public void doRegister(final MinecraftServer server) {
         log.trace("Registering commands with Minecraft...");
         CommandHandler commandHandler = (CommandHandler) server.getCommandManager();
         commands.forEach(commandHandler::registerCommand);
 
-        if (ServerToolsCore.getConfig().getGeneral().isHelpOverrideEnabled()) {
+        if (ServerToolsCore.instance().getConfig().getGeneral().isHelpOverrideEnabled()) {
             overrideHelp(commandHandler);
         }
     }

@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,16 +38,23 @@ import java.util.List;
 
 public class Motd {
 
+    private static final Logger log = LogManager.getLogger();
+
     private final Path file;
     private List<String> lines = new ArrayList<>();
 
-    public Motd(final Path file) throws IOException {
-        this.file = file;
-        if (!Files.exists(file.getParent())) {
-            Files.createDirectories(file.getParent());
+    public Motd(final Path file) {
+        try {
+            this.file = file;
+            if (!Files.exists(file.getParent())) {
+                Files.createDirectories(file.getParent());
+            }
+            load();
+            save();
+        } catch (IOException e) {
+            log.error("Failed to create MOTD", e);
+            throw new RuntimeException(e);
         }
-        load();
-        save();
     }
 
     private void load() throws IOException {

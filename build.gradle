@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 buildscript {
     repositories {
         jcenter()
@@ -19,8 +21,8 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = '3.0.0'
-minecraft.version = '1.8.8-11.15.0.1611-1.8.8'
-minecraft.mappings = 'snapshot_20151208'
+minecraft.version = '1.8.8-11.15.0.1634-1.8.8'
+minecraft.mappings = 'snapshot_20151215'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -30,8 +32,7 @@ repositories {
 }
 
 dependencies {
-    // TODO: Forge ships an older version of hocon-config. Need to figure out how to handle this
-    compile(group: 'ninja.leaping.configurate', name: 'configurate-hocon', version: '3.0') {
+    compile(group: 'ninja.leaping.configurate', name: 'configurate-hocon', version: '3.1') {
         exclude module: 'guava'
     }
 
@@ -45,20 +46,25 @@ if (System.getenv().'BUILD_NUMBER' != null) {
     version += ".0"
 }
 
-minecraft {
-    runDir = 'run'
-}
-
-[jar, sourceJar, shadowJar]*.exclude 'log4j2-test.xml'
+def commonManifest = [
+        'Built-By'              : System.properties['user.name'],
+        'Created-By'            : "${System.properties['java.version']} (${System.properties['java.vendor']})",
+        'Implementation-Title'  : project.name,
+        'Implementation-Version': project.version
+]
 
 jar {
     classifier = 'nodeps'
+    manifest.mainAttributes(commonManifest)
 }
 
+def repackPackage = 'info.servertools.repack'
 shadowJar {
     classifier = '' // This is now the main jar
-    relocate 'ninja.leaping.configurate', 'info.servertools.repack.ninja.leaping.configurate'
-    relocate 'com.typesafe.config', 'info.servertools.repack.com.typesafe.config'
+    relocate 'ninja.leaping.configurate', "${repackPackage}.ninja.leaping.configurate"
+    relocate 'com.typesafe.config', "${repackPackage}.com.typesafe.config"
+
+    manifest.mainAttributes(commonManifest)
 }
 
 reobf {
@@ -95,13 +101,13 @@ processResources {
 }
 
 license {
-    ext.name = project.name
-    ext.organization = project.organization
-    ext.year = project.inceptionYear
-    ext.url = project.url
-    exclude '**/*.info'
-    exclude '**/*.properties'
-    exclude '**/*.cfg'
+    ext {
+        name = project.name
+        organization = project.organization
+        year = new SimpleDateFormat("yyyy").format(new Date())
+        url = project.url
+    }
+    include '**/*.java'
     header = file('HEADER.txt')
     sourceSets = project.sourceSets
     ignoreFailures = false

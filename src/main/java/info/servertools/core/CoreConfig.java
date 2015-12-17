@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,12 +73,19 @@ public class CoreConfig {
         @Setting(value = "enable-motd", comment = "Enable a message of the day sent to users when they log in")
         private boolean motdEnabled = true;
 
+        @Setting(value = "enable-silence", comment = "Enable the ability to silence players in chat")
+        private boolean silenceEnabled = true;
+
         @Setting(value = "additional-silence-banned-commands",
                 comment = "Additional class names to ban when users are silenced. The built in vanilla commands are already banned")
         private List<String> additionalSilenceCommands = new ArrayList<>();
 
         public boolean isMotdEnabled() {
             return motdEnabled;
+        }
+
+        public boolean isSilenceEnabled() {
+            return silenceEnabled;
         }
 
         public List<String> getAdditionalSilenceCommands() {

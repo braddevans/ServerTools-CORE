@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,11 +51,8 @@ public class STConfig<T> {
      *
      * @param file  The file to save to
      * @param clazz The type that holds the configuration values
-     *
-     * @throws IOException            If a problem occurs reading or writing to and from disk
-     * @throws ObjectMappingException If a problem occurs serializing or deserializing data
      */
-    public STConfig(final Path file, final Class<T> clazz) throws IOException, ObjectMappingException {
+    public STConfig(final Path file, final Class<T> clazz) {
         this.file = file;
         try {
             if (!Files.exists(file.getParent())) {
@@ -73,7 +70,7 @@ public class STConfig<T> {
             save();
         } catch (Exception e) {
             log.error("Failed to create config file {}", file, e);
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 

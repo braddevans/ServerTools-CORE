@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
  * Base class for all ServerTools commands. A user-facing configuration file can be edited to rename, disable, and change required permission level
  * for any command that implements this.
  * <p>
- * <b>Do not</b> register these commands with Minecraft yourself. Instead regsiter with {@link CommandManager#registerCommand(STCommand)}
+ * <b>Do not</b> register these commands with Minecraft yourself. Instead annotate them with {@link Command} and they will be auto-registered.
  * </p>
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({ "WeakerAccess", "unused" })
 public abstract class STCommand extends CommandBase {
 
     public static final int PERMISSION_EVERYONE = 0;
@@ -43,22 +43,8 @@ public abstract class STCommand extends CommandBase {
     public static final int PERMISSION_ADMIN = 3;
     public static final int PERMISSION_SUPERADMIN = 4;
 
-    private final String defaultName;
-    private String name;
-    private int permissionLevel = PERMISSION_SUPERADMIN;
-
-    protected STCommand(final String defaultName) {
-        this.defaultName = requireNonNull(defaultName, "defaultName");
-    }
-
-    /**
-     * Get the default name of the command
-     *
-     * @return The default name
-     */
-    public final String getDefaultName() {
-        return this.defaultName;
-    }
+    private String name; // Will be reflectively set
+    private int permissionLevel; // Will be reflectively set
 
     /**
      * Get the registered name of the command. This can be changed via a configuraion file
@@ -70,17 +56,9 @@ public abstract class STCommand extends CommandBase {
         return this.name;
     }
 
-    void setName(final String name) {
-        this.name = name;
-    }
-
     @Override
     public final int getRequiredPermissionLevel() {
         return this.permissionLevel;
-    }
-
-    protected void setPermissionLevel(final int permissionLevel) {
-        this.permissionLevel = permissionLevel;
     }
 
     @Override
@@ -97,7 +75,6 @@ public abstract class STCommand extends CommandBase {
     @Override
     public String toString() {
         return "STCommand{" +
-                "defaultName='" + defaultName + '\'' +
                 ", name='" + name + '\'' +
                 ", permissionLevel=" + permissionLevel +
                 '}';

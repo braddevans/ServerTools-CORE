@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 package info.servertools.core.command;
 
+import info.servertools.core.feature.Features;
 import info.servertools.core.feature.SilenceHandler;
 import info.servertools.core.util.ServerUtils;
 
@@ -34,14 +35,17 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+@Command(
+        name = "silence",
+        requiredPermissionLevel = STCommand.PERMISSION_OPERATOR,
+        requiredFeatures = { SilenceHandler.class }
+)
 public class CommandSilence extends STCommand {
 
     private final SilenceHandler silenceHandler;
 
-    public CommandSilence(final SilenceHandler silenceHandler) {
-        super("silence");
-        this.silenceHandler = silenceHandler;
-        setPermissionLevel(PERMISSION_OPERATOR);
+    public CommandSilence() {
+        this.silenceHandler = Features.getService(SilenceHandler.class).get();
     }
 
     @Override

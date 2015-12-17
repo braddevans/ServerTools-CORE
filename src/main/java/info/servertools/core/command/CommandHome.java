@@ -1,8 +1,8 @@
 /*
  * This file is a part of ServerTools <http://servertools.info>
  *
- * Copyright (c) 2014 ServerTools
- * Copyright (c) 2014 contributors
+ * Copyright (c) 2015 ServerTools
+ * Copyright (c) 2015 contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 package info.servertools.core.command;
 
+import info.servertools.core.feature.Features;
 import info.servertools.core.feature.HomeHandler;
 import info.servertools.core.util.Location;
 import info.servertools.core.util.PlayerUtils;
@@ -28,14 +29,17 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 
+@Command(
+        name = "home",
+        requiredPermissionLevel = STCommand.PERMISSION_EVERYONE,
+        requiredFeatures = { HomeHandler.class }
+)
 public class CommandHome extends STCommand {
 
     private final HomeHandler homeHandler;
 
-    public CommandHome(final HomeHandler homeHandler) {
-        super("home");
-        this.homeHandler = homeHandler;
-        setPermissionLevel(PERMISSION_EVERYONE);
+    public CommandHome() {
+        this.homeHandler = Features.getService(HomeHandler.class).get();
     }
 
     @Override
