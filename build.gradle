@@ -21,8 +21,8 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = '3.0.0'
-minecraft.version = '1.8.8-11.15.0.1634-1.8.8'
-minecraft.mappings = 'snapshot_20151215'
+minecraft.version = '1.8.9-11.15.0.1663'
+minecraft.mappings = 'snapshot_20151230'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
