@@ -43,7 +43,8 @@ import java.nio.file.Path;
         name = Constants.MOD_NAME,
         dependencies = Constants.DEPENDENCIES,
         acceptableRemoteVersions = "*", // Don't require mod on client
-        acceptedMinecraftVersions = '[' + Constants.MC_VERSION + ']'
+        acceptedMinecraftVersions = '[' + Constants.MC_VERSION + ']',
+        updateJSON = Constants.UPDATE_JSON_URL
 )
 public final class ServerToolsCore {
 

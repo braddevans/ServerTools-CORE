@@ -32,5 +32,7 @@ public final class Constants {
     public static final String CHARSET_NAME = "UTF-8";
     public static final Charset CHARSET = Charset.forName(CHARSET_NAME);
 
+    public static final String UPDATE_JSON_URL = "http://files.minecraftforge.net/maven/info/servertools/core/ServerTools-CORE/promotions_slim.json";
+
     private Constants() {}
 }
