@@ -104,7 +104,7 @@ license {
     ext {
         name = project.name
         organization = project.organization
-        year = new SimpleDateFormat("yyyy").format(new Date())
+        year = project.inceptionYear
         url = project.url
     }
     include '**/*.java'
