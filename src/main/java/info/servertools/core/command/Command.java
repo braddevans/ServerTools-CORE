@@ -38,11 +38,11 @@ public @interface Command {
     String name();
 
     /**
-     * The required permission level to execute this command. This value can be changed via a user-facing configuration file.
+     * Get if server operator status is required to execute the command. This can be changed via a user-facing configuration file.
      *
-     * @return The required permission level
+     * @return If op is required
      */
-    int requiredPermissionLevel();
+    boolean opRequired();
 
     /**
      * An array of feature classes that must be enabled for this command to be enabled. If all of the features are not available, the command will

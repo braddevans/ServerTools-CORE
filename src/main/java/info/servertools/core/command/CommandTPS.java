@@ -32,7 +32,7 @@ import java.text.DecimalFormat;
 
 @Command(
         name = "tps",
-        requiredPermissionLevel = STCommand.PERMISSION_OPERATOR
+        opRequired = false
 )
 public class CommandTPS extends STCommand {
 

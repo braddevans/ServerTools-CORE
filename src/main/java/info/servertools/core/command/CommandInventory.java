@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 
 @Command(
         name = "inventory",
-        requiredPermissionLevel = STCommand.PERMISSION_OPERATOR
+        opRequired = true
 )
 public class CommandInventory extends STCommand {
 

@@ -37,7 +37,7 @@ import javax.annotation.Nullable;
 
 @Command(
         name = "silence",
-        requiredPermissionLevel = STCommand.PERMISSION_OPERATOR,
+        opRequired = true,
         requiredFeatures = { SilenceHandler.class }
 )
 public class CommandSilence extends STCommand {

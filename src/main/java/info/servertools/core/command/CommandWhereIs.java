@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 
 @Command(
         name = "whereis",
-        requiredPermissionLevel = STCommand.PERMISSION_EVERYONE
+        opRequired = false
 )
 public class CommandWhereIs extends STCommand {
 

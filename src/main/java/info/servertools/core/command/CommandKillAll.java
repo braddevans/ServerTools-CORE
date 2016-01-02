@@ -37,7 +37,7 @@ import javax.annotation.Nullable;
 
 @Command(
         name = "killall",
-        requiredPermissionLevel = STCommand.PERMISSION_OPERATOR
+        opRequired = true
 )
 public class CommandKillAll extends STCommand {
 

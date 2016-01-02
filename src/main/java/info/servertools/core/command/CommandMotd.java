@@ -26,7 +26,7 @@ import net.minecraft.command.ICommandSender;
 
 @Command(
         name = "motd",
-        requiredPermissionLevel = STCommand.PERMISSION_EVERYONE,
+        opRequired = false,
         requiredFeatures = { Motd.class }
 )
 public class CommandMotd extends STCommand {

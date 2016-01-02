@@ -23,6 +23,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.MathHelper;
 
+import net.minecraftforge.common.DimensionManager;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import com.mojang.authlib.GameProfile;
 
@@ -180,7 +182,6 @@ public final class ServerUtils {
      */
     public static boolean isEffectiveOp(final GameProfile gameProfile) {
         return server.getConfigurationManager().canSendCommands(gameProfile);
-
     }
 
     /**

@@ -31,7 +31,7 @@ import net.minecraft.util.ChatComponentText;
 
 @Command(
         name = "home",
-        requiredPermissionLevel = STCommand.PERMISSION_EVERYONE,
+        opRequired = false,
         requiredFeatures = { HomeHandler.class }
 )
 public class CommandHome extends STCommand {

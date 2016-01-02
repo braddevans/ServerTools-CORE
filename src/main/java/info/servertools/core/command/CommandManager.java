@@ -91,15 +91,15 @@ public final class CommandManager {
         CommentedConfigurationNode commandNode = node.getNode(command.getClass().getName());
         CommentedConfigurationNode enableNode = commandNode.getNode("enable-command");
         CommentedConfigurationNode nameNode = commandNode.getNode("command-name");
-        CommentedConfigurationNode permNode = commandNode.getNode("permission-level");
+        CommentedConfigurationNode permNode = commandNode.getNode("op-required");
 
         if (enableNode.isVirtual() || enableNode.getValue() == null) { enableNode.setValue(true); }
         if (nameNode.isVirtual() || nameNode.getValue() == null) { nameNode.setValue(commandAnnotation.name()); }
-        if (permNode.isVirtual() || permNode.getValue() == null) { permNode.setValue(commandAnnotation.requiredPermissionLevel()); }
+        if (permNode.isVirtual() || permNode.getValue() == null) { permNode.setValue(commandAnnotation.opRequired()); }
 
         enableNode.setComment("Set to false to disable this command");
         nameNode.setComment("Default name: " + commandAnnotation.name());
-        permNode.setComment("The required permission level for this command. 0 is everyone. 1+ requires some level of OP");
+        permNode.setComment("If server operator status is needed to execute the command");
 
         final String name = nameNode.getString();
 
@@ -113,11 +113,8 @@ public final class CommandManager {
             log.info("Command {} was renamed from {} to {}", command, commandAnnotation.name(), command.getCommandName());
         }
 
-        final int permLevel = permNode.getInt();
-        if (permLevel != commandAnnotation.requiredPermissionLevel()) {
-            log.info("Changing permission level of {} from {} to {}", command, commandAnnotation.requiredPermissionLevel(), permLevel);
-        }
-        ObfuscationReflectionHelper.setPrivateValue(STCommand.class, command, permLevel, "permissionLevel");
+        final boolean opRequired = permNode.getBoolean(commandAnnotation.opRequired());
+        ObfuscationReflectionHelper.setPrivateValue(STCommand.class, command, opRequired, "opRequired");
 
         if (enableNode.getBoolean(true)) {
             commands.add(command);

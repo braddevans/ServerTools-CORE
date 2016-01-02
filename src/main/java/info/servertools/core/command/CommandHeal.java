@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 
 @Command(
         name = "heal",
-        requiredPermissionLevel = STCommand.PERMISSION_OPERATOR
+        opRequired = true
 )
 public class CommandHeal extends STCommand {
 

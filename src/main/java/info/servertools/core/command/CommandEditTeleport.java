@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
 
 @Command(
         name = "editteleport",
-        requiredPermissionLevel = STCommand.PERMISSION_OPERATOR,
+        opRequired = true,
         requiredFeatures = { TeleportHandler.class }
 )
 public class CommandEditTeleport extends STCommand {

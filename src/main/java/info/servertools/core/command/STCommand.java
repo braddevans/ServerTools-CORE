@@ -37,14 +37,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 @SuppressWarnings({ "WeakerAccess", "unused" })
 public abstract class STCommand extends CommandBase {
 
-    public static final int PERMISSION_EVERYONE = 0;
-    public static final int PERMISSION_BYPASS_SPAWN = 1;
-    public static final int PERMISSION_OPERATOR = 2;
-    public static final int PERMISSION_ADMIN = 3;
-    public static final int PERMISSION_SUPERADMIN = 4;
-
+    @SuppressWarnings("NullableProblems")
     private String name; // Will be reflectively set
-    private int permissionLevel; // Will be reflectively set
+    private boolean opRequired; // Will be reflectively set
 
     /**
      * Get the registered name of the command. This can be changed via a configuraion file
@@ -58,29 +53,32 @@ public abstract class STCommand extends CommandBase {
 
     @Override
     public final int getRequiredPermissionLevel() {
-        return this.permissionLevel;
+        return this.opRequired ? 4 : 0;
+    }
+
+    public final boolean isOpRequired() {
+        return opRequired;
     }
 
     @Override
     public boolean canCommandSenderUseCommand(final ICommandSender sender) {
-        if (sender instanceof EntityPlayerMP) {
-            final EntityPlayerMP player = ((EntityPlayerMP) sender);
-            final int permLevel = getRequiredPermissionLevel();
-            return permLevel == 0 || ServerUtils.isEffectiveOp(player.getGameProfile());
-        } else {
+        if (!opRequired || !(sender instanceof EntityPlayerMP)) {
             return true;
+        } else {
+            final EntityPlayerMP player = ((EntityPlayerMP) sender);
+            return ServerUtils.isEffectiveOp(player.getGameProfile());
         }
     }
 
     @Override
     public String toString() {
         return "STCommand{" +
-                ", name='" + name + '\'' +
-                ", permissionLevel=" + permissionLevel +
+                "name='" + name + '\'' +
+                ", opRequired=" + opRequired +
                 '}';
     }
 
-/* ---------- Utilities ---------- */
+    /* ---------- Utilities ---------- */
 
     /**
      * Requre that a {@linkplain ICommandSender command sender} instance be an instance of {@linkplain EntityPlayerMP}

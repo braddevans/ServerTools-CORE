@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 
 @Command(
         name = "ping",
-        requiredPermissionLevel = STCommand.PERMISSION_EVERYONE
+        opRequired = false
 )
 public class CommandPing extends STCommand {
 

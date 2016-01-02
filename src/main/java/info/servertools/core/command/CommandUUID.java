@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 
 @Command(
         name = "uuid",
-        requiredPermissionLevel = STCommand.PERMISSION_EVERYONE
+        opRequired = false
 )
 public class CommandUUID extends STCommand {
 
