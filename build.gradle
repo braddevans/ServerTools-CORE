@@ -38,7 +38,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-version = "$minecraft.version-$version"
 if (System.getenv().'BUILD_NUMBER' != null) {
     version += ".${System.getenv().'BUILD_NUMBER'}"
 } else {
@@ -55,6 +54,7 @@ def commonManifest = [
 jar {
     classifier = 'slim'
     manifest.mainAttributes(commonManifest)
+    appendix = minecraft.version
 }
 
 def repackPackage = 'info.servertools.repack'
@@ -64,6 +64,7 @@ shadowJar {
     relocate 'com.typesafe.config', "${repackPackage}.com.typesafe.config"
 
     manifest.mainAttributes(commonManifest)
+    appendix = minecraft.version
 }
 
 reobf {
@@ -136,7 +137,7 @@ uploadArchives {
 
         pom {
             groupId = project.group
-            version = project.version
+            version = "$project.minecraft.version-$project.version"
             artifactId = project.name
 
             project {
