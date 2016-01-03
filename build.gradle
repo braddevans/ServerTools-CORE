@@ -54,7 +54,6 @@ def commonManifest = [
 jar {
     classifier = 'slim'
     manifest.mainAttributes(commonManifest)
-    appendix = minecraft.version
 }
 
 def repackPackage = 'info.servertools.repack'
@@ -64,8 +63,9 @@ shadowJar {
     relocate 'com.typesafe.config', "${repackPackage}.com.typesafe.config"
 
     manifest.mainAttributes(commonManifest)
-    appendix = minecraft.version
 }
+
+[jar, shadowJar, sourceJar]*.version = "$minecraft.version-$project.version"
 
 reobf {
     shadowJar { useSrgSrg() }
