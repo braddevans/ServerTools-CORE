@@ -59,7 +59,6 @@ jar {
 def repackPackage = 'info.servertools.repack'
 shadowJar {
     classifier = '' // This is now the main jar
-    relocate 'ninja.leaping.configurate', "${repackPackage}.ninja.leaping.configurate"
     relocate 'com.typesafe.config', "${repackPackage}.com.typesafe.config"
 
     manifest.mainAttributes(commonManifest)
