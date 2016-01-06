@@ -67,7 +67,7 @@ shadowJar {
 [jar, shadowJar, sourceJar]*.version = "$minecraft.version-$project.version"
 
 reobf {
-    shadowJar { useSrgSrg() }
+    shadowJar { mappingType = 'SEARGE' }
 }
 
 tasks.build.dependsOn reobfShadowJar
