@@ -22,6 +22,7 @@ import info.servertools.core.Constants;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -88,6 +89,11 @@ public class Motd {
 
     public void serveMotd(final ICommandSender sender) {
         for (String line : lines) {
+            line = line.replace("$PLAYER$", sender.getName());
+            for (EnumChatFormatting color : EnumChatFormatting.values()) {
+                if (!color.isColor()) continue;
+                line = line.replace('$' + color.getFriendlyName().toUpperCase() + '$', color.toString());
+            }
             sender.addChatMessage(new ChatComponentText(line));
         }
     }
