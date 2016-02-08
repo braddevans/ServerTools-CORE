@@ -22,14 +22,11 @@ import info.servertools.core.util.ServerUtils;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerNotFoundException;
-import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.BlockPos;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
+import java.util.List;
 
 @Command(
         name = "heal",
@@ -55,8 +52,7 @@ public class CommandHeal extends STCommand {
 
     @Override
     public void processCommand(final ICommandSender sender, final String[] args) throws CommandException {
-        if (args.length != 1) throw new WrongUsageException(getCommandUsage(sender));
-        final EntityPlayerMP player = ServerUtils.getPlayerForUsername(args[0]).orElseThrow(PlayerNotFoundException::new);
+        EntityPlayerMP player = args.length < 1 ? getCommandSenderAsPlayer(sender) : getPlayer(sender, args[0]);
         player.heal(Float.MAX_VALUE);
         notifyOperators(sender, this, "Healed %s", player.getName());
     }
