@@ -63,6 +63,7 @@ def repackPackage = 'info.servertools.repack'
 shadowJar {
     classifier = '' // This is now the main jar
     relocate 'com.typesafe.config', "${repackPackage}.com.typesafe.config"
+    relocate 'ninja.leaping.configurate', "${repackPackage}.ninja.leaping.configurate"
 
     manifest.attributes(commonManifest)
 }
